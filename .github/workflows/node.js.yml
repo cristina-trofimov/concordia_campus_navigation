@@ -1,10 +1,4 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Node.js CI
+name: CI Pipeline
 
 on:
   push:
@@ -13,21 +7,52 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x ]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16.x, 18.x]
 
     steps:
+      # Checkout repository
       - uses: actions/checkout@v2
+
+      # Set up Node.js
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+
+      # Install dependencies
       - run: npm ci
-      - run: npm test
+
+      # Run Jest tests
+      - name: Run Jest tests
+        run: npm test
+
+  detox-tests:
+    runs-on: macos-latest # Required for iOS tests
+
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@v2
+
+      # Set up Node.js
+      - name: Use Node.js 18.x
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      # Install dependencies
+      - run: npm ci
+
+      # Build app for Detox
+      - name: Build app for Detox
+        run: npm run detox-build
+
+      # Run Detox tests
+      - name: Run Detox tests
+        run: npm run detox-test
