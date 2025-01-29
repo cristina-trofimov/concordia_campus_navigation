@@ -9,7 +9,7 @@ module.exports = {
   reporters: ['detox/runners/jest/reporter'],
   testEnvironment: 'detox/runners/jest/testEnvironment',
   verbose: true,
-  testPathIgnorePatterns:["/node_modules/","/tests"], // ignore jest
+  testPathIgnorePatterns: ["/node_modules/", "/tests"], // ignore jest
 };
 const isMac = process.platform === 'darwin';
 
@@ -36,7 +36,7 @@ module.exports = {
         },
         "app": {
           "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
-          "build": "cd android && ./gradlew assembleDebug"
+          "build": "cd android && .\\gradlew.bat assembleDebug assembleAndroidTest -DtestBuildType=debug && cd .."
         }
       } : undefined
     }
