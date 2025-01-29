@@ -58,4 +58,4 @@ jobs:
 
       # Run Detox tests
       - name: Run Detox tests
-        run: npm run detox-test
+         run: xcodebuild -workspace ios/concordia_campus_navigation.xcworkspace -scheme concordia_campus_navigation -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build
