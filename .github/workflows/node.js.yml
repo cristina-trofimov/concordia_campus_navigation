@@ -58,4 +58,4 @@ jobs:
 
       # Run Detox tests
       - name: Run Detox tests
-         run: npm run detox-test
+        run: npm run detox-test
