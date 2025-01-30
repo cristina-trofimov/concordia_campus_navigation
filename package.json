@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --config=tests/jest.config.js",
     "detox-build": "detox build --configuration android.emu.debug",
-    "detox-test": "detox test --configuration android.emu.debug",
+    "detox-test": "expo start --no-interactive & detox test --configuration android.emu.debug",
     "start": "expo start",
     "android": "expo start --android",
     "web": "expo start --web"
