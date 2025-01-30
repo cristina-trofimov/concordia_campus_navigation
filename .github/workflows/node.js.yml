@@ -56,6 +56,16 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Install Android SDK
+      - name: Install Android SDK
+        run: |
+          mkdir -p $ANDROID_HOME
+          cd $ANDROID_HOME
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip
+          unzip commandlinetools-linux-8092744_latest.zip
+          rm commandlinetools-linux-8092744_latest.zip
+          yes | ./cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;default;x86_64" "emulator"
+
       # Install dependencies
       - run: npm ci
 
