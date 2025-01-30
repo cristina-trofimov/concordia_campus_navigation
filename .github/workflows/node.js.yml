@@ -54,7 +54,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'adoptopenjdk'  # You can also use 'zulu' if preferred
+          distribution: 'temurin'  # You can also use 'zulu' if preferred
 
       # Install dependencies
       - run: npm ci
