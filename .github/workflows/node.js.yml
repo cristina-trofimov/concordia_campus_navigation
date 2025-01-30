@@ -66,6 +66,13 @@ jobs:
           rm commandlinetools-linux-8092744_latest.zip
           yes | ./cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;default;x86_64" "emulator"
 
+      # Start Emulator
+      - name: Start Emulator
+        run: |
+          emulator -avd Pixel_3a_API_30 -no-window -gpu off &
+          # Give it a few seconds to boot
+          sleep 30
+
       # Install dependencies
       - run: npm ci
 
