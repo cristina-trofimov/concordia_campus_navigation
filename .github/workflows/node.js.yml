@@ -59,6 +59,10 @@ jobs:
       # Install dependencies
       - run: npm ci
 
+      # List available Android emulators
+      - name: List available emulators
+        run: emulator -list-avds
+
       # Build app for Detox
       - name: Build app for Detox
         run: npm run detox-build
