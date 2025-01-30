@@ -32,7 +32,7 @@
         "build": "cd android && ./gradlew assembleDebug && ./gradlew assembleAndroidTest -DtestBuildType=debug",
         "type": "android.emulator",
         "device": {
-          "avdName": "Pixel_3a_API_30_AOSP"
+          "avdName": "Medium_Phone_API_35"
         }
       }
     },
