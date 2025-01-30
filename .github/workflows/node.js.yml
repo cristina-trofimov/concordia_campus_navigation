@@ -36,7 +36,7 @@ jobs:
         run: npm test
 
   detox-tests:
-    runs-on: macos-latest # Required for iOS tests
+    runs-on: windows-latest # Required for iOS tests
 
     steps:
       # Checkout repository
