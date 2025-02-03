@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import Map from './components/Map';
 
 export default function App() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:3000')
+    fetch('http://10.0.2.2:3000')
       .then(response => response.text())
       .then(data => setMessage(data))
       .catch(error => console.error('Error:', error));
@@ -13,7 +14,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to My React Native Expo App!</Text>
+      <Map />
       <Text>{message}</Text>
     </View>
   );
