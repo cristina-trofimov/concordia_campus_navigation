@@ -5,19 +5,21 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --config=tests/jest.config.js",
-    "detox-build": "detox build --configuration ios.sim.debug",
-    "detox-test": "detox test --configuration ios.sim.debug",
+    "detox-build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+    "detox-test": "detox test --configuration android.emu.debug",
     "start": "expo start",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
+    "android": "expo start --android",
     "web": "expo start --web"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "expo": "~52.0.27",
     "expo-status-bar": "~2.0.1",
     "react": "18.3.1",
     "react-native": "0.76.6",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "react-native-web": "~0.19.13",
+    "@expo/metro-runtime": "~4.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
@@ -31,11 +33,13 @@
   },
   "detox": {
     "configurations": {
-      "ios.sim.debug": {
-        "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/MyApp.app",
-        "build": "xcodebuild -workspace ios/MyApp.xcworkspace -scheme MyApp -configuration Debug -sdk iphonesimulator -derivedDataPath ios/build",
-        "type": "ios.simulator",
-        "name": "iPhone 11"
+      "android.emu.debug": {
+        "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+        "build": "cd android && ./gradlew assembleDebug && ./gradlew assembleAndroidTest -DtestBuildType=debug",
+        "type": "android.emulator",
+        "device": {
+          "avdName": "Medium_Phone_API_35"
+        }
       }
     },
     "test-runner": "jest"
