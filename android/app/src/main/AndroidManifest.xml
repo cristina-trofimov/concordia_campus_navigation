@@ -27,6 +27,5 @@
         <data android:scheme="com.cristina.trofimov143.frontend"/>
       </intent-filter>
     </activity>
-
   </application>
 </manifest>
