@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
-import React from 'react'
+import { StyleSheet, Text, View, Image } from 'react-native';
+import React from 'react';
 import MapView, { Callout, Marker } from 'react-native-maps';
 
 export default function CustomMarker({ coordinate, title, image }) {
