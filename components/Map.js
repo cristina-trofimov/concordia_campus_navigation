@@ -1,9 +1,10 @@
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polygon } from 'react-native-maps';
 import * as Location from 'expo-location';
 import CustomMarker from './CustomMarker';
 import ToggleButton from './toggleButton';
+
 
 export default function Map() {
   const sgwCoords = {
@@ -18,6 +19,9 @@ export default function Map() {
 
   const [myLocation, setMyLocation] = useState(null);
   const mapRef = useRef(null);
+  
+
+
 
   useEffect(() => {
     // Focus on SGW when the app starts
@@ -30,8 +34,9 @@ export default function Map() {
       }, 1000);
     }
 
-    _getLocation(); 
-  }, []);
+    _getLocation();
+  }
+    , []);
 
   const _getLocation = async () => {
     try {
@@ -77,9 +82,17 @@ export default function Map() {
           longitudeDelta: 0.0100,
         }}
       >
+        <Polygon coordinates={[{ latitude: 45.497709441485306, longitude: -73.5790341480075 },
+        { latitude: 45.49737298229737, longitude: -73.57833781758659 },
+        { latitude: 45.496829618863075, longitude: -73.57884950710131 },
+        { latitude: 45.49716439702004, longitude: -73.57954413762752 }]}
+          fillColor={'rgba(0, 200, 0, 0.3)'}
+          strokeWidth={1}>
+        </Polygon>
+
         {myLocation && (
           <CustomMarker
-            key={`${myLocation.latitude}-${myLocation.longitude}`} 
+            key={`${myLocation.latitude}-${myLocation.longitude}`}
             coordinate={{
               latitude: myLocation.latitude,
               longitude: myLocation.longitude,
@@ -98,10 +111,10 @@ export default function Map() {
           />
         </TouchableOpacity>
       </View>
-      console.log('Loyola Coords in Map Component:', loyolaCoords);
+
       <ToggleButton mapRef={mapRef} sgwCoords={sgwCoords} loyolaCoords={loyolaCoords} />
     </View>
-    
+
   );
 }
 
@@ -119,12 +132,12 @@ const styles = StyleSheet.create({
   buttonContainer: {
     position: 'absolute',
     bottom: 20,
-    right: 20, 
+    right: 20,
     alignItems: 'center',
   },
   buttonImage: {
-    width: 50, 
-    height: 50, 
-    resizeMode: 'contain', 
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
   },
 });
