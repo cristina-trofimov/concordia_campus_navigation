@@ -1,8 +1,9 @@
-import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native'; 
+import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import CustomMarker from './CustomMarker';
+import ToggleButton from './toggleButton';
 
 export default function Map() {
   const sgwCoords = {
@@ -11,7 +12,7 @@ export default function Map() {
   };
 
   const loyolaCoords = {
-    latitude: 45.45822972841337, 
+    latitude: 45.45822972841337,
     longitude: -73.63915818932158,
   };
 
@@ -97,7 +98,10 @@ export default function Map() {
           />
         </TouchableOpacity>
       </View>
+      console.log('Loyola Coords in Map Component:', loyolaCoords);
+      <ToggleButton mapRef={mapRef} sgwCoords={sgwCoords} loyolaCoords={loyolaCoords} />
     </View>
+    
   );
 }
 
