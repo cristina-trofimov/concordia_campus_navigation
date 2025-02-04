@@ -10,6 +10,11 @@ export default function Map() {
     longitude: -73.57794614197633,
   };
 
+  const loyolaCoords = {
+    latitude: 45.45822972841337, 
+    longitude: -73.63915818932158,
+  };
+
   const [myLocation, setMyLocation] = useState(null);
   const mapRef = useRef(null);
 
