@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native'; 
+import { Dimensions, StyleSheet, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native'; 
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
@@ -16,6 +16,7 @@ export default function Map() {
   };
 
   const [myLocation, setMyLocation] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const mapRef = useRef(null);
 
   useEffect(() => {
@@ -29,22 +30,38 @@ export default function Map() {
       }, 1000);
     }
 
-    _getLocation(); 
+    startWatchingLocation(); 
   }, []);
 
-  const _getLocation = async () => {
+  const startWatchingLocation = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
 
       if (status !== 'granted') {
         console.warn('Permission to access location was denied');
+        setIsLoading(false);
         return;
       }
 
+      // Get the initial location
       let location = await Location.getCurrentPositionAsync({});
       setMyLocation(location.coords);
+      setIsLoading(false);
+
+      // Watch for location updates
+      await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 1000,
+          distanceInterval: 10,
+        },
+        (location) => {
+          setMyLocation(location.coords);
+        }
+      );
     } catch (err) {
       console.warn(err);
+      setIsLoading(false);
     }
   };
 
@@ -65,29 +82,33 @@ export default function Map() {
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        ref={mapRef}
-        provider="google"
-        initialRegion={{
-          latitude: sgwCoords.latitude,
-          longitude: sgwCoords.longitude,
-          latitudeDelta: 0.0100,
-          longitudeDelta: 0.0100,
-        }}
-      >
-        {myLocation && (
-          <CustomMarker
-            key={`${myLocation.latitude}-${myLocation.longitude}`} 
-            coordinate={{
-              latitude: myLocation.latitude,
-              longitude: myLocation.longitude,
-            }}
-            title="My current location"
-            image={require('../assets/currentLocation-Icon.png')}
-          />
-        )}
-      </MapView>
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <MapView
+          style={styles.map}
+          ref={mapRef}
+          provider="google"
+          initialRegion={{
+            latitude: sgwCoords.latitude,
+            longitude: sgwCoords.longitude,
+            latitudeDelta: 0.0100,
+            longitudeDelta: 0.0100,
+          }}
+        >
+          {myLocation && (
+            <CustomMarker
+              key={`${myLocation.latitude}-${myLocation.longitude}`} 
+              coordinate={{
+                latitude: myLocation.latitude,
+                longitude: myLocation.longitude,
+              }}
+              title="My current location"
+              image={require('../assets/currentLocation-Icon.png')}
+            />
+          )}
+        </MapView>
+      )}
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
