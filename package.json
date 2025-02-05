@@ -8,8 +8,9 @@
     "detox-build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
     "detox-test": "detox test --configuration android.emu.debug",
     "start": "expo start",
-    "android": "expo start --android",
-    "web": "expo start --web"
+    "android": "expo run:android",
+    "web": "expo start --web",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
