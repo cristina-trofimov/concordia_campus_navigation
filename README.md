@@ -59,9 +59,9 @@ npx expo prebuild
 ```
 14. Now run the following commands. The first one may take up to 15 min $${\color{red}This \space dosen't \space work \space yet}$$
 ```
-detox build --configuration android.emu.debug $${\color{red}This \space one \space will \space run}$$
+npx detox build --configuration android.emu.debug
 ```
 ```
-detox test --configuration android.emu.debug $${\color{red}This \space one \space dosen't }$$
+npx detox test --configuration android.emu.debug
 ```
 
