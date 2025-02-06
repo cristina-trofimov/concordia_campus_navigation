@@ -1,4 +1,4 @@
-# Concordia Campus Navigation
+# Concordia Campus Navigation=-6655
 
 This project is the result of SOEN 390 course. 
 This is a mobile application that provides Concordia campus navigation with in-building navigation to classrooms and indication of points of interest (indoor and outdoor)
