@@ -2,7 +2,6 @@ import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-nat
 import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
-import CustomMarker from './CustomMarker';
 
 // Set your Mapbox access token
 Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
@@ -44,18 +43,19 @@ export default function Map() {
   const _getLocation = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
-
+      
       if (status !== 'granted') {
         console.warn('Permission to access location was denied');
         return;
       }
-
+  
       let location = await Location.getCurrentPositionAsync({});
+      console.log("User location received:", location.coords);
       setMyLocation(location.coords);
     } catch (err) {
-      console.warn(err);
+      console.warn("Error getting location:", err);
     }
-  };
+  };  
 
   const focusOnLocation = () => {
     if (!myLocation) {
@@ -103,16 +103,16 @@ export default function Map() {
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
         {myLocation && (
-          <MarkerView
+          <Mapbox.PointAnnotation
             key={`${myLocation.latitude}-${myLocation.longitude}`}
+            id="my-location"
             coordinate={[myLocation.longitude, myLocation.latitude]}
           >
-            <CustomMarker
-              title="My current location"
-              image={require('../assets/currentLocation-Icon.png')}
-              coordinate={{ latitude: myLocation.latitude, longitude: myLocation.longitude }}
+            <Image 
+              source={require('../assets/currentLocation-Icon.png')} 
+              style={{ width: 30, height: 30 }}
             />
-          </MarkerView>
+          </Mapbox.PointAnnotation>        
         )}
       </Mapbox.MapView>
 
