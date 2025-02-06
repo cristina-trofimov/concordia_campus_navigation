@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Button, ThemeProvider, createTheme } from '@rneui/themed';
 import Map from './components/Map';
+
+const theme = createTheme({
+  lightColors: {
+    primary: '#B52B20',
+    secondary: '#D15329',
+  },
+
+  mode: 'light',
+});
 
 export default function App() {
   const [message, setMessage] = useState('');
