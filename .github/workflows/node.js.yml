@@ -39,51 +39,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # Set up Node.js
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 18.x
-          cache: 'npm'
+          cache: yarn
+          node-version-file: .node-version
 
-      # Install Java 17 (for Gradle compatibility)
-      - name: Set up Java 17
+     - name: Install Yarn dependencies
+        run: yarn --frozen-lockfile --prefer-offline
+
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          cache: gradle
+          distribution: temurin
+          java-version: 17
 
-      # Install Android SDK
-      - name: Install Android SDK
-        run: |
-          mkdir -p $ANDROID_HOME
-          cd $ANDROID_HOME
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip
-          unzip commandlinetools-linux-8092744_latest.zip
-          rm commandlinetools-linux-8092744_latest.zip
-          yes | ./cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;default;x86_64" "emulator"
+      - name: Cache Detox build
+        id: cache-detox-build
+        uses: actions/cache@v3
+        with:
+          path: android/app/build
+          key: ${{ runner.os }}-detox-build
+          restore-keys: |
+            ${{ runner.os }}-detox-build
 
-      # Start Emulator
-      - name: Start Emulator
-        run: |
-          emulator -avd Pixel_3a_API_30 -no-window -gpu off &
-          # Give it a few seconds to boot
-          sleep 30
+      - name: Detox build
+        run: yarn detox build --configuration android.emu.release
 
-      # Install dependencies
-      - run: npm ci
+      - name: Get device name
+        id: device
+        run: node -e "console.log('AVD_NAME=' + require('./.detoxrc').devices.emulator.device.avdName)" >> $GITHUB_OUTPUT
 
-      # Fix Gradle permission issue
-      - name: Grant execute permission to Gradle wrapper
-        run: chmod +x android/gradlew
+      - name: Run Detox tests on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 31
+          arch: x86_64
+          avd-name: ${{ steps.device.outputs.AVD_NAME }}
+          script: yarn detox test --configuration android.emu.release --headless --record-logs all
 
-      # Build app for Detox
-      - name: Build app for Detox
-        run: npm run detox-build
-
-      # Run Detox tests
-      - name: Run Detox tests
-        run: npm run detox-test
+      - name: Upload Detox artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: detox-artifacts
+          path: artifacts
