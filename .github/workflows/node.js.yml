@@ -48,8 +48,8 @@ jobs:
           cache: yarn
           node-version-file: .node-version
 
-     - name: Install Yarn dependencies
-        run: yarn --frozen-lockfile --prefer-offline
+       - name: Install Yarn dependencies
+          run: yarn --frozen-lockfile --prefer-offline
 
       - name: Setup Java
         uses: actions/setup-java@v3
