@@ -4,6 +4,7 @@ import MapView, { Marker, Polygon } from 'react-native-maps';
 import * as Location from 'expo-location';
 import CustomMarker from './CustomMarker';
 import ToggleButton from './toggleButton';
+import PolygonBuildings from './PolygonBuildings';
 
 
 export default function Map() {
@@ -82,13 +83,7 @@ export default function Map() {
           longitudeDelta: 0.0100,
         }}
       >
-        <Polygon coordinates={[{ latitude: 45.497709441485306, longitude: -73.5790341480075 },
-        { latitude: 45.49737298229737, longitude: -73.57833781758659 },
-        { latitude: 45.496829618863075, longitude: -73.57884950710131 },
-        { latitude: 45.49716439702004, longitude: -73.57954413762752 }]}
-          fillColor={'rgba(0, 200, 0, 0.3)'}
-          strokeWidth={1}>
-        </Polygon>
+
 
         {myLocation && (
           <CustomMarker
@@ -102,6 +97,8 @@ export default function Map() {
           />
         )}
       </MapView>
+
+      <PolygonBuildings />
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
