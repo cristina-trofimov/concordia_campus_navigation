@@ -23,16 +23,23 @@ export default function Map() {
 
   useEffect(() => {
     // Focus on SGW when the app starts
-    if (cameraRef.current) {
-      cameraRef.current.setCamera({
-        center: [sgwCoords.longitude, sgwCoords.latitude],
-        zoom: 14,
-        animationDuration: 1000,
-      });
-    }
-
+    const timer = setTimeout(() => {
+      if (cameraRef.current) {
+        cameraRef.current.setCamera({
+          centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
+          zoomLevel: 17,
+          animationMode: 'flyTo',
+          animationDuration: 1000, 
+        });
+      } else {
+        console.warn("Camera reference is not available yet");
+      }
+    }, 1000); // Increased delay for stability (to make sure that MapView is loaded before setting the camera)
+  
     _getLocation();
-  }, []);
+  
+    return () => clearTimeout(timer);
+  }, []);  
 
   const _getLocation = async () => {
     try {
@@ -54,10 +61,11 @@ export default function Map() {
     if (myLocation) {
       if (cameraRef.current) {
         cameraRef.current.setCamera({
-          center: [myLocation.longitude, myLocation.latitude],
-          zoom: 14,
+          centerCoordinate: [myLocation.longitude, myLocation.latitude],
+          zoomLevel: 17,
+          animationMode: 'flyTo',
           animationDuration: 1000,
-        });
+        });        
       }
     } else {
       console.warn("User location not available yet.");
@@ -66,13 +74,28 @@ export default function Map() {
 
   return (
     <View style={styles.container}>
-      <Mapbox.MapView style={styles.map}>
-        <Camera
+      <Mapbox.MapView
+        style={styles.map}
+        onDidFinishLoadingMap={() => {
+          if (!cameraRef.current) {
+            console.warn("Camera reference not available yet.");
+            return;
+          }
+        
+          setTimeout(() => {
+            cameraRef.current?.setCamera({
+              centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
+              zoomLevel: 17,
+              animationMode: 'flyTo',
+              animationDuration: 1000,
+            });
+          }, 500); // Small delay to ensure the map is fully ready
+        }}        
+      >
+        <Camera 
           ref={cameraRef}
-          defaultSettings={{
-            center: [sgwCoords.longitude, sgwCoords.latitude],
-            zoom: 14,
-          }}
+          zoomLevel={17} 
+          centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
         {myLocation && (
           <MarkerView
