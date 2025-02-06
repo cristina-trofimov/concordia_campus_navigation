@@ -58,19 +58,24 @@ export default function Map() {
   };
 
   const focusOnLocation = () => {
-    if (myLocation) {
-      if (cameraRef.current) {
-        cameraRef.current.setCamera({
-          centerCoordinate: [myLocation.longitude, myLocation.latitude],
-          zoomLevel: 17,
-          animationMode: 'flyTo',
-          animationDuration: 1000,
-        });        
-      }
-    } else {
+    if (!myLocation) {
       console.warn("User location not available yet.");
+      return;
     }
-  };
+  
+    if (!cameraRef.current) {
+      console.warn("Camera reference is null.");
+      return;
+    }
+  
+    console.log("Focusing on location:", myLocation);
+    cameraRef.current.setCamera({
+      centerCoordinate: [myLocation.longitude, myLocation.latitude],
+      zoomLevel: 17,
+      animationMode: 'flyTo',
+      animationDuration: 1000,
+    });
+  };  
 
   return (
     <View style={styles.container}>
@@ -92,8 +97,8 @@ export default function Map() {
           }, 500); // Small delay to ensure the map is fully ready
         }}        
       >
-        <Camera 
-          ref={cameraRef}
+        <Camera
+          ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17} 
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
