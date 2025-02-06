@@ -64,6 +64,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-detox-build
 
+      - name: Grant execute permission to Gradle wrapper
+        run: chmod +x android/gradlew
+
       - name: Build app for Detox
         run: npm run detox-build
 
