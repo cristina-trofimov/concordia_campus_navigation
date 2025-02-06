@@ -1,5 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Button, ThemeProvider, createTheme } from '@rneui/themed';
+
+
+const theme = createTheme({
+  lightColors: {
+    primary: '#B52B20',
+    secondary: '#D15329',
+  },
+
+  mode: 'light',
+});
 
 export default function App() {
   const [message, setMessage] = useState('');
@@ -12,10 +24,15 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to My React Native Expo App!</Text>
-      <Text>{message}</Text>
-    </View>
+    <SafeAreaProvider>
+      <ThemeProvider theme={theme}>
+        <View style={styles.container}>
+          <Text style={styles.title}>Welcome to My React Native Expo App!</Text>
+          <Text>{message}</Text>
+          <Button onPress={() => setMessage('Hello, world!')}>Press me</Button>
+        </View>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
 
