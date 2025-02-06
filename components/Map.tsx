@@ -17,8 +17,8 @@ export default function Map() {
     longitude: -73.63915818932158,
   };
 
-  const [myLocation, setMyLocation] = useState(null);
-  const cameraRef = useRef(null);
+  const cameraRef = useRef<Camera | null>(null);
+  const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
 
   useEffect(() => {
     // Focus on SGW when the app starts
@@ -149,5 +149,10 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     resizeMode: 'contain',
+  },
+  imageButton: {
+    padding: 10,
+    backgroundColor: 'transparent',
+    borderRadius: 25,
   },
 });
