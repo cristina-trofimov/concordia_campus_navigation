@@ -9,6 +9,7 @@ def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
  * By default you don't need to apply any configuration, just uncomment the lines you need.
  */
 react {
+    root = rootProject.file("../")
     entryFile = file(["node", "-e", "require('expo/scripts/resolveAppEntry')", projectRoot, "android", "absolute"].execute(null, rootDir).text.trim())
     reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
     hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
@@ -152,6 +153,8 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     androidTestImplementation('com.wix:detox:+')
+    implementation("com.facebook.react:react-android")
+    implementation("com.facebook.react:hermes-android")
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation("com.facebook.react:react-android")
 
