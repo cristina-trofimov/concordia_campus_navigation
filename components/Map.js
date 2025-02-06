@@ -1,8 +1,11 @@
-import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native'; 
+import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import MapView, { Marker } from 'react-native-maps';
+import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
 import CustomMarker from './CustomMarker';
+
+// Set your Mapbox access token
+Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
 
 export default function Map() {
   const sgwCoords = {
@@ -11,25 +14,24 @@ export default function Map() {
   };
 
   const loyolaCoords = {
-    latitude: 45.45822972841337, 
+    latitude: 45.45822972841337,
     longitude: -73.63915818932158,
   };
 
   const [myLocation, setMyLocation] = useState(null);
-  const mapRef = useRef(null);
+  const cameraRef = useRef(null);
 
   useEffect(() => {
     // Focus on SGW when the app starts
-    if (mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude: sgwCoords.latitude,
-        longitude: sgwCoords.longitude,
-        latitudeDelta: 0.0100,
-        longitudeDelta: 0.0100,
-      }, 1000);
+    if (cameraRef.current) {
+      cameraRef.current.setCamera({
+        center: [sgwCoords.longitude, sgwCoords.latitude],
+        zoom: 14,
+        animationDuration: 1000,
+      });
     }
 
-    _getLocation(); 
+    _getLocation();
   }, []);
 
   const _getLocation = async () => {
@@ -50,13 +52,12 @@ export default function Map() {
 
   const focusOnLocation = () => {
     if (myLocation) {
-      if (mapRef.current) {
-        mapRef.current.animateToRegion({
-          latitude: myLocation.latitude,
-          longitude: myLocation.longitude,
-          latitudeDelta: 0.0100,
-          longitudeDelta: 0.0100,
-        }, 1000);
+      if (cameraRef.current) {
+        cameraRef.current.setCamera({
+          center: [myLocation.longitude, myLocation.latitude],
+          zoom: 14,
+          animationDuration: 1000,
+        });
       }
     } else {
       console.warn("User location not available yet.");
@@ -65,29 +66,27 @@ export default function Map() {
 
   return (
     <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        ref={mapRef}
-        provider="google"
-        initialRegion={{
-          latitude: sgwCoords.latitude,
-          longitude: sgwCoords.longitude,
-          latitudeDelta: 0.0100,
-          longitudeDelta: 0.0100,
-        }}
-      >
+      <Mapbox.MapView style={styles.map}>
+        <Camera
+          ref={cameraRef}
+          defaultSettings={{
+            center: [sgwCoords.longitude, sgwCoords.latitude],
+            zoom: 14,
+          }}
+        />
         {myLocation && (
-          <CustomMarker
-            key={`${myLocation.latitude}-${myLocation.longitude}`} 
-            coordinate={{
-              latitude: myLocation.latitude,
-              longitude: myLocation.longitude,
-            }}
-            title="My current location"
-            image={require('../assets/currentLocation-Icon.png')}
-          />
+          <MarkerView
+            key={`${myLocation.latitude}-${myLocation.longitude}`}
+            coordinate={[myLocation.longitude, myLocation.latitude]}
+          >
+            <CustomMarker
+              title="My current location"
+              image={require('../assets/currentLocation-Icon.png')}
+              coordinate={{ latitude: myLocation.latitude, longitude: myLocation.longitude }}
+            />
+          </MarkerView>
         )}
-      </MapView>
+      </Mapbox.MapView>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
@@ -115,12 +114,12 @@ const styles = StyleSheet.create({
   buttonContainer: {
     position: 'absolute',
     bottom: 20,
-    right: 20, 
+    right: 20,
     alignItems: 'center',
   },
   buttonImage: {
-    width: 50, 
-    height: 50, 
-    resizeMode: 'contain', 
+    width: 50,
+    height: 50,
+    resizeMode: 'contain',
   },
 });
