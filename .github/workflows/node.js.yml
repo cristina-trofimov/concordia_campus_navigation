@@ -55,6 +55,9 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Install @react-native-community/cli-platform-android
+        run: npm install @react-native-community/cli-platform-android --save-dev   
+
       - name: Cache Detox build
         id: cache-detox-build
         uses: actions/cache@v3
