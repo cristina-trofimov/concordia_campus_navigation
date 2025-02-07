@@ -44,12 +44,11 @@ jobs:
     - name: Node
       uses: actions/setup-node@v3
 
-    - name: Use specific Java version for sdkmanager to work
+    - name: Set up Java
       uses: actions/setup-java@v3
       with:
-        java-version: '8'
-        distribution: 'zulu'
-        architecture: 'x64'
+        distribution: 'temurin'
+        java-version: '17'
 
     - name: Download Android Emulator Image
       run: |
