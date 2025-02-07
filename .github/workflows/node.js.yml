@@ -75,7 +75,7 @@ jobs:
 
     - name: Start Emulator
       run: |
-        nohup $ANDROID_SDK_ROOT/emulator/emulator -avd TestEmulator -no-window -no-audio -no-boot-anim -gpu off -accel off &
+        nohup $ANDROID_SDK_ROOT/emulator/emulator -avd TestEmulator -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -accel off &
         # Wait for the emulator to fully boot
         adb wait-for-device
         adb shell input keyevent 82  # Unlock the emulator
