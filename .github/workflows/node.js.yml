@@ -74,10 +74,10 @@ jobs:
             rm sdk-tools.zip
           fi
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "emulator" "system-images;android-31;google_apis;x86_64"
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "emulator" "system-images;android-29;google_apis;x86"
           echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force -n TestEmulator -k "system-images;android-31;google_apis;x86_64" -d "pixel"
-          nohup $ANDROID_HOME/emulator/emulator -avd TestEmulator -no-audio -no-window -gpu off -no-snapshot > /dev/null 2>&1 &
-          for i in {1..60}; do
+          $ANDROID_HOME/emulator/emulator -avd TestEmulator -no-audio -no-window -gpu off -no-snapshot > /dev/null 2>&1 &
+          for i in {1..240}; do
             if adb shell getprop sys.boot_completed | grep -m 1 "1"; then
               echo "Emulator is ready!"
               break
