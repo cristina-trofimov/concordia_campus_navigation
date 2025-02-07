@@ -55,7 +55,8 @@ module.exports = {
       type: 'android.emulator',
       device: {
         avdName: 'TestEmulator',
-        emulatorLaunchArgs: "-accel off -feature Vulkan=false -gpu swiftshader_indirect"
+        emulatorLaunchArgs: "-accel hvf:off -feature Vulkan=false -gpu swiftshader_indirect"
+
       }
     }
   },
