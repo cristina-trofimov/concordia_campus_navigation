@@ -1,6 +1,8 @@
 describe('Example Test', () => {
     beforeAll(async () => {
+        console.log('Launching app...');
         await device.launchApp();
+        console.log('App launched successfully!');
     });
 
     it('should display welcome screen', async () => {
