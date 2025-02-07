@@ -73,7 +73,10 @@ jobs:
         arch: arm64-v8a
         profile: pixel_3a
         disable-animations: true
-        script: adb wait-for-device
+        emulator-boot-timeout: 600  # increase timeout to 10 minutes for emulator to boot
+        script: |
+          adb wait-for-device
+          adb shell input keyevent 82  # Unlock the screen if needed
         
     - name: Set up Gradle
       uses: gradle/gradle-build-action@v2
