@@ -73,6 +73,7 @@ jobs:
             mv $ANDROID_HOME/cmdline-tools/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
             rm sdk-tools.zip
           fi
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "emulator" "system-images;android-31;google_apis;x86_64"
           echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force -n TestEmulator -k "system-images;android-31;google_apis;x86_64" -d "pixel"
           nohup $ANDROID_HOME/emulator/emulator -avd TestEmulator -no-audio -no-window -gpu off -no-snapshot > /dev/null 2>&1 &
