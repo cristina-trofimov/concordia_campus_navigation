@@ -47,7 +47,8 @@ jobs:
       - name: Setup Node.js        
         uses: actions/setup-node@v4
         with:
-          node-version: 22.2.0
+          node-version: 18.x
+          cache: 'npm'
   
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -65,7 +66,7 @@ jobs:
           distribution: 'bin'  # Use the binary distribution (y
   
       - name: Build Detox
-        run: detox build --configuration android.emu.debug
+        run: npm run detox-build
   
       - name: Start Metro Server
         run: npm run detox:start &
@@ -79,7 +80,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: false
-          script: detox test --configuration android.emu.debug
+          script: npm run detox-test
   
       - name: Upload Test Artifact
         if: failure()
