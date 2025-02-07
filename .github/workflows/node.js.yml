@@ -67,11 +67,11 @@ jobs:
 
     - name: Build detox
       run: |
-        npx detox build -c android
+        npx detox build -c android.emu.debug
 
     - name: Android Run Detox
       run: |
-        npx detox test --record-videos all --take-screenshots all -c android
+        npx detox test --record-videos all --take-screenshots all -c android.emu.debug
 
     - name: Upload Test Artifact - GitHub Action
       if: always()
