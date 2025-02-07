@@ -57,9 +57,15 @@ jobs:
   
       - name: Npm install
         run: npm install
+        
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          version: '7.4'  # specify the desired Gradle version
+          distribution: 'bin'  # Use the binary distribution (y
   
       - name: Build Detox
-        run: npm run detox:android:build
+        run: detox build --configuration android.emu.debug
   
       - name: Start Metro Server
         run: npm run detox:start &
@@ -73,7 +79,7 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: false
-          script: npm run detox:android:test:ci
+          script: detox test --configuration android.emu.debug
   
       - name: Upload Test Artifact
         if: failure()
