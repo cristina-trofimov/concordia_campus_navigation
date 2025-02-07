@@ -65,6 +65,7 @@ jobs:
         run: |
           export ANDROID_HOME=$HOME/android-sdk
           export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          sdkmanager --install "platform-tools"
           nohup $ANDROID_HOME/emulator/emulator -avd TestEmulator -no-audio -no-window -gpu off -no-snapshot > /dev/null 2>&1 &
           adb wait-for-device
 
