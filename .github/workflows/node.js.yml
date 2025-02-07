@@ -18,20 +18,16 @@ jobs:
         node-version: [18.x, 20.x]
 
     steps:
-      # Checkout repository
       - uses: actions/checkout@v2
 
-      # Set up Node.js
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
-      # Install dependencies
       - run: npm ci
 
-      # Run Jest tests
       - name: Run Jest tests
         run: npm test
 
@@ -39,24 +35,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repository
       - uses: actions/checkout@v2
 
-      # Set up Node.js
       - name: Use Node.js 18.x
         uses: actions/setup-node@v2
         with:
           node-version: 18.x
           cache: 'npm'
 
-      # Install Java 17 (for Gradle compatibility)
       - name: Set up Java 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Install Android SDK
       - name: Install Android SDK
         run: |
           mkdir -p $ANDROID_HOME
@@ -65,25 +57,35 @@ jobs:
           unzip commandlinetools-linux-8092744_latest.zip
           rm commandlinetools-linux-8092744_latest.zip
           yes | ./cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;default;x86_64" "emulator"
+          echo "y" | ./cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "system-images;android-30;default;x86_64"
+          echo "y" | ./cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "emulator"
+          echo "no" | ./cmdline-tools/bin/avdmanager create avd -n Pixel_3a_API_30 -k "system-images;android-30;default;x86_64" -d "pixel_3a"
 
-      # Start Emulator
+      - name: Set Android environment variables
+        run: |
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/tools/bin" >> $GITHUB_PATH
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
       - name: Start Emulator
         run: |
-          emulator -avd Pixel_3a_API_30 -no-window -gpu off &
-          # Give it a few seconds to boot
-          sleep 30
+          $ANDROID_HOME/emulator/emulator -avd Pixel_3a_API_30 -no-window -no-audio -no-boot-anim -gpu off &
+          $ANDROID_HOME/platform-tools/adb wait-for-device
+          $ANDROID_HOME/platform-tools/adb shell input keyevent 82
 
-      # Install dependencies
+      - name: Verify Emulator
+        run: |
+          $ANDROID_HOME/platform-tools/adb devices
+
       - run: npm ci
 
-      # Fix Gradle permission issue
       - name: Grant execute permission to Gradle wrapper
         run: chmod +x android/gradlew
 
-      # Build app for Detox
       - name: Build app for Detox
         run: npm run detox-build
 
-      # Run Detox tests
       - name: Run Detox tests
         run: npm run detox-test
