@@ -89,6 +89,10 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: false
           script: npm run detox-test
+
+      - name: Stop Emulator
+        if: always()  # Ensures this runs even if previous steps fail
+        run: adb -s emulator-5554 emu kill
   
       - name: Upload Test Artifact
         if: failure()
