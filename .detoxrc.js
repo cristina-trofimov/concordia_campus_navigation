@@ -9,21 +9,6 @@ module.exports = {
       setupTimeout: 120000
     }
   },
-  /*apps: {
-    'android.debug': {
-      type: 'android.apk',
-      binaryPath: 'android/app/build/outputs/apk/debug/app-debug.apk',
-      build: 'cd android && call gradlew.bat assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..',
-      reversePorts: [
-        8081
-      ]
-    },
-    'android.release': {
-      type: 'android.apk',
-      binaryPath: 'android/app/build/outputs/apk/release/app-release.apk',
-      build: 'cd android && gradlew.bat assembleRelease assembleAndroidTest -DtestBuildType=release && cd ..'
-    }
-  }, */
   apps: {
       'android.debug': {
         type: 'android.apk',
