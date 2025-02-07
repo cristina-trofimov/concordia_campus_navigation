@@ -52,40 +52,64 @@ jobs:
           distribution: 'temurin'
 
       - name: Install Android SDK & Emulator
-        run: |
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-29;google_apis;x86"
-          $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force -n TestEmulator -d pixel --package 'system-images;android-29;google_apis;x86'
-          $ANDROID_HOME/emulator/emulator -list-avds
-        
-      - name: Create Android Emulator
-        run: |
-          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force -n TestEmulator -k "system-images;android-29;google_apis;x86" -d "pixel"
-    
-      - name: Start Android Emulator
-        run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
-            mkdir -p $ANDROID_HOME/cmdline-tools
-            curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-            unzip -q sdk-tools.zip -d $ANDROID_HOME/cmdline-tools
-            mkdir -p $ANDROID_HOME/cmdline-tools/latest
-            mv $ANDROID_HOME/cmdline-tools/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
-            rm sdk-tools.zip
-          fi
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "emulator" "system-images;android-29;google_apis;x86"
-          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force -n TestEmulator -k "system-images;android-29;google_apis;x86" -d "pixel"
-          $ANDROID_HOME/emulator/emulator -avd TestEmulator -no-audio -no-window -gpu off -no-snapshot > /dev/null 2>&1 &
-          for i in {1..240}; do
-            if adb shell getprop sys.boot_completed | grep -m 1 "1"; then
-              echo "Emulator is ready!"
-              break
-            fi
-            echo "Waiting for emulator to boot..."
-            sleep 5
-          done
-          adb wait-for-device
+  run: |
+    $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "system-images;android-29;google_apis;x86"
+    $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force -n TestEmulator -d pixel --package "system-images;android-29;google_apis;x86"
+    $ANDROID_HOME/emulator/emulator -list-avds
+
+- name: Create Android Emulator
+  run: |
+    echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force -n TestEmulator -k "system-images;android-29;google_apis;x86" -d "pixel"
+
+- name: Start Android Emulator
+  run: |
+    export ANDROID_HOME=$HOME/android-sdk
+    export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+
+    # Ensure SDK tools are installed
+    if [ ! -f "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" ]; then
+      mkdir -p $ANDROID_HOME/cmdline-tools
+      curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+      unzip -q sdk-tools.zip -d $ANDROID_HOME/cmdline-tools
+      mkdir -p $ANDROID_HOME/cmdline-tools/latest
+      mv $ANDROID_HOME/cmdline-tools/cmdline-tools/* $ANDROID_HOME/cmdline-tools/latest/
+      rm sdk-tools.zip
+    fi
+
+    # Accept licenses and install necessary packages
+    yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses
+    $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "emulator" "system-images;android-29;google_apis;x86"
+
+    # Check if AVD exists
+    echo "Checking available AVDs..."
+    $ANDROID_HOME/emulator/emulator -list-avds
+
+    # Ensure the AVD is created before launching
+    if ! $ANDROID_HOME/emulator/emulator -list-avds | grep -q "TestEmulator"; then
+      echo "AVD TestEmulator not found. Creating it now..."
+      echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force -n TestEmulator -k "system-images;android-29;google_apis;x86" -d "pixel"
+    fi
+
+    # Start ADB server
+    adb start-server
+
+    # Launch the emulator
+    nohup $ANDROID_HOME/emulator/emulator -avd TestEmulator -no-audio -no-window -gpu off -no-snapshot > emulator.log 2>&1 &
+
+    # Debugging: Run emulator in foreground if needed
+    # $ANDROID_HOME/emulator/emulator -avd TestEmulator -no-audio -no-window -gpu off -no-snapshot -verbose
+
+    # Wait for emulator to boot
+    for i in {1..240}; do
+      if adb devices | grep "emulator-"; then
+        echo "Emulator detected!"
+        break
+      fi
+      echo "Waiting for emulator to boot..."
+      sleep 5
+    done
+    adb wait-for-device
+
 
       - name: Install node_modules
         run: |
