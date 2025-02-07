@@ -65,6 +65,9 @@ jobs:
       run: |
         npx react-native start &> android_packager.log &
 
+    - name: Grant execute permission to Gradle Wrapper
+      run: chmod +x android/gradlew
+
     - name: Build detox
       run: |
         npx detox build -c android.emu.debug
