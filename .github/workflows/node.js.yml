@@ -73,6 +73,14 @@ jobs:
     - name: Grant execute permission to Gradle Wrapper
       run: chmod +x android/gradlew
 
+    - name: Start Emulator
+      run: |
+        nohup $ANDROID_SDK_ROOT/emulator/emulator -avd TestEmulator -no-window -no-audio -no-boot-anim -gpu off -accel off &
+        # Wait for the emulator to fully boot
+        adb wait-for-device
+        adb shell input keyevent 82  # Unlock the emulator
+
+
     - name: Build detox
       run: |
         npx detox build -c android.emu.debug
