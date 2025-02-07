@@ -93,7 +93,7 @@ jobs:
 
       - name: Stop Emulator
         if: always()  # Ensures this runs even if previous steps fail
-        run: adb -s emulator-5554 emu kill
+        run: adb -s emulator-5554 emu kill || true
   
       - name: Upload Test Artifact
         if: failure()
