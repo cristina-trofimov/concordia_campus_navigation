@@ -33,15 +33,17 @@ jobs:
 
   detox-tests:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 30
+    
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
 
       - name: Use Node.js 18.x
         uses: actions/setup-node@v2
         with:
           node-version: 18.x
-          cache: 'npm'
 
       - name: Set up Java 17
         uses: actions/setup-java@v3
@@ -49,43 +51,43 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Android SDK
+      - name: Install Android SDK & Emulator
         run: |
-          mkdir -p $ANDROID_HOME
-          cd $ANDROID_HOME
-          wget https://dl.google.com/android/repository/commandlinetools-linux-8092744_latest.zip
-          unzip commandlinetools-linux-8092744_latest.zip
-          rm commandlinetools-linux-8092744_latest.zip
-          yes | ./cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "platform-tools" "platforms;android-30" "build-tools;30.0.3" "system-images;android-30;default;x86_64" "emulator"
-          echo "y" | ./cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "system-images;android-30;default;x86_64"
-          echo "y" | ./cmdline-tools/bin/sdkmanager --sdk_root=$ANDROID_HOME --install "emulator"
-          echo "no" | ./cmdline-tools/bin/avdmanager create avd -n Pixel_3a_API_30 -k "system-images;android-30;default;x86_64" -d "pixel_3a"
-
-      - name: Set Android environment variables
+          sudo apt update
+          sudo apt install -y openjdk-17-jdk wget unzip libgl1-mesa-dev
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O sdk-tools.zip
+          unzip sdk-tools.zip -d $ANDROID_HOME/cmdline-tools
+          mv $ANDROID_HOME/cmdline-tools/cmdline-tools $ANDROID_HOME/cmdline-tools/latest
+          rm sdk-tools.zip
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
+          sdkmanager --install "platform-tools" "platforms;android-31" "build-tools;31.0.0" "system-images;android-31;google_apis;x86_64" "emulator"
+          sdkmanager --licenses
+        
+      - name: Create Android Emulator
         run: |
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "$ANDROID_HOME/emulator" >> $GITHUB_PATH
-          echo "$ANDROID_HOME/tools/bin" >> $GITHUB_PATH
-          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
-
-      - name: Start Emulator
+          echo "no" | avdmanager create avd --force -n TestEmulator -k "system-images;android-31;google_apis;x86_64" -d "pixel"
+    
+      - name: Start Android Emulator
         run: |
-          $ANDROID_HOME/emulator/emulator -avd Pixel_3a_API_30 -no-window -no-audio -no-boot-anim -gpu off &
-          $ANDROID_HOME/platform-tools/adb wait-for-device
-          $ANDROID_HOME/platform-tools/adb shell input keyevent 82
+          nohup $ANDROID_HOME/emulator/emulator -avd TestEmulator -no-audio -no-window -gpu off -no-snapshot > /dev/null 2>&1 &
+          adb wait-for-device
 
-      - name: Verify Emulator
-        run: |
-          $ANDROID_HOME/platform-tools/adb devices
+      - name: Install Dependencies
+        run: npm install
 
-      - run: npm ci
-
-      - name: Grant execute permission to Gradle wrapper
-        run: chmod +x android/gradlew
+      - name: Start Metro Bundler
+        run: npx react-native start &
 
       - name: Build app for Detox
         run: npm run detox-build
 
       - name: Run Detox tests
         run: npm run detox-test
+
+      - name: Upload Test Artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: detox-artifacts
+          path: artifacts
