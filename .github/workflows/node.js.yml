@@ -59,7 +59,7 @@ jobs:
         
       - name: Create Android Emulator
         run: |
-          echo "no" | avdmanager create avd --force -n TestEmulator -k "system-images;android-31;google_apis;x86_64" -d "pixel"
+          echo "no" | $ANDROID_HOME/cmdline-tools/latest/bin/avdmanager create avd --force -n TestEmulator -k "system-images;android-31;google_apis;x86_64" -d "pixel"
     
       - name: Start Android Emulator
         run: |
