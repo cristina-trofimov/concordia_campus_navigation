@@ -79,6 +79,7 @@ jobs:
 
     - name: Android Run Detox
       run: |
+        $ANDROID_SDK_ROOT/emulator/emulator -list-avds
         npx detox test --record-videos all --take-screenshots all -c android.emu.debug
 
     - name: Upload Test Artifact - GitHub Action
