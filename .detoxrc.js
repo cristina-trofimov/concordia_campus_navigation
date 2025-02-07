@@ -55,7 +55,6 @@ module.exports = {
       type: 'android.emulator',
       device: {
         avdName: 'Android_API31',
-        emulatorLaunchArgs: "-accel off -feature Vulkan=false -gpu off"
       }
     }
   },
