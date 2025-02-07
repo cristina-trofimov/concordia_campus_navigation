@@ -28,17 +28,13 @@ module.exports = {
       'android.debug': {
         type: 'android.apk',
         build: 'cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug',
-        //build: 'cd android && gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug',
         binaryPath: 'android/app/build/outputs/apk/debug/app-debug.apk',
         testBinaryPath: 'android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk'
-        reversePorts: [8081]
       },
       'android.release': {
         type: 'android.apk',
         binaryPath: 'android/app/build/outputs/apk/release/app-release.apk',
-        //build: 'cd android && gradlew assembleRelease assembleAndroidTest -DtestBuildType=release',
         build: 'cd android && ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release',
-        //testBinaryPath: 'custom/path/to/app-release-androidTest.apk'
       }
       },
   devices: {
