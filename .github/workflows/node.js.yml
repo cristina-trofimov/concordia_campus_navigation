@@ -44,11 +44,11 @@ jobs:
     - name: Node
       uses: actions/setup-node@v3
 
-    - name: Set up Java
+    - name: Install Java 8 for SDK Manager
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '8'
 
     - name: Download Android Emulator Image
       run: |
@@ -56,6 +56,11 @@ jobs:
         echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force -n TestEmulator -d pixel --package 'system-images;android-29;google_apis;x86'
         $ANDROID_HOME/emulator/emulator -list-avds
 
+    - name: Restore Java 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
     - name: Install node_modules
       run: |
         npm install
