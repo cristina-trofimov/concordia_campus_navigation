@@ -7,9 +7,9 @@ import { Text } from '@rneui/themed';
 // import buildingData from '../assets/GeoJSON/allBuildings.geojson';
 
 
+const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
+
 // Set your Mapbox access token
-Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
-//MapboxGL.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
 
 const locations = [
   {
@@ -31,6 +31,8 @@ const locations = [
     description: 'This is Building B.',
   },
 ];
+console.log("Setting Mapbox access token:", MAPBOX_TOKEN);
+Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map() {
   const sgwCoords = {
