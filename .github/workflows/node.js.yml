@@ -88,9 +88,7 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: false
-
-      - name: Wait for Emulator to Boot
-        run: adb wait-for-device shell getprop sys.boot_completed
+          script: adb wait-for-device shell getprop sys.boot_completed
 
       - name: Run Detox Tests
         run: npm run detox-test
