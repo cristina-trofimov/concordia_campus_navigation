@@ -2,9 +2,35 @@ import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-nat
 import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
+import { Text } from '@rneui/themed';
+//import MapboxGL from '@react-native-mapbox-gl/maps';
+// import buildingData from '../assets/GeoJSON/allBuildings.geojson';
+
 
 // Set your Mapbox access token
 Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
+//MapboxGL.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
+
+const locations = [
+  {
+    id: 1,
+    coordinates: [
+      -73.57794125724925,
+      45.49537552501002
+    ],
+    title: 'Building A',
+    description: 'This is Building A.',
+  },
+  {
+    id: 2,
+    coordinates: [
+      -73.5787373645142,
+      45.49585909906821
+    ],
+    title: 'Building B',
+    description: 'This is Building B.',
+  },
+];
 
 export default function Map() {
   const sgwCoords = {
@@ -102,6 +128,24 @@ export default function Map() {
           zoomLevel={17} 
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
+
+        {locations.map((location) => (
+          <Mapbox.PointAnnotation
+            key={location.id.toString()}
+            id={`point-${location.id}`}
+            coordinate={location.coordinates}
+          >
+            <View style={styles.marker}>
+              <Text style={styles.markerText}>📍</Text>
+            </View>
+            <Mapbox.Callout title={location.title}>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>{location.title}</Text>
+                <Text style={styles.calloutDescription}>{location.description}</Text>
+              </View>
+            </Mapbox.Callout>
+          </Mapbox.PointAnnotation>
+        ))}
         {myLocation && (
           <Mapbox.PointAnnotation
             key={`${myLocation.latitude}-${myLocation.longitude}`}
@@ -154,5 +198,25 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: 'transparent',
     borderRadius: 25,
+  },
+  marker: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  markerText: {
+    fontSize: 24,
+  },
+  callout: {
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    width: 150,
+  },
+  calloutTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  calloutDescription: {
+    fontSize: 14,
   },
 });
