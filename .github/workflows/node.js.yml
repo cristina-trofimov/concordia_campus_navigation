@@ -30,19 +30,12 @@ jobs:
       - name: Run Jest tests
         run: npm test
 
-  detox-tests:
+  maestro-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: true
-          android: false
-  
+    
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
   
       - name: Setup Node.js        
         uses: actions/setup-node@v4
@@ -55,61 +48,28 @@ jobs:
         with:
           distribution: zulu
           java-version: 17
+
+      - name: Install Maestro CLI
+        run: |
+          curl -s https://raw.githubusercontent.com/maestro-dev/maestro/master/install.sh | bash
+          export PATH=$PATH:$(pwd)/.maestro-cli
   
       - name: Npm install
         run: npm install
         
-      - name: Set up Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          version: '7.4'  # specify the desired Gradle version
-          distribution: 'bin' 
-
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
-  
-      - name: Build Detox
-        run: npm run detox-build
   
       - name: Start Metro Server
-        run: nohup npm start > metro.log 2>&1 &
+        run: nohup npm start > metro.log 2>&1 &\
 
-      - name: Install Required Android Dependencies
+      - name: Run Maestro tests
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libpulse0 libxkbfile1 libglu1-mesa libnss3
-
-      - name: Start Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 31
-          arch: x86_64
-          avd-name: Android_API31
-          force-avd-creation: true
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
-          disable-animations: false
-          script: adb wait-for-device shell 'while [[ $(getprop sys.boot_completed) -ne 1 ]]; do sleep 1; done; input keyevent 82'
-      
-      - name: Ensure Emulator is Ready
-        run: |
-          adb wait-for-device
-          adb shell 'while [[ $(getprop sys.boot_completed) -ne 1 ]]; do sleep 1; done; echo "Emulator is ready"'
-      
-      - name: Run Detox Tests
-        run: npm run detox-test
-
-      - name: Stop Emulator
-        if: always()  # Ensures this runs even if previous steps fail
-        run: adb -s emulator-5554 emu kill || true
-
-      - name: kill emulator (if needed)
-        run: pkill -f qemu-system || true
+          maestro test --device "Pixel 3" --project ./e2e/test.yaml
   
       - name: Upload Test Artifact
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: detox-android-artifacts
+          name: maestro-android-artifacts
           path: artifacts
           retention-days: 5
   
