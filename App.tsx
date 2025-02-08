@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Button, ThemeProvider, createTheme } from '@rneui/themed';
-import Map from './components/Map';
+import Map from './src/components/Map';
 
 const theme = createTheme({
   lightColors: {
