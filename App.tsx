@@ -1,8 +1,10 @@
+import 'react-native-get-random-values';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Button, ThemeProvider, createTheme } from '@rneui/themed';
 import Map from './components/Map';
+import SearchBar from './components/SearchBar';
 
 const theme = createTheme({
   lightColors: {
@@ -24,10 +26,14 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Map />
-      <Text>{message}</Text>
-    </View>
+    <SafeAreaProvider>
+    <ThemeProvider theme={theme}>
+      <View style={styles.container}>
+        <Map />
+        <SearchBar />
+      </View>
+    </ThemeProvider>
+  </SafeAreaProvider>
   );
 }
 
