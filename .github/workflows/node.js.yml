@@ -88,8 +88,13 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: false
-          script: adb wait-for-device shell getprop sys.boot_completed
-
+          script: adb wait-for-device shell 'while [[ $(getprop sys.boot_completed) -ne 1 ]]; do sleep 1; done; input keyevent 82'
+      
+      - name: Ensure Emulator is Ready
+        run: |
+          adb wait-for-device
+          adb shell 'while [[ $(getprop sys.boot_completed) -ne 1 ]]; do sleep 1; done; echo "Emulator is ready"'
+      
       - name: Run Detox Tests
         run: npm run detox-test
 
@@ -107,4 +112,5 @@ jobs:
           name: detox-android-artifacts
           path: artifacts
           retention-days: 5
+  
   
