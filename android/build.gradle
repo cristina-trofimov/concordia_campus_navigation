@@ -43,3 +43,20 @@ allprojects {
         maven { url 'https://www.jitpack.io' }
     }
 }
+// @generated begin @rnmapbox/maps-v2-maven - expo prebuild (DO NOT MODIFY) sync-32f1b7024bb5099f2805443b1960a3233ccde124
+
+allprojects {
+    repositories {
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            credentials {
+                username = 'mapbox'
+                password = project.hasProperty("MAPBOX_DOWNLOADS_TOKEN") ? project.MAPBOX_DOWNLOADS_TOKEN : ""
+            }
+        }
+        mavenCentral()
+        google()
+    }
+}
+
+// @generated end @rnmapbox/maps-v2-maven
