@@ -1,6 +1,6 @@
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
+import Mapbox, { Camera, MapView, PointAnnotation } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
@@ -35,10 +35,30 @@ export default function Map() {
         console.warn("Camera reference is not available yet");
       }
     }, 1000); // Increased delay for stability (to make sure that MapView is loaded before setting the camera)
-  
+    
     _getLocation();
   
-    return () => clearTimeout(timer);
+    const locationSubscription = Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 10000,
+        distanceInterval: 1,
+      },
+      (location) => {
+        console.log("User location updated:", location.coords);
+        setMyLocation(location.coords);
+      }
+    );
+
+    return () => {
+      clearTimeout(timer);
+
+      locationSubscription.then((subscription) => {
+        subscription.remove();
+      }).catch((error) => {
+        console.warn("Error unsubscribing from location updates:", error);
+      });
+    }
   }, []);  
 
   const _getLocation = async () => {
@@ -79,8 +99,8 @@ export default function Map() {
 
   return (
     <View style={styles.container}>
-      <Mapbox.MapView
-        style={styles.map}
+      <MapView
+        style={styles.map}   
         onDidFinishLoadingMap={() => {
           if (!cameraRef.current) {
             console.warn("Camera reference not available yet.");
@@ -95,7 +115,7 @@ export default function Map() {
               animationDuration: 1000,
             });
           }, 500); // Small delay to ensure the map is fully ready
-        }}        
+        }} 
       >
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
@@ -103,7 +123,7 @@ export default function Map() {
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
         {myLocation && (
-          <Mapbox.PointAnnotation
+          <PointAnnotation
             key={`${myLocation.latitude}-${myLocation.longitude}`}
             id="my-location"
             coordinate={[myLocation.longitude, myLocation.latitude]}
@@ -112,9 +132,9 @@ export default function Map() {
               source={require('../resources/images/currentLocation-Icon.png')} 
               style={{ width: 30, height: 30 }}
             />
-          </Mapbox.PointAnnotation>        
+          </PointAnnotation>        
         )}
-      </Mapbox.MapView>
+      </MapView>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
