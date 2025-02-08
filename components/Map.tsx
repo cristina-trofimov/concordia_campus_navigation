@@ -5,8 +5,6 @@ import * as Location from 'expo-location';
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
-// Set your Mapbox access token
-console.log("Setting Mapbox access token:", MAPBOX_TOKEN);
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map() {
@@ -71,7 +69,6 @@ export default function Map() {
       return;
     }
   
-    console.log("Focusing on location:", myLocation);
     cameraRef.current.setCamera({
       centerCoordinate: [myLocation.longitude, myLocation.latitude],
       zoomLevel: 17,

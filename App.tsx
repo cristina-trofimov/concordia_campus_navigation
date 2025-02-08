@@ -14,19 +14,10 @@ const theme = createTheme({
 });
 
 export default function App() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('http://10.0.2.2:3000')
-      .then(response => response.text())
-      .then(data => setMessage(data))
-      .catch(error => console.error('Error:', error));
-  }, []);
 
   return (
     <View style={styles.container}>
       <Map />
-      <Text>{message}</Text>
     </View>
   );
 }
