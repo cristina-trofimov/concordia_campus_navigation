@@ -12,8 +12,8 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container} testID="welcomeScreen" accessibilityLabel="welcomeScreen">
-      <Text style={styles.title}>Welcome to My React Native Expo App!</Text>
+    <View style={styles.container} accessibilityLabel="welcomeScreen">
+      <Text style={styles.title} testID="welcomeScreen" accessibilityLabel="welcomeMessage">Welcome to My React Native Expo App!</Text>
       <Text>{message}</Text>
     </View>
   );

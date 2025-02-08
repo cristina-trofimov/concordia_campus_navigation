@@ -1,0 +1,4 @@
+appId: com.cristina.trofimov143.frontend
+---
+- launchApp
+- tapOn: "welcomeScreen"
