@@ -79,6 +79,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libpulse0 libxkbfile1 libglu1-mesa libnss3
 
+      - name: Stop Any Running Emulator
+        run: |
+          adb devices | grep emulator | cut -f1 | while read line; do adb -s $line emu kill; done
+
       - name: Start Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
