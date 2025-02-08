@@ -72,7 +72,7 @@ jobs:
         run: npm run detox-build
   
       - name: Start Metro Server
-        run: npm run detox:start &
+        run: nohup npm start > metro.log 2>&1 &
 
       - name: Install libpulse
         run: |
