@@ -80,7 +80,7 @@ jobs:
           sudo apt-get install -y libpulse0
           sudo apt-get install -y libxkbfile1 libglu1-mesa
 
-      - name: Run Detox tests
+      - name: Start Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 31
@@ -89,7 +89,12 @@ jobs:
           force-avd-creation: true
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: false
-          script: npm run detox-test
+
+      - name: Wait for Emulator to Boot
+        run: adb wait-for-device shell getprop sys.boot_completed
+
+      - name: Run Detox Tests
+        run: npm run detox-test
 
       - name: Stop Emulator
         if: always()  # Ensures this runs even if previous steps fail
