@@ -12,7 +12,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'H',
             },
 
@@ -33,7 +33,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'EV',
             },
 
@@ -59,7 +59,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'EV',
             },
 
@@ -85,7 +85,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'MB',
             },
 
@@ -108,7 +108,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'GS',
             },
 
@@ -152,7 +152,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'EN',
             },
 
@@ -205,7 +205,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'X',
             },
 
@@ -241,7 +241,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'Z',
             },
 
@@ -301,7 +301,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'PR',
             },
 
@@ -377,7 +377,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'V',
             },
 
@@ -413,7 +413,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'ER',
             },
 
@@ -457,7 +457,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'FA',
             },
 
@@ -493,7 +493,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'R',
             },
 
@@ -529,7 +529,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'RR',
             },
 
@@ -565,7 +565,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'T',
             },
 
@@ -601,7 +601,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'P',
             },
 
@@ -637,7 +637,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'Q',
             },
 
@@ -681,7 +681,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'LS',
             },
 
@@ -725,7 +725,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'CI',
             },
 
@@ -773,7 +773,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'S',
             },
 
@@ -829,7 +829,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'M',
             },
 
@@ -877,7 +877,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'MU',
             },
 
@@ -913,7 +913,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'B',
             },
 
@@ -949,7 +949,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'K',
             },
 
@@ -1009,7 +1009,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'D',
             },
 
@@ -1053,7 +1053,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'MI',
             },
 
@@ -1097,7 +1097,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'LB',
             },
 
@@ -1173,7 +1173,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'LD',
             },
 
@@ -1225,7 +1225,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'FG',
             },
 
@@ -1301,7 +1301,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'GA',
             },
 
@@ -1353,7 +1353,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'GN',
             },
 
@@ -1661,7 +1661,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'VA',
             },
 
@@ -1706,7 +1706,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'RA',
             },
 
@@ -1774,7 +1774,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'PC',
             },
 
@@ -1810,7 +1810,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'DO',
             },
 
@@ -1846,7 +1846,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'VL',
             },
 
@@ -1938,7 +1938,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'VE',
             },
 
@@ -1974,7 +1974,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'PT',
             },
 
@@ -2018,7 +2018,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'SC',
             },
 
@@ -2094,7 +2094,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'SP',
             },
 
@@ -2234,7 +2234,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'BB',
             },
 
@@ -2270,7 +2270,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'BH',
             },
 
@@ -2306,7 +2306,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'GE',
             },
 
@@ -2366,7 +2366,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'PS',
             },
 
@@ -2434,7 +2434,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'SI',
             },
 
@@ -2621,7 +2621,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'CJ',
             },
 
@@ -2777,7 +2777,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'HC',
             },
 
@@ -2829,7 +2829,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'JR',
             },
 
@@ -2921,7 +2921,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'HU',
             },
 
@@ -2973,7 +2973,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'HA',
             },
 
@@ -3025,7 +3025,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'HB',
             },
 
@@ -3123,7 +3123,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'CC',
             },
 
@@ -3239,7 +3239,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'CC2',
             },
 
@@ -3443,7 +3443,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'RF',
             },
 
@@ -3559,7 +3559,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'RF2',
             },
 
@@ -3763,7 +3763,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'TA-TB',
             },
 
@@ -3799,7 +3799,7 @@ export const HighlightBuilding = () => {
             type: 'Feature',
             properties: {
               height: 1,
-              color: 'red',
+              color: '#912338',
               id: 'PY',
             },
 
@@ -3867,7 +3867,7 @@ export const HighlightBuilding = () => {
         style={{
           fillExtrusionColor: ['get', 'color'],
           fillExtrusionHeight: ['get', 'height'],
-          fillExtrusionOpacity: 0.8,
+          fillExtrusionOpacity: 0.3,
         }}
       />
     </Mapbox.ShapeSource>
