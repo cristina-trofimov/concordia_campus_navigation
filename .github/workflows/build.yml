@@ -1,9 +1,12 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - master
+  push: # Trigger on all pushes to any branch
+    branches: 
+      - '**' # Match all branches
+  pull_request: # Trigger on all pull requests to any branch
+    branches: 
+      - '**' # Match all branches
 
 
 jobs:
