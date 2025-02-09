@@ -2,15 +2,10 @@
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MapView, PointAnnotation, MarkerView } from '@rnmapbox/maps';
-import { MapboxGLEvent } from '@rnmapbox/maps/lib/typescript/src/types';
 import * as Location from 'expo-location';
 import { Text } from '@rneui/themed';
 import { locations } from '../data/buildingLocation.ts'
-import { Icon, SocialIcon } from 'react-native-elements';
-import { Feature, Geometry, GeoJsonProperties } from 'geojson';
-import { OnPressEvent } from '@rnmapbox/maps/lib/typescript/src/types/OnPressEvent';
-//import MapboxGL from '@react-native-mapbox-gl/maps';
-// import buildingData from '../assets/GeoJSON/allBuildings.geojson';
+
 
 import ToggleButton from './ToggleButton';
 import { HighlightBuilding } from './BuildingCoordinates';
