@@ -26,6 +26,11 @@ jobs:
           args: >
             -Dsonar.projectKey=cristina-trofimov_concordia_campus_navigation
             -Dsonar.organization=the-niners
+      - name: Run SonarQube Scanner
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner -X
 
       # - name: Set up JDK
       #   uses: actions/setup-java@v3
