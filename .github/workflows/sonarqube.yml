@@ -11,6 +11,8 @@ on:
 jobs:
   sonarqube:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read-all
     steps:
       - uses: actions/checkout@v4
         with:
