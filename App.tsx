@@ -16,8 +16,8 @@ const theme = createTheme({
 export default function App() {
 
   return (
-    <View style={styles.container}>
-      <Map />
+    <View  style={styles.container}>
+      <Map testID="Image"/>
     </View>
   );
 }

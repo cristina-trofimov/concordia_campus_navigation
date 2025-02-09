@@ -1,12 +1,11 @@
 import 'react-native';
 import React from 'react';
 import App from '../App';
-import {expect, it, describe, test} from '@jest/globals';
+import {render, fireEvent} from '@testing-library/react-native'
 
-// test renderer must be required after react-native.
-import renderer from 'react-test-renderer';
-
-
-it('renders correctly', () => {
-  renderer.create(<App />);
-});
+describe(App,() =>{
+    it('Does our app start up', function() {
+    const{getByTestID}=render(<App />);
+    const image = getByTestID('Image');
+    expect(image).toBeTruthy();
+    });})
