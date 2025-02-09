@@ -1,6 +1,8 @@
+// Map.tsx
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
+import Mapbox, { Camera, MapView, PointAnnotation, MarkerView } from '@rnmapbox/maps';
+import { MapboxGLEvent } from '@rnmapbox/maps/lib/typescript/src/types';
 import * as Location from 'expo-location';
 import { Text } from '@rneui/themed';
 import { locations } from '../data/buildingLocation.ts'
@@ -10,9 +12,12 @@ import { OnPressEvent } from '@rnmapbox/maps/lib/typescript/src/types/OnPressEve
 //import MapboxGL from '@react-native-mapbox-gl/maps';
 // import buildingData from '../assets/GeoJSON/allBuildings.geojson';
 
+import ToggleButton from './ToggleButton';
+import { HighlightBuilding } from './BuildingCoordinates';
+
+
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
-
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
@@ -23,12 +28,16 @@ export default function Map() {
   };
 
   const loyolaCoords = {
-    latitude: 45.45822972841337,
-    longitude: -73.63915818932158,
+    latitude: 45.45830498353995,
+    longitude: -73.63917964725294
   };
 
   const cameraRef = useRef<Camera | null>(null);
   const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const mapRef = useRef<Mapbox.MapView | null>(null);
+  const [currentCoords, setCurrentCoords] = useState(sgwCoords);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
     // Focus on SGW when the app starts
@@ -47,8 +56,33 @@ export default function Map() {
 
     _getLocation();
 
-    return () => clearTimeout(timer);
+    const locationSubscription = Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 10000,
+        distanceInterval: 1,
+      },
+      (location) => {
+        console.log("User location updated:", location.coords);
+        setMyLocation(location.coords);
+      }
+    );
+
+    return () => {
+      clearTimeout(timer);
+
+      locationSubscription.then((subscription) => {
+        subscription.remove();
+      }).catch((error) => {
+        console.warn("Error unsubscribing from location updates:", error);
+      });
+    }
   }, []);
+
+  // Trigger a re-render when the user location changes
+  useEffect(() => {
+    setForceUpdate((prev) => prev + 1);
+  }, [myLocation]);
 
   const _getLocation = async () => {
     try {
@@ -68,13 +102,8 @@ export default function Map() {
   };
 
   const focusOnLocation = () => {
-    if (!myLocation) {
-      console.warn("User location not available yet.");
-      return;
-    }
-
-    if (!cameraRef.current) {
-      console.warn("Camera reference is null.");
+    if (!myLocation || !cameraRef.current || !mapLoaded) { // Check mapLoaded
+      console.warn("User location, camera, or map not available.");
       return;
     }
 
@@ -86,26 +115,30 @@ export default function Map() {
     });
   };
 
+  const handleCampusChange = (isSGW: boolean) => {
+    const coords = isSGW ? sgwCoords : loyolaCoords;
+    setCurrentCoords(coords);
+
+    if (mapLoaded && cameraRef.current) {
+      cameraRef.current.setCamera({
+        centerCoordinate: [coords.longitude, coords.latitude],
+        zoomLevel: 17,
+        animationMode: 'flyTo',
+        animationDuration: 1000,
+      });
+    } else {
+      console.warn("Error loading campus");
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <Mapbox.MapView
+      <MapView
         style={styles.map}
-        onDidFinishLoadingMap={() => {
-          if (!cameraRef.current) {
-            console.warn("Camera reference not available yet.");
-            return;
-          }
-
-          setTimeout(() => {
-            cameraRef.current?.setCamera({
-              centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
-              zoomLevel: 17,
-              animationMode: 'flyTo',
-              animationDuration: 1000,
-            });
-          }, 500); // Small delay to ensure the map is fully ready
-        }}
+        ref={mapRef}
+        onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
+        <HighlightBuilding />
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17}
@@ -134,8 +167,8 @@ export default function Map() {
 
 
         {myLocation && (
-          <Mapbox.PointAnnotation
-            key={`${myLocation.latitude}-${myLocation.longitude}`}
+          <PointAnnotation
+            key={`${myLocation.latitude}-${myLocation.longitude}-${forceUpdate}`}
             id="my-location"
             coordinate={[myLocation.longitude, myLocation.latitude]}
           >
@@ -143,9 +176,9 @@ export default function Map() {
               source={require('../resources/images/currentLocation-Icon.png')}
               style={{ width: 30, height: 30 }}
             />
-          </Mapbox.PointAnnotation>
+          </PointAnnotation>
         )}
-      </Mapbox.MapView>
+      </MapView>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
@@ -154,6 +187,16 @@ export default function Map() {
             style={styles.buttonImage}
           />
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.toggleButtonContainer}>
+        <ToggleButton
+          mapRef={mapRef}
+          sgwCoords={sgwCoords}
+          loyolaCoords={loyolaCoords}
+          onCampusChange={handleCampusChange}
+          initialCampus={true}
+        />
       </View>
     </View>
   );
@@ -186,6 +229,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderRadius: 25,
   },
+  annotationImage: {
+    width: 30,
+    height: 30,
+  },
+  toggleButtonContainer: {
+    position: 'absolute',
+    top: 20,
+    alignItems: 'center',
+  },
   marker: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -207,3 +259,5 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
+
+
