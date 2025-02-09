@@ -6,8 +6,14 @@ import { MapboxGLEvent } from '@rnmapbox/maps/lib/typescript/src/types';
 import * as Location from 'expo-location';
 import ToggleButton from './ToggleButton';
 
+<<<<<<< HEAD:components/Map.tsx
 
 Mapbox.setAccessToken('ACCESS_TOKEN');
+=======
+const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
+
+Mapbox.setAccessToken(MAPBOX_TOKEN);
+>>>>>>> 6daa999eb32fbb355705382902e71e144cf23418:src/components/Map.tsx
 
 export default function Map() {
     const sgwCoords = {
@@ -29,6 +35,54 @@ export default function Map() {
     useEffect(() => {
         _getLocation();
 
+<<<<<<< HEAD:components/Map.tsx
+=======
+  const _getLocation = async () => {
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      
+      if (status !== 'granted') {
+        console.warn('Permission to access location was denied');
+        return;
+      }
+  
+      let location = await Location.getCurrentPositionAsync({});
+      console.log("User location received:", location.coords);
+      setMyLocation(location.coords);
+    } catch (err) {
+      console.warn("Error getting location:", err);
+    }
+  };  
+
+  const focusOnLocation = () => {
+    if (!myLocation) {
+      console.warn("User location not available yet.");
+      return;
+    }
+  
+    if (!cameraRef.current) {
+      console.warn("Camera reference is null.");
+      return;
+    }
+  
+    cameraRef.current.setCamera({
+      centerCoordinate: [myLocation.longitude, myLocation.latitude],
+      zoomLevel: 17,
+      animationMode: 'flyTo',
+      animationDuration: 1000,
+    });
+  };  
+
+  return (
+    <View style={styles.container}>
+      <Mapbox.MapView
+        style={styles.map}
+        onDidFinishLoadingMap={() => {
+          if (!cameraRef.current) {
+            console.warn("Camera reference not available yet.");
+            return;
+          }
+>>>>>>> 6daa999eb32fbb355705382902e71e144cf23418:src/components/Map.tsx
         
         if (mapLoaded && cameraRef.current) {
             cameraRef.current.setCamera({
@@ -37,6 +91,7 @@ export default function Map() {
                 animationMode: 'flyTo',
                 animationDuration: 1000,
             });
+<<<<<<< HEAD:components/Map.tsx
         }
     }, [mapLoaded]);
 
@@ -135,6 +190,40 @@ export default function Map() {
             </View>
         </View>
     );
+=======
+          }, 500); // Small delay to ensure the map is fully ready
+        }}        
+      >
+        <Camera
+          ref={(ref) => { cameraRef.current = ref; }}
+          zoomLevel={17} 
+          centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
+        />
+        {myLocation && (
+          <Mapbox.PointAnnotation
+            key={`${myLocation.latitude}-${myLocation.longitude}`}
+            id="my-location"
+            coordinate={[myLocation.longitude, myLocation.latitude]}
+          >
+            <Image 
+              source={require('../resources/images/currentLocation-Icon.png')} 
+              style={{ width: 30, height: 30 }}
+            />
+          </Mapbox.PointAnnotation>        
+        )}
+      </Mapbox.MapView>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
+          <Image
+            source={require('../resources/images/currentLocation-button.png')}
+            style={styles.buttonImage}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+>>>>>>> 6daa999eb32fbb355705382902e71e144cf23418:src/components/Map.tsx
 }
 
 const styles = StyleSheet.create({
