@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { ReactNode, useRef } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -14,7 +14,7 @@ const COLLAPSED_HEIGHT = height * 0.1;
 const EXPANDED_HEIGHT = height * 0.5;
 const VELOCITY_THRESHOLD = 0.5; // swipe speed
 
-const SearchBarMenu: React.FC = () => {
+function BottomDrawer ({children} : {children : ReactNode} ) {
   const containerHeight = useRef(new Animated.Value(EXPANDED_HEIGHT)).current;
   const isExpanded = useRef<boolean>(true);
   const gestureStartY = useRef<number>(0);
@@ -90,6 +90,7 @@ const SearchBarMenu: React.FC = () => {
     >
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
+        { children }
       </View>
     </Animated.View>
   );
@@ -119,4 +120,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SearchBarMenu;
+export default BottomDrawer;
