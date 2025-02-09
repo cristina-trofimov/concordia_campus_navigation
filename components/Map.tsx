@@ -2,11 +2,12 @@
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
+import { MapboxGLEvent } from '@rnmapbox/maps/lib/typescript/src/types';
 import * as Location from 'expo-location';
-import ToggleButton from './toggleButton';
+import ToggleButton from './ToggleButton';
 
 
-Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA'); /
+Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
 
 export default function Map() {
     const sgwCoords = {
@@ -69,6 +70,8 @@ export default function Map() {
         });
     };
 
+
+
     const handleCampusChange = (isSGW: boolean) => {
         const coords = isSGW ? sgwCoords : loyolaCoords;
         setCurrentCoords(coords);
@@ -77,11 +80,11 @@ export default function Map() {
             cameraRef.current.setCamera({
                 centerCoordinate: [coords.longitude, coords.latitude],
                 zoomLevel: 17,
-                animationMode: 'flyTo', // Or 'immediate' for testing
+                animationMode: 'flyTo',
                 animationDuration: 1000,
             });
         } else {
-            console.warn("Map not loaded or camera ref not available in handleCampusChange");
+            console.warn("Error loading campus");
         }
     };
 
@@ -91,11 +94,11 @@ export default function Map() {
             <Mapbox.MapView
                 style={styles.map}
                 ref={mapRef}
-                onDidFinishLoadingMap={() => setMapLoaded(true)} // Map is loaded
+                onDidFinishLoadingMap={() => setMapLoaded(true)}
             >
                 <Camera
                     ref={(ref) => (cameraRef.current = ref)}
-                    zoomLevel={17} // Initial zoom
+                    zoomLevel={17}
                     centerCoordinate={[currentCoords.longitude, currentCoords.latitude]}
                 />
                 {myLocation && (
@@ -127,7 +130,7 @@ export default function Map() {
                     sgwCoords={sgwCoords}
                     loyolaCoords={loyolaCoords}
                     onCampusChange={handleCampusChange}
-                    initialCampus={true} // Optional: Set initial campus
+                    initialCampus={true}
                 />
             </View>
         </View>

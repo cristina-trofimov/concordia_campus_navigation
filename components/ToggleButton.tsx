@@ -7,8 +7,8 @@ interface ToggleButtonProps {
     mapRef: React.RefObject<Mapbox.MapView>;
     sgwCoords: { latitude: number; longitude: number };
     loyolaCoords: { latitude: number; longitude: number };
-    onCampusChange: (isSGW: boolean) => void; // Callback function
-    initialCampus?: boolean; // Optional: Initial campus (SGW if true)
+    onCampusChange: (isSGW: boolean) => void;
+    initialCampus?: boolean;
 }
 
 const ToggleButton: React.FC<ToggleButtonProps> = ({ mapRef, sgwCoords, loyolaCoords, onCampusChange, initialCampus = true }) => {
@@ -19,11 +19,11 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ mapRef, sgwCoords, loyolaCo
         Animated.timing(translateX, {
             toValue: isSGW ? 40 : 0,
             duration: 300,
-            useNativeDriver: true, // Try true, fallback to false
+            useNativeDriver: true, //Allows for smoother scroll motionn
         }).start(() => {
             const newIsSGW = !isSGW;
             setIsSGW(newIsSGW);
-            onCampusChange(newIsSGW); // Call the callback function
+            onCampusChange(newIsSGW);
         });
     };
 
@@ -43,9 +43,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         padding: 10,
-        marginTop: 10,  // Or adjust as needed
-        backgroundColor: 'rgba(0,0,0,0.5)', // Optional: semi-transparent background
-        borderRadius: 20, // Optional: rounded corners
+        marginTop: 10,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderRadius: 20,
     },
     slider: {
         width: 80,
