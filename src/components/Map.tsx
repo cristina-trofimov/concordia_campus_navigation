@@ -5,6 +5,7 @@ import Mapbox, { Camera, MapView, PointAnnotation, MarkerView } from '@rnmapbox/
 import { MapboxGLEvent } from '@rnmapbox/maps/lib/typescript/src/types';
 import * as Location from 'expo-location';
 import ToggleButton from './ToggleButton';
+import { HighlightBuilding } from './BuildingCoordinates';
 
 
 Mapbox.setAccessToken('ACCESS_TOKEN');
@@ -126,6 +127,7 @@ export default function Map() {
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
+        <HighlightBuilding/>
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17} 
