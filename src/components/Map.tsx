@@ -7,7 +7,7 @@ import * as Location from 'expo-location';
 import ToggleButton from './ToggleButton';
 
 
-Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qAEN');
+Mapbox.setAccessToken('ACCESS_TOKEN');
 
 export default function Map() {
     const sgwCoords = {
@@ -27,23 +27,23 @@ export default function Map() {
     const [mapLoaded, setMapLoaded] = useState(false);
 
     useEffect(() => {
-      // Focus on SGW when the app starts
-      const timer = setTimeout(() => {
-        if (cameraRef.current) {
-          cameraRef.current.setCamera({
-            centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
-            zoomLevel: 17,
-            animationMode: 'flyTo',
-            animationDuration: 1000, 
-          });
-        } else {
-          console.warn("Camera reference is not available yet");
-        }
-      }, 1000); // Increased delay for stability (to make sure that MapView is loaded before setting the camera)
-    
-      _getLocation();
-    
-      return () => clearTimeout(timer);
+        // Focus on SGW when the app starts
+        const timer = setTimeout(() => {
+            if (cameraRef.current) {
+                cameraRef.current.setCamera({
+                    centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
+                    zoomLevel: 17,
+                    animationMode: 'flyTo',
+                    animationDuration: 1000,
+                });
+            } else {
+                console.warn("Camera reference is not available yet");
+            }
+        }, 1000); // Increased delay for stability (to make sure that MapView is loaded before setting the camera)
+
+        _getLocation();
+
+        return () => clearTimeout(timer);
     }, []);
 
     const _getLocation = async () => {
