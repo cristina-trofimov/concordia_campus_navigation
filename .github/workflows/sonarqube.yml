@@ -12,7 +12,7 @@ jobs:
   sonarqube:
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: read-all
+      pull-requests: read
     steps:
       - uses: actions/checkout@v4
         with:
