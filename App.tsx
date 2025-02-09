@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Button, ThemeProvider, createTheme } from "@rneui/themed";
-import Map from "./components/Map";
-import SearchBarMenu from "./components/SearchBarMenu";
+import Map from "./src/components/Map";
+import SearchBarMenu from "./src/components/SearchBarMenu";
 
 const { height, width } = Dimensions.get("window");
 

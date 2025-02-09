@@ -3,8 +3,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
 
-// Set your Mapbox access token
-Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
+const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
+
+Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map() {
   const sgwCoords = {
@@ -68,7 +69,6 @@ export default function Map() {
       return;
     }
   
-    console.log("Focusing on location:", myLocation);
     cameraRef.current.setCamera({
       centerCoordinate: [myLocation.longitude, myLocation.latitude],
       zoomLevel: 17,
@@ -109,7 +109,7 @@ export default function Map() {
             coordinate={[myLocation.longitude, myLocation.latitude]}
           >
             <Image 
-              source={require('../assets/currentLocation-Icon.png')} 
+              source={require('../resources/images/currentLocation-Icon.png')} 
               style={{ width: 30, height: 30 }}
             />
           </Mapbox.PointAnnotation>        
@@ -119,7 +119,7 @@ export default function Map() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
           <Image
-            source={require('../assets/currentLocation-button.png')}
+            source={require('../resources/images/currentLocation-button.png')}
             style={styles.buttonImage}
           />
         </TouchableOpacity>
