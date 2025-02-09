@@ -114,7 +114,7 @@ export default function Map() {
                         coordinate={[myLocation.longitude, myLocation.latitude]}
                     >
                         <Image
-                            source={require('../assets/currentLocation-Icon.png')}
+                            source={require('../resources/images/currentLocation-Icon.png')}
                             style={styles.annotationImage}
                         />
                     </Mapbox.PointAnnotation>
@@ -124,7 +124,7 @@ export default function Map() {
             <View style={styles.buttonContainer}>
                 <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
                     <Image
-                        source={require('../assets/currentLocation-button.png')}
+                        source={require('../resources/images/currentLocation-button.png')}
                         style={styles.buttonImage}
                     />
                 </TouchableOpacity>
