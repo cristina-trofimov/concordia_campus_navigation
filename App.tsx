@@ -4,8 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Button, ThemeProvider, createTheme } from '@rneui/themed';
 import Map from './components/Map';
-import SearchBar from './components/SearchBar';
-import SearchBarMenu from './components/SearchBarMenu';
+import BottomDrawer from './components/BottomDrawer';
 
 const theme = createTheme({
   lightColors: {
@@ -31,8 +30,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <View style={styles.container}>
         <Map />
-        <SearchBarMenu />
-        <SearchBar />
+          <BottomDrawer> hello</BottomDrawer>
       </View>
     </ThemeProvider>
   </SafeAreaProvider>
