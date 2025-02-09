@@ -23,17 +23,17 @@ export default function Map() {
     const cameraRef = useRef<Camera | null>(null);
     const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     const mapRef = useRef<Mapbox.MapView | null>(null);
-    const [currentCoords, setCurrentCoords] = useState(sgwCoords); // Track current coords
-    const [mapLoaded, setMapLoaded] = useState(false); // Track map load
+    const [currentCoords, setCurrentCoords] = useState(sgwCoords);
+    const [mapLoaded, setMapLoaded] = useState(false);
 
     useEffect(() => {
         _getLocation();
 
-        // Initial camera position set after map loads
+        
         if (mapLoaded && cameraRef.current) {
             cameraRef.current.setCamera({
                 centerCoordinate: [currentCoords.longitude, currentCoords.latitude],
-                zoomLevel: 17,  // Initial zoom level
+                zoomLevel: 17,
                 animationMode: 'flyTo',
                 animationDuration: 1000,
             });
@@ -171,7 +171,6 @@ const styles = StyleSheet.create({
     toggleButtonContainer: {
         position: 'absolute',
         top: 20,
-        right: 20,
         alignItems: 'center',
     },
 });
