@@ -20,6 +20,10 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+        with:
+          args: >
+            -Dsonar.projectKey=cristina-trofimov_concordia_campus_navigation
+            -Dsonar.organization=the-niners
 
       # - name: Set up JDK
       #   uses: actions/setup-java@v3
