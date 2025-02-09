@@ -1,4 +1,5 @@
 /** @type {import('jest').Config} */
+
 const config = {
   rootDir: '..',
   testTimeout: 120000,
@@ -18,15 +19,16 @@ const config = {
     '^.+\\.(js|ts|tsx)$': 'babel-jest'
   },
   preset: 'react-native',  // Tells Jest to use react-native preset
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   setupFilesAfterEnv: ['@testing-library/jest-native/extend-expect'],
   testEnvironment: 'node',
   transformIgnorePatterns: [
-    '/node_modules/(?!(@react-native|react-native|@rnmapbox|@react-native-community|react-test-renderer)/).*/', // Transform these node_modules
+    '/node_modules/(?!(@react-native|react-native|@rnmapbox|@react-native-community|react-test-renderer|@rneui|react-native-size-matters|@babel)/).*/', // Transform these node_modules
   ],
   moduleNameMapper: {
     '\\.css$': 'identity-obj-proxy', // If you're using CSS, you can mock it
     '\\.png$': '<rootDir>/__mocks__/fileMock.js', // Mock image files
+    '@rnmapbox/maps': '<rootDir>/__mocks__/@rnmapbox/maps.js',
   },
 };
 
