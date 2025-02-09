@@ -15,14 +15,14 @@ const config = {
   ],
   testPathIgnorePatterns: ["/node_modules/", "/e2e"], // Ignore these so unit tests run with unit
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.(js|ts|tsx)$': 'babel-jest'
   },
-  preset: 'ts-jest',  // Tells Jest to use react-native preset
+  preset: 'react-native',  // Tells Jest to use react-native preset
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  setupFilesAfterEnv: ['./tests/jest-setup.ts'],
+  setupFilesAfterEnv: ['@testing-library/jest-native/extend-expect'],
   testEnvironment: 'node',
   transformIgnorePatterns: [
-    '/node_modules/(?!(@react-native|react-native|@rnmapbox|@react-native-community)/).*/', // Transform these node_modules
+    '/node_modules/(?!(@react-native|react-native|@rnmapbox|@react-native-community|react-test-renderer)/).*/', // Transform these node_modules
   ],
   moduleNameMapper: {
     '\\.css$': 'identity-obj-proxy', // If you're using CSS, you can mock it
