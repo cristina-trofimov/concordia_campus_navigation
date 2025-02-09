@@ -1,25 +1,30 @@
+// Map.tsx
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import Mapbox, { Camera, MapView, PointAnnotation } from '@rnmapbox/maps';
+import Mapbox, { Camera, MapView, PointAnnotation, MarkerView } from '@rnmapbox/maps';
+import { MapboxGLEvent } from '@rnmapbox/maps/lib/typescript/src/types';
 import * as Location from 'expo-location';
+import ToggleButton from './ToggleButton';
 
-const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
-Mapbox.setAccessToken(MAPBOX_TOKEN);
+Mapbox.setAccessToken('ACCESS_TOKEN');
 
 export default function Map() {
-  const sgwCoords = {
-    latitude: 45.4949968855897,
-    longitude: -73.57794614197633,
-  };
+    const sgwCoords = {
+        latitude: 45.4949968855897,
+        longitude: -73.57794614197633,
+    };
 
-  const loyolaCoords = {
-    latitude: 45.45822972841337,
-    longitude: -73.63915818932158,
-  };
+    const loyolaCoords = {
+        latitude: 45.45830498353995,
+        longitude: -73.63917964725294
+    };
 
   const cameraRef = useRef<Camera | null>(null);
   const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const mapRef = useRef<Mapbox.MapView | null>(null);
+  const [currentCoords, setCurrentCoords] = useState(sgwCoords);
+  const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
@@ -85,43 +90,41 @@ export default function Map() {
   };  
 
   const focusOnLocation = () => {
-    if (!myLocation) {
-      console.warn("User location not available yet.");
-      return;
+    if (!myLocation || !cameraRef.current || !mapLoaded) { // Check mapLoaded
+        console.warn("User location, camera, or map not available.");
+        return;
     }
-  
-    if (!cameraRef.current) {
-      console.warn("Camera reference is null.");
-      return;
-    }
-  
+
     cameraRef.current.setCamera({
-      centerCoordinate: [myLocation.longitude, myLocation.latitude],
-      zoomLevel: 17,
-      animationMode: 'flyTo',
-      animationDuration: 1000,
+        centerCoordinate: [myLocation.longitude, myLocation.latitude],
+        zoomLevel: 17,
+        animationMode: 'flyTo',
+        animationDuration: 1000,
     });
-  };  
+  };
+
+  const handleCampusChange = (isSGW: boolean) => {
+    const coords = isSGW ? sgwCoords : loyolaCoords;
+    setCurrentCoords(coords);
+
+    if (mapLoaded && cameraRef.current) {
+        cameraRef.current.setCamera({
+            centerCoordinate: [coords.longitude, coords.latitude],
+            zoomLevel: 17,
+            animationMode: 'flyTo',
+            animationDuration: 1000,
+        });
+    } else {
+        console.warn("Error loading campus");
+    }
+};
 
   return (
     <View style={styles.container}>
       <MapView
-        style={styles.map}   
-        onDidFinishLoadingMap={() => {
-          if (!cameraRef.current) {
-            console.warn("Camera reference not available yet.");
-            return;
-          }
-        
-          setTimeout(() => {
-            cameraRef.current?.setCamera({
-              centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
-              zoomLevel: 17,
-              animationMode: 'flyTo',
-              animationDuration: 1000,
-            });
-          }, 500); // Small delay to ensure the map is fully ready
-        }} 
+        style={styles.map}
+        ref={mapRef}
+        onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
@@ -150,35 +153,54 @@ export default function Map() {
           />
         </TouchableOpacity>
       </View>
+
+      <View style={styles.toggleButtonContainer}>
+        <ToggleButton
+          mapRef={mapRef}
+          sgwCoords={sgwCoords}
+          loyolaCoords={loyolaCoords}
+          onCampusChange={handleCampusChange}
+          initialCampus={true}
+        />
+      </View>
     </View>
-  );
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  map: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
-  },
-  buttonContainer: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    alignItems: 'center',
-  },
-  buttonImage: {
-    width: 50,
-    height: 50,
-    resizeMode: 'contain',
-  },
-  imageButton: {
-    padding: 10,
-    backgroundColor: 'transparent',
-    borderRadius: 25,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    map: {
+        width: Dimensions.get('window').width,
+        height: Dimensions.get('window').height,
+    },
+    buttonContainer: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        alignItems: 'center',
+    },
+    buttonImage: {
+        width: 50,
+        height: 50,
+        resizeMode: 'contain',
+    },
+    imageButton: {
+        padding: 10,
+        backgroundColor: 'transparent',
+        borderRadius: 25,
+    },
+    annotationImage: {
+        width: 30,
+        height: 30,
+    },
+    toggleButtonContainer: {
+        position: 'absolute',
+        top: 20,
+        alignItems: 'center',
+    },
 });
