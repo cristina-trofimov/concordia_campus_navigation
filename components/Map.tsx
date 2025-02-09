@@ -7,7 +7,7 @@ import * as Location from 'expo-location';
 import ToggleButton from './ToggleButton';
 
 
-Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
+Mapbox.setAccessToken('ACCESS_TOKEN');
 
 export default function Map() {
     const sgwCoords = {
