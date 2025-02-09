@@ -6,7 +6,7 @@ import Map from './src/components/Map';
 
 const theme = createTheme({
   lightColors: {
-    primary: '#B52B20',
+    primary: '#912338',
     secondary: '#D15329',
   },
 

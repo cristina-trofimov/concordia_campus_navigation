@@ -3,34 +3,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
 import { Text } from '@rneui/themed';
+import { locations } from '../data/buildingLocation.ts'
+import { Icon, SocialIcon } from 'react-native-elements';
+import { Feature, Geometry, GeoJsonProperties } from 'geojson';
+import { OnPressEvent } from '@rnmapbox/maps/lib/typescript/src/types/OnPressEvent';
 //import MapboxGL from '@react-native-mapbox-gl/maps';
 // import buildingData from '../assets/GeoJSON/allBuildings.geojson';
 
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
-
-
-const locations = [
-  {
-    id: 1,
-    coordinates: [
-      -73.57794125724925,
-      45.49537552501002
-    ],
-    title: 'Building A',
-    description: 'This is Building A.',
-  },
-  {
-    id: 2,
-    coordinates: [
-      -73.5787373645142,
-      45.49585909906821
-    ],
-    title: 'Building B',
-    description: 'This is Building B.',
-  },
-];
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
@@ -56,53 +38,53 @@ export default function Map() {
           centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
           zoomLevel: 17,
           animationMode: 'flyTo',
-          animationDuration: 1000, 
+          animationDuration: 1000,
         });
       } else {
         console.warn("Camera reference is not available yet");
       }
     }, 1000); // Increased delay for stability (to make sure that MapView is loaded before setting the camera)
-  
+
     _getLocation();
-  
+
     return () => clearTimeout(timer);
-  }, []);  
+  }, []);
 
   const _getLocation = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      
+
       if (status !== 'granted') {
         console.warn('Permission to access location was denied');
         return;
       }
-  
+
       let location = await Location.getCurrentPositionAsync({});
       console.log("User location received:", location.coords);
       setMyLocation(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
     }
-  };  
+  };
 
   const focusOnLocation = () => {
     if (!myLocation) {
       console.warn("User location not available yet.");
       return;
     }
-  
+
     if (!cameraRef.current) {
       console.warn("Camera reference is null.");
       return;
     }
-  
+
     cameraRef.current.setCamera({
       centerCoordinate: [myLocation.longitude, myLocation.latitude],
       zoomLevel: 17,
       animationMode: 'flyTo',
       animationDuration: 1000,
     });
-  };  
+  };
 
   return (
     <View style={styles.container}>
@@ -113,7 +95,7 @@ export default function Map() {
             console.warn("Camera reference not available yet.");
             return;
           }
-        
+
           setTimeout(() => {
             cameraRef.current?.setCamera({
               centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
@@ -122,11 +104,11 @@ export default function Map() {
               animationDuration: 1000,
             });
           }, 500); // Small delay to ensure the map is fully ready
-        }}        
+        }}
       >
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
-          zoomLevel={17} 
+          zoomLevel={17}
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
 
@@ -135,8 +117,10 @@ export default function Map() {
             key={location.id.toString()}
             id={`point-${location.id}`}
             coordinate={location.coordinates}
+            style={{ zIndex: 1 }}
           >
             <View style={styles.marker}>
+              {/* <Text style={styles.markerText}><Icon name='map-marker' type='font-awesome' color='red' size={30} /></Text> */}
               <Text style={styles.markerText}>📍</Text>
             </View>
             <Mapbox.Callout title={location.title}>
@@ -147,17 +131,19 @@ export default function Map() {
             </Mapbox.Callout>
           </Mapbox.PointAnnotation>
         ))}
+
+
         {myLocation && (
           <Mapbox.PointAnnotation
             key={`${myLocation.latitude}-${myLocation.longitude}`}
             id="my-location"
             coordinate={[myLocation.longitude, myLocation.latitude]}
           >
-            <Image 
-              source={require('../resources/images/currentLocation-Icon.png')} 
+            <Image
+              source={require('../resources/images/currentLocation-Icon.png')}
               style={{ width: 30, height: 30 }}
             />
-          </Mapbox.PointAnnotation>        
+          </Mapbox.PointAnnotation>
         )}
       </Mapbox.MapView>
 
