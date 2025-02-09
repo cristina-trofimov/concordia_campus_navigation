@@ -2,6 +2,7 @@ import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-nat
 import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
+import { HighlightBuilding } from './BuildingCoordinates';
 
 // Set your Mapbox access token
 Mapbox.setAccessToken('sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA');
@@ -97,6 +98,7 @@ export default function Map() {
           }, 500); // Small delay to ensure the map is fully ready
         }}        
       >
+        <HighlightBuilding/>
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17} 
