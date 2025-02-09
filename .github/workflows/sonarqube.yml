@@ -16,24 +16,29 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better experience
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Cache SonarQube packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
-
-      - name: Run SonarQube Scanner
+      - uses: sonarsource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          ./gradlew sonarqube -Dsonar.projectKey=cristina-trofimov_concordia_campus_navigation -Dsonar.host.url=https://sonarcloud.io/
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+      # - name: Set up JDK
+      #   uses: actions/setup-java@v3
+      #   with:
+      #     java-version: '17'
+      #     distribution: 'temurin'
+
+      # - name: Cache SonarQube packages
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.sonar/cache
+      #     key: ${{ runner.os }}-sonar
+      #     restore-keys: ${{ runner.os }}-sonar
+
+      # - name: Run SonarQube Scanner
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #   run: |
+      #     ./gradlew sonarqube -Dsonar.projectKey=cristina-trofimov_concordia_campus_navigation -Dsonar.host.url=https://sonarcloud.io/
 
 
 # jobs:
