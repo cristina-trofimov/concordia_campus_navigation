@@ -2,22 +2,22 @@ import React, { ReactNode, useRef } from "react";
 import {
   Dimensions,
   StyleSheet,
+  Text,
   View,
   PanResponder,
   Animated,
   PanResponderGestureState,
 } from "react-native";
-import SearchBar from "./SearchBar";
-import SearchBarMapbox from "./SearchBarMapbox";
 
 const { height, width } = Dimensions.get("window");
-const COLLAPSED_HEIGHT = height * 0.15; // Adjusted for title + bar visibility
+const COLLAPSED_HEIGHT = height * 0.1;
 const EXPANDED_HEIGHT = height * 0.5;
-const VELOCITY_THRESHOLD = 0.5;
+const VELOCITY_THRESHOLD = 0.5; // swipe speed
 
-function BottomDrawer({ children }: { children: ReactNode }) {
+const SearchBarMenu: React.FC = () => {
   const containerHeight = useRef(new Animated.Value(EXPANDED_HEIGHT)).current;
   const isExpanded = useRef<boolean>(true);
+  const gestureStartY = useRef<number>(0);
 
   const animateToPosition = (expanded: boolean) => {
     isExpanded.current = expanded;
@@ -29,7 +29,10 @@ function BottomDrawer({ children }: { children: ReactNode }) {
     }).start();
   };
 
-  const handlePanResponderMove = (_: any, gesture: PanResponderGestureState) => {
+  const handlePanResponderMove = (
+    _: any,
+    gesture: PanResponderGestureState
+  ) => {
     const newHeight = Math.max(
       COLLAPSED_HEIGHT,
       Math.min(
@@ -42,58 +45,78 @@ function BottomDrawer({ children }: { children: ReactNode }) {
     containerHeight.setValue(newHeight);
   };
 
-  const handlePanResponderRelease = (_: any, gesture: PanResponderGestureState) => {
-    const shouldExpand = gesture.vy < 0 || (isExpanded.current && gesture.dy < 0);
-    animateToPosition(shouldExpand);
+  const handlePanResponderGrant = (
+    _: any,
+    gesture: PanResponderGestureState
+  ) => {
+    gestureStartY.current = gesture.y0;
+  };
+
+  const handlePanResponderRelease = (
+    _: any,
+    gesture: PanResponderGestureState
+  ) => {
+    const totalDistance = gesture.dy;
+    const heightDifference = EXPANDED_HEIGHT - COLLAPSED_HEIGHT;
+
+    if (Math.abs(gesture.vy) > VELOCITY_THRESHOLD) {
+      animateToPosition(gesture.vy < 0);
+    } else {
+      const shouldExpand = isExpanded.current
+        ? Math.abs(totalDistance) < heightDifference / 2
+        : -totalDistance > heightDifference / 2;
+
+      animateToPosition(shouldExpand);
+    }
   };
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
+      onPanResponderGrant: handlePanResponderGrant,
       onPanResponderMove: handlePanResponderMove,
       onPanResponderRelease: handlePanResponderRelease,
     })
   ).current;
 
   return (
-    <Animated.View style={[styles.container, { height: containerHeight }]}>
-      {/* Drag Handle + Search Component */}
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          height: containerHeight,
+        },
+      ]}
+    >
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
-        <SearchBar /> {/* Include SearchTry inside the draggable area */}
       </View>
-
-      {/* Children components (only visible when expanded) */}
-      <View style={styles.contentContainer}>{children}</View>
     </Animated.View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    padding: 20,
     width: width,
-    position: "absolute",
-    bottom: 0,
   },
   dragHandle: {
     width: width,
+    height: 30,
     alignItems: "center",
-    paddingVertical: 10,
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
   },
   dragIndicator: {
     width: 60,
     height: 5,
     backgroundColor: "#8F8F8F",
     borderRadius: 3,
-    marginBottom: 10,
-  },
-  contentContainer: {
-    flex: 1,
-    padding: 16,
   },
 });
 
-export default BottomDrawer;
+export default SearchBarMenu;
