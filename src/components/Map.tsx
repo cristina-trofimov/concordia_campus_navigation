@@ -1,7 +1,16 @@
+// Map.tsx
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import Mapbox, { Camera, MarkerView } from '@rnmapbox/maps';
+import Mapbox, { Camera, MapView, PointAnnotation, MarkerView } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
+import { Text } from '@rneui/themed';
+import { locations } from '../data/buildingLocation.ts'
+
+
+import ToggleButton from './ToggleButton';
+import { HighlightBuilding } from './BuildingCoordinates';
+
+
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
@@ -14,12 +23,16 @@ export default function Map() {
   };
 
   const loyolaCoords = {
-    latitude: 45.45822972841337,
-    longitude: -73.63915818932158,
+    latitude: 45.45830498353995,
+    longitude: -73.63917964725294
   };
 
   const cameraRef = useRef<Camera | null>(null);
   const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const mapRef = useRef<Mapbox.MapView | null>(null);
+  const [currentCoords, setCurrentCoords] = useState(sgwCoords);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
     // Focus on SGW when the app starts
@@ -29,95 +42,126 @@ export default function Map() {
           centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
           zoomLevel: 17,
           animationMode: 'flyTo',
-          animationDuration: 1000, 
+          animationDuration: 1000,
         });
       } else {
         console.warn("Camera reference is not available yet");
       }
     }, 1000); // Increased delay for stability (to make sure that MapView is loaded before setting the camera)
-  
+
     _getLocation();
-  
-    return () => clearTimeout(timer);
-  }, []);  
+
+    const locationSubscription = Location.watchPositionAsync(
+      {
+        accuracy: Location.Accuracy.High,
+        timeInterval: 10000,
+        distanceInterval: 1,
+      },
+      (location) => {
+        console.log("User location updated:", location.coords);
+        setMyLocation(location.coords);
+      }
+    );
+
+    return () => {
+      clearTimeout(timer);
+
+      locationSubscription.then((subscription) => {
+        subscription.remove();
+      }).catch((error) => {
+        console.warn("Error unsubscribing from location updates:", error);
+      });
+    }
+  }, []);
+
+  // Trigger a re-render when the user location changes
+  useEffect(() => {
+    setForceUpdate((prev) => prev + 1);
+  }, [myLocation]);
 
   const _getLocation = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      
+
       if (status !== 'granted') {
         console.warn('Permission to access location was denied');
         return;
       }
-  
+
       let location = await Location.getCurrentPositionAsync({});
       console.log("User location received:", location.coords);
       setMyLocation(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
     }
-  };  
+  };
 
   const focusOnLocation = () => {
-    if (!myLocation) {
-      console.warn("User location not available yet.");
+    if (!myLocation || !cameraRef.current || !mapLoaded) { // Check mapLoaded
+      console.warn("User location, camera, or map not available.");
       return;
     }
-  
-    if (!cameraRef.current) {
-      console.warn("Camera reference is null.");
-      return;
-    }
-  
+
     cameraRef.current.setCamera({
       centerCoordinate: [myLocation.longitude, myLocation.latitude],
       zoomLevel: 17,
       animationMode: 'flyTo',
       animationDuration: 1000,
     });
-  };  
+  };
 
   return (
     <View style={styles.container} testID="map-container">
-      <Mapbox.MapView
+      <MapView
         style={styles.map}
         testID="map-view"
-        onDidFinishLoadingMap={() => {
-          if (!cameraRef.current) {
-            console.warn("Camera reference not available yet.");
-            return;
-          }
-        
-          setTimeout(() => {
-            cameraRef.current?.setCamera({
-              centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
-              zoomLevel: 17,
-              animationMode: 'flyTo',
-              animationDuration: 1000,
-            });
-          }, 500); // Small delay to ensure the map is fully ready
-        }}        
+        ref={mapRef}
+        onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <Camera testId="camera"
+        <HighlightBuilding />
+        <Camera
+          testId="camera"
           ref={(ref) => { cameraRef.current = ref; }}
-          zoomLevel={17} 
+          zoomLevel={17}
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
-        {myLocation && (
+
+        {locations.map((location) => (
           <Mapbox.PointAnnotation
-            key={`${myLocation.latitude}-${myLocation.longitude}`}
+            key={location.id.toString()}
+            id={`point-${location.id}`}
+            coordinate={location.coordinates}
+            style={{ zIndex: 1 }}
+          >
+            <View style={styles.marker}>
+              {/* <Text style={styles.markerText}><Icon name='map-marker' type='font-awesome' color='red' size={30} /></Text> */}
+              <Text style={styles.markerText}>📍</Text>
+            </View>
+            <Mapbox.Callout title={location.title}>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>{location.title}</Text>
+                <Text style={styles.calloutDescription}>{location.description}</Text>
+              </View>
+            </Mapbox.Callout>
+          </Mapbox.PointAnnotation>
+        ))}
+
+
+        {myLocation && (
+          <PointAnnotation
+            key={`${myLocation.latitude}-${myLocation.longitude}-${forceUpdate}`}
             id="my-location"
             coordinate={[myLocation.longitude, myLocation.latitude]}
             testID="user-location-point"
           >
-            <Image 
-              source={require('../resources/images/currentLocation-Icon.png')} 
+            <Image
+              source={require('../resources/images/currentLocation-Icon.png')}
               style={{ width: 30, height: 30 }}
               testID="current-location-icon"
             />
-          </Mapbox.PointAnnotation>        
+          </PointAnnotation>
         )}
-      </Mapbox.MapView>
+      </MapView>
 
       <View style={styles.buttonContainer} testID="button-container">
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton} testID="location-button">
@@ -127,6 +171,16 @@ export default function Map() {
             testID="location-button-image"
           />
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.toggleButtonContainer}>
+        <ToggleButton
+          mapRef={mapRef}
+          sgwCoords={sgwCoords}
+          loyolaCoords={loyolaCoords}
+          onCampusChange={handleCampusChange}
+          initialCampus={true}
+        />
       </View>
     </View>
   );
@@ -158,5 +212,34 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: 'transparent',
     borderRadius: 25,
+  },
+  annotationImage: {
+    width: 30,
+    height: 30,
+  },
+  toggleButtonContainer: {
+    position: 'absolute',
+    top: 20,
+    alignItems: 'center',
+  },
+  marker: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  markerText: {
+    fontSize: 24,
+  },
+  callout: {
+    padding: 10,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    width: 150,
+  },
+  calloutTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  calloutDescription: {
+    fontSize: 14,
   },
 });

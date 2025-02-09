@@ -83,13 +83,16 @@ def jscFlavor = 'org.webkit:android-jsc:+'
 android {
 // @generated begin @rnmapbox/maps-libcpp - expo prebuild (DO NOT MODIFY) sync-e24830a5a3e854b398227dfe9630aabfaa1cadd1
 packagingOptions {
-        pickFirst 'lib/x86/libc++_shared.so'
+        
+        //pickFirst 'lib/x86/libc++_shared.so'
         pickFirst 'lib/x86_64/libc++_shared.so'
-        pickFirst 'lib/arm64-v8a/libc++_shared.so'
-        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        //pickFirst 'lib/arm64-v8a/libc++_shared.so'
+        //pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        
     }
 // @generated end @rnmapbox/maps-libcpp
     ndkVersion rootProject.ext.ndkVersion
+    
 
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
@@ -101,8 +104,6 @@ packagingOptions {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
-        testBuildType System.getProperty('testBuildType', 'debug')
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     signingConfigs {
         debug {
@@ -112,6 +113,9 @@ packagingOptions {
             keyPassword 'android'
         }
     }
+
+
+
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
@@ -123,7 +127,6 @@ packagingOptions {
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
             crunchPngs (findProperty('android.enablePngCrunchInReleaseBuilds')?.toBoolean() ?: true)
         }
     }
@@ -159,8 +162,6 @@ packagingOptions {
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
-    androidTestImplementation('com.wix:detox:+')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation("com.facebook.react:react-android")
 
     def isGifEnabled = (findProperty('expo.gif.enabled') ?: "") == "true";

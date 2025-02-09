@@ -9,8 +9,8 @@ const { height, width } = Dimensions.get("window");
 
 const theme = createTheme({
   lightColors: {
-    primary: "#B52B20",
-    secondary: "#D15329",
+    primary: '#912338',
+    secondary: '#D15329',
   },
 
   mode: "light",
@@ -20,9 +20,10 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Map />
-      <BottomDrawer>hello</BottomDrawer>
       <Map testID="Image"/>
+      <BottomDrawer>
+        <Text>hello</Text>
+      </BottomDrawer>
     </View>
   );
 }

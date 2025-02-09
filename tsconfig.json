@@ -2,6 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "isolatedModules": true,
     "jsx": "react-native",
@@ -11,7 +12,8 @@
     "moduleResolution": "node",
     "noEmit": true,
     "strict": true,
-    "target": "esnext"
+    "target": "esnext",
+    "resolveJsonModule": true
   },
   "exclude": [
     "node_modules",
