@@ -20,6 +20,7 @@ export default function Map() {
 
   const cameraRef = useRef<Camera | null>(null);
   const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
     // Focus on SGW when the app starts
@@ -60,6 +61,11 @@ export default function Map() {
       });
     }
   }, []);  
+
+  // Trigger a re-render when the user location changes
+  useEffect(() => {
+    setForceUpdate((prev) => prev + 1);
+  }, [myLocation]);
 
   const _getLocation = async () => {
     try {
@@ -124,7 +130,7 @@ export default function Map() {
         />
         {myLocation && (
           <PointAnnotation
-            key={`${myLocation.latitude}-${myLocation.longitude}`}
+            key={`${myLocation.latitude}-${myLocation.longitude}-${forceUpdate}`}
             id="my-location"
             coordinate={[myLocation.longitude, myLocation.latitude]}
           >
