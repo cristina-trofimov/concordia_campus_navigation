@@ -1,7 +1,5 @@
-const Mapbox = {
-  setAccessToken: jest.fn(),
-  Camera: jest.fn(() => null),
-  MarkerView: jest.fn(() => null),
+export default {
+  Camera: {},
+  MarkerView: {},
+  MapView: () => null, // Return null for now, or add basic functionality
 };
-
-export default Mapbox;

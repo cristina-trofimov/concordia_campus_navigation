@@ -1,6 +1,16 @@
+const { getDefaultConfig } = require('metro-config');
 
-module.exports = {
-  resolver: {
-    sourceExts: ['jsx', 'js', 'ts', 'tsx'], // Ensure TypeScript and JSX files are resolved
-  },
-};
+module.exports = (async () => {
+  const {
+    resolver: { sourceExts },
+  } = await getDefaultConfig();
+
+  return {
+    transformer: {
+      babelTransformerPath: require.resolve('react-native-svg-transformer'),
+    },
+    resolver: {
+      sourceExts: [...sourceExts, 'ts', 'tsx'],
+    },
+  };
+})();

@@ -1,4 +1,7 @@
 /** @type {import('jest').Config} */
+//require('ignore-styles');
+//register(['.css', '.sass', '.scss']);
+
 
 const config = {
   rootDir: '..',
@@ -14,7 +17,7 @@ const config = {
     "**/tests/**/*.test.ts",   // For TypeScript tests
     "**/tests/**/*.test.tsx"   // For TypeScript JSX tests
   ],
-  testPathIgnorePatterns: ["/node_modules/", "/e2e"], // Ignore these so unit tests run with unit
+  testPathIgnorePatterns: ["/node_modules/", "/e2e", "/build/"], // Ignore these so unit tests run with unit
   transform: {
     '^.+\\.(js|ts|tsx)$': 'babel-jest'
   },
@@ -27,8 +30,8 @@ const config = {
   ],
   moduleNameMapper: {
     '\\.css$': 'identity-obj-proxy', // If you're using CSS, you can mock it
-    '\\.png$': '<rootDir>/__mocks__/fileMock.js', // Mock image files
-    '@rnmapbox/maps': '<rootDir>/__mocks__/@rnmapbox/maps.js',
+    '\\.png$': '<rootDir>/tests/_mocks_/fileMock.js', // Mock image files
+    '@rnmapbox/maps': '<rootDir>/tests/_mocks_/@rnmapbox/maps.js',
   },
 };
 

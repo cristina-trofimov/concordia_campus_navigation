@@ -78,9 +78,10 @@ export default function Map() {
   };  
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} testID="map-container">
       <Mapbox.MapView
         style={styles.map}
+        testID="map-view"
         onDidFinishLoadingMap={() => {
           if (!cameraRef.current) {
             console.warn("Camera reference not available yet.");
@@ -97,7 +98,7 @@ export default function Map() {
           }, 500); // Small delay to ensure the map is fully ready
         }}        
       >
-        <Camera
+        <Camera testId="camera"
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17} 
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
@@ -107,20 +108,23 @@ export default function Map() {
             key={`${myLocation.latitude}-${myLocation.longitude}`}
             id="my-location"
             coordinate={[myLocation.longitude, myLocation.latitude]}
+            testID="user-location-point"
           >
             <Image 
               source={require('../resources/images/currentLocation-Icon.png')} 
               style={{ width: 30, height: 30 }}
+              testID="current-location-icon"
             />
           </Mapbox.PointAnnotation>        
         )}
       </Mapbox.MapView>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
+      <View style={styles.buttonContainer} testID="button-container">
+        <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton} testID="location-button">
           <Image
             source={require('../resources/images/currentLocation-button.png')}
             style={styles.buttonImage}
+            testID="location-button-image"
           />
         </TouchableOpacity>
       </View>
