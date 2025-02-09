@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react-native';
 import React from 'react';
-import Map from './Map'; // Adjust the import path based on your file structure
+import Map from '../src/components/Map'; // Adjust the import path based on your file structure
 import * as Location from 'expo-location';
 import Mapbox from '@rnmapbox/maps';
 
