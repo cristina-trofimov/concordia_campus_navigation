@@ -8,6 +8,13 @@ sonar {
     property "sonar.projectKey", "cristina-trofimov_concordia_campus_navigation"
     property "sonar.organization", "the-niners"
     property "sonar.host.url", "https://sonarcloud.io"
+
+    // Read PR variables if they exist
+    if (System.getenv("GITHUB_ACTIONS") == "true") {
+      property "sonar.pullrequest.key", System.getenv("GITHUB_PR_NUMBER")
+      property "sonar.pullrequest.branch", System.getenv("GITHUB_PR_BRANCH")
+      property "sonar.pullrequest.base", System.getenv("GITHUB_PR_BASE")
+    }
   }
 }
 
