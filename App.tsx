@@ -9,8 +9,8 @@ const { height, width } = Dimensions.get("window");
 
 const theme = createTheme({
   lightColors: {
-    primary: "#B52B20",
-    secondary: "#D15329",
+    primary: '#912338',
+    secondary: '#D15329',
   },
 
   mode: "light",
