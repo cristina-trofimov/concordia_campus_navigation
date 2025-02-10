@@ -26,13 +26,13 @@ jobs:
 
       - name: Install Gradle Wrapper (if missing)
         run: |
-          if [ ! -f "./gradlew" ]; then
+          cd android && if [ ! -f "./gradlew" ]; then
             echo "gradlew not found. Installing..."
             gradle wrapper
           fi
 
       - name: Make gradlew executable
-        run: chmod +x ./gradlew  # Ensure it can be executed
+        run: cd android && chmod +x ./gradlew  # Ensure it can be executed
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4
@@ -51,7 +51,7 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew build sonarqube \
+        run: cd android && ./gradlew build sonarqube \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
             -Dsonar.pullrequest.branch=${{ github.head_ref }} \
