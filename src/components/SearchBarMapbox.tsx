@@ -3,7 +3,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "r
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-const MAPBOX_ACCESS_TOKEN = "sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA"; // Replace with your actual Mapbox token
+const MAPBOX_ACCESS_TOKEN = "sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA"; 
 
 const SearchBarMapbox = () => {
   const [query, setQuery] = useState("");

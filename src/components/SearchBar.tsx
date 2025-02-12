@@ -3,7 +3,7 @@ import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "r
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU"; // Replace with your actual Google API key
+const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU"; 
 
 const SearchBar = () => {
   const [query, setQuery] = useState("");
