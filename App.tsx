@@ -21,9 +21,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Map />
-      <BottomDrawer>
-        <Text>hello</Text>
-      </BottomDrawer>
+      <BottomDrawer> </BottomDrawer>
     </View>
   );
 }
