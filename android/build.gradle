@@ -6,7 +6,7 @@ buildscript {
         minSdkVersion = Integer.parseInt(findProperty('android.minSdkVersion') ?: '24')
         compileSdkVersion = Integer.parseInt(findProperty('android.compileSdkVersion') ?: '35')
         targetSdkVersion = Integer.parseInt(findProperty('android.targetSdkVersion') ?: '34')
-        kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.24'
+        kotlinVersion = findProperty('android.kotlinVersion') ?: '1.9.25'
 
         ndkVersion = "26.1.10909125"
     }
@@ -18,9 +18,28 @@ buildscript {
         classpath('com.android.tools.build:gradle')
         classpath('com.facebook.react:react-native-gradle-plugin')
         classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
+
+plugins {
+  id "org.sonarqube" version "6.0.1.5171"
+}
+
+sonar {
+  properties {
+    property "sonar.projectKey", "cristina-trofimov_concordia_campus_navigation"
+    property "sonar.organization", "the-niners"
+    property "sonar.host.url", "https://sonarcloud.io"
+
+    // Read PR variables if they exist
+    if (System.getenv("GITHUB_ACTIONS") == "true") {
+      property "sonar.pullrequest.key", System.getenv("GITHUB_PR_NUMBER")
+      property "sonar.pullrequest.branch", System.getenv("GITHUB_PR_BRANCH")
+      property "sonar.pullrequest.base", System.getenv("GITHUB_PR_BASE")
+    }
+  }
+}
+
 
 apply plugin: "com.facebook.react.rootproject"
 
@@ -36,9 +55,6 @@ allprojects {
         }
 
         google()
-        maven {
-            url("$rootDir/../node_modules/detox/Detox-android")
-        }
         mavenCentral()
         maven { url 'https://www.jitpack.io' }
     }
@@ -46,17 +62,16 @@ allprojects {
 // @generated begin @rnmapbox/maps-v2-maven - expo prebuild (DO NOT MODIFY) sync-32f1b7024bb5099f2805443b1960a3233ccde124
 
 allprojects {
-    repositories {
-        maven {
-            url 'https://api.mapbox.com/downloads/v2/releases/maven'
-            credentials {
-                username = 'mapbox'
-                password = project.hasProperty("MAPBOX_DOWNLOADS_TOKEN") ? project.MAPBOX_DOWNLOADS_TOKEN : ""
-            }
-        }
-        mavenCentral()
-        google()
+  repositories {
+    maven {
+      url 'https://api.mapbox.com/downloads/v2/releases/maven'
+      authentication { basic(BasicAuthentication) }
+      credentials {
+        username = 'mapbox'
+        password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
+      }
     }
+  }
 }
 
 // @generated end @rnmapbox/maps-v2-maven
