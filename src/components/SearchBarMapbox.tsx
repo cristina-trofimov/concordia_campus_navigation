@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// THIS COMPONENT IS A DUPLICATE OF SEARCHBAR.TSX BUT USES MAPBOX API, FOR NOW ITS COMMENTED TO AVOID CODE DUPLICATION
+/*import React, { useState } from "react";
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -34,12 +35,12 @@ const SearchBarMapbox = () => {
 
   return (
     <View style={styles.container}>
-      {/* Centered Title */}
+      {/* Centered Title }
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Find your way around campus</Text>
       </View>
 
-      {/* Search Input */}
+      {/* Search Input }
       <View style={styles.inputContainer}>
         <MaterialIcons name="search" size={24} color="#666" style={styles.searchIcon} />
         <TextInput
@@ -53,7 +54,7 @@ const SearchBarMapbox = () => {
         />
       </View>
 
-      {/* Suggestions List */}
+      {/* Suggestions List }
       <FlatList
         data={suggestions}
         keyExtractor={(item) => item.id}
@@ -114,4 +115,6 @@ const styles = StyleSheet.create({
   });
   
 
-export default SearchBarMapbox;
+export default SearchBarMapbox; 
+
+*/

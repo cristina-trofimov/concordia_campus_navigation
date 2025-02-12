@@ -8,7 +8,7 @@ import {
   PanResponderGestureState,
 } from "react-native";
 import SearchBar from "./SearchBar"; // Import your search component
-import SearchBarMapbox from "./SearchBarMapbox";
+//import SearchBarMapbox from "./SearchBarMapbox";
 
 const { height, width } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.15; // Adjusted for title + bar visibility
