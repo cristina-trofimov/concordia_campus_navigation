@@ -3,7 +3,7 @@ import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-nat
 import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MapView, PointAnnotation, MarkerView } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
-import { Text } from '@rneui/themed';
+//import { Text } from '@rneui/themed';
 import { locations } from '../data/buildingLocation.ts'
 
 

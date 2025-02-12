@@ -81,6 +81,7 @@ function BottomDrawer ({children} : {children : ReactNode} ) {
 
   return (
     <Animated.View
+    testId="bottom-drawer"
       style={[
         styles.container,
         {
@@ -88,7 +89,7 @@ function BottomDrawer ({children} : {children : ReactNode} ) {
         },
       ]}
     >
-      <View {...panResponder.panHandlers} style={styles.dragHandle}>
+      <View {...panResponder.panHandlers} style={styles.dragHandle} testID="drag-handle">
         <View style={styles.dragIndicator} />
         { children }
       </View>

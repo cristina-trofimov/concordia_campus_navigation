@@ -26,7 +26,7 @@ const config = {
   setupFilesAfterEnv: ['@testing-library/jest-native/extend-expect'],
   testEnvironment: 'node',
   transformIgnorePatterns: [
-    '/node_modules/(?!(@react-native|react-native|@rnmapbox|@react-native-community|react-test-renderer|@rneui|react-native-size-matters|@babel)/).*/', // Transform these node_modules
+    '/node_modules/(?!(@react-native|react-native|@rnmapbox|@react-native-community|react-test-renderer|@rneui|react-native-size-matters|@babel|@react-native-mapbox-gl)/).*/', // Transform these node_modules
   ],
   moduleNameMapper: {
     '\\.css$': 'identity-obj-proxy', // If you're using CSS, you can mock it

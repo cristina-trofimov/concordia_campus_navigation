@@ -28,15 +28,16 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ mapRef, sgwCoords, loyolaCo
     };
 
     return (
-        <View style={styles.container}>
-            <TouchableOpacity style={styles.slider} onPress={toggleSwitch} activeOpacity={1}>
-                <Animated.View style={[styles.knob, { transform: [{ translateX }] }]}>
+        <View style={styles.container} testID="toggle-container">
+            <TouchableOpacity style={styles.slider} onPress={toggleSwitch} activeOpacity={1} testID="toggle-button">
+                <Animated.View style={[styles.knob, { transform: [{ translateX }] }]} testID="knob">
                     <Text style={styles.label}>{isSGW ? 'SGW' : 'Loyola'}</Text>
                 </Animated.View>
             </TouchableOpacity>
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
