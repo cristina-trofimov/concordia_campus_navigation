@@ -66,6 +66,7 @@ jobs:
           profile: pixel_3
           disable-animations: true
           script: echo "Emulator is ready!"
+          disable-terminate: true  # Prevents automatic termination after running the script.
 
       - name: Build Android App
         run: |
