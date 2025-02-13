@@ -51,8 +51,8 @@ jobs:
 
       - name: Install Maestro CLI
         run: |
-          curl -s https://raw.githubusercontent.com/maestro-dev/maestro/master/install.sh | bash
-          export PATH=$PATH:$(pwd)/.maestro-cli
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          export PATH=$PATH:$HOME/.maestro/bin
   
       - name: Npm install
         run: npm install
