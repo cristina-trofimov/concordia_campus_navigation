@@ -57,13 +57,30 @@ jobs:
       - name: Npm install
         run: npm install
         
-  
+      - name: Start Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_3
+          disable-animations: true
+          script: echo "Emulator is ready!"
+
+      - name: Build Android App
+        run: |
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Install App on Emulator
+        run: adb install android/app/build/outputs/apk/debug/app-debug.apk
+
       - name: Start Metro Server
-        run: nohup npm start > metro.log 2>&1 &\
+        run: nohup npm start > metro.log 2>&1 &
 
       - name: Run Maestro tests
         run: |
-          maestro test --device "Pixel 3" --project ./e2e/test.yaml
+          maestro test --device "Pixel 3" --app android/app/build/outputs/apk/debug/app-debug.apk --project ./e2e/test.yaml
   
       - name: Upload Test Artifact
         if: failure()
