@@ -11,7 +11,7 @@ import SearchBar from "./SearchBar"; // Import your search component
 //import SearchBarMapbox from "./SearchBarMapbox";
 
 const { height, width } = Dimensions.get("window");
-const COLLAPSED_HEIGHT = height * 0.15; // Adjusted for title + bar visibility
+const COLLAPSED_HEIGHT = height * 0.1; // Adjusted search bar visibility
 const EXPANDED_HEIGHT = height * 0.5;
 const VELOCITY_THRESHOLD = 0.5;
 

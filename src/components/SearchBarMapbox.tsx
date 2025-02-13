@@ -35,10 +35,6 @@ const SearchBarMapbox = () => {
 
   return (
     <View style={styles.container}>
-      {/* Centered Title }
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Find your way around campus</Text>
-      </View>
 
       {/* Search Input }
       <View style={styles.inputContainer}>
@@ -79,16 +75,6 @@ const styles = StyleSheet.create({
       width: "100%",
       paddingHorizontal: 16,
       paddingBottom: 10,
-    },
-    titleContainer: {
-        alignItems: 'center', // Center the title horizontally
-        marginBottom: 16,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: "bold",
-      textAlign: "center",
-      marginBottom: 8,
     },
     inputContainer: {
       flexDirection: "row",
