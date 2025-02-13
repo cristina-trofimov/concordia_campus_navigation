@@ -66,9 +66,9 @@ jobs:
           profile: pixel_3
           disable-animations: true
           emulator-options: "-no-snapshot-save -no-boot-anim -memory 1024 -no-accel -gpu swiftshader_indirect"
-          emulator-wait-timeout: 300  # Give it time to start
+          emulator-boot-timeout: 300000  # Timeout in milliseconds (300000 = 5 minutes)
           script: adb wait-for-device shell sleep 10
-          disable-terminate: true
+
 
 
       - name: Build Android App
