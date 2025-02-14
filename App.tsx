@@ -22,7 +22,7 @@ export default function App() {
     <View style={styles.container}>
       <Map testID="Image"/>
       <BottomDrawer>
-        <Text>hello</Text>
+        <Text accessible={true} accessibilityLabel="hello">hello</Text>
       </BottomDrawer>
     </View>
   );

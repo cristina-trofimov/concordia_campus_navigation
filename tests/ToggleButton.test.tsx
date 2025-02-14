@@ -1,4 +1,6 @@
 import React from 'react';
+import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import Mapbox from '@rnmapbox/maps';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import ToggleButton from '../src/components/ToggleButton';  // Adjust the path accordingly
 
