@@ -57,16 +57,15 @@ jobs:
       - name: Npm install
         run: npm install
         
-      - name: Start Android Emulator
+       - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 30
-          target: google_apis
+          api-level: 31
           arch: x86_64
-          profile: pixel_3
-          disable-animations: true
-          emulator-options: "-no-snapshot-save -no-boot-anim -memory 4096 -cores 2 -gpu swiftshader_indirect -noaudio -no-accel"
-          emulator-boot-timeout: 300000  # 5 minutes
+          avd-name: Android_API31
+          force-avd-creation: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
+          disable-animations: false
           script: adb wait-for-device shell sleep 5
 
 
@@ -83,7 +82,7 @@ jobs:
 
       - name: Run Maestro tests
         run: |
-          maestro test --device "Pixel 3" --app android/app/build/outputs/apk/debug/app-debug.apk --project ./e2e/test.yaml
+          maestro test --device "Android_API31" --app android/app/build/outputs/apk/debug/app-debug.apk --project ./e2e/test.yaml
   
       - name: Upload Test Artifact
         if: failure()
