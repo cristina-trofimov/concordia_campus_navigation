@@ -62,6 +62,8 @@ jobs:
         with:
           version: '7.4'  # specify the desired Gradle version
           distribution: 'bin' 
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
 
       - name: Build Android App
         run: |
