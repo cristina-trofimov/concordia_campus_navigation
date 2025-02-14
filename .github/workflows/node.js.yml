@@ -57,7 +57,18 @@ jobs:
       - name: Npm install
         run: npm install
         
-       - name: Run Detox tests
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          version: '7.4'  # specify the desired Gradle version
+          distribution: 'bin' 
+
+      - name: Build Android App
+        run: |
+          cd android
+          ./gradlew assembleDebug
+        
+      - name: Run Detox tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 31
@@ -67,12 +78,6 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
           disable-animations: false
           script: adb wait-for-device shell sleep 5
-
-
-      - name: Build Android App
-        run: |
-          cd android
-          ./gradlew assembleDebug
 
       - name: Install App on Emulator
         run: adb install android/app/build/outputs/apk/debug/app-debug.apk
@@ -84,6 +89,13 @@ jobs:
         run: |
           maestro test --device "Android_API31" --app android/app/build/outputs/apk/debug/app-debug.apk --project ./e2e/test.yaml
   
+
+      - name: Stop Emulator
+        if: always()  # Ensures this runs even if previous steps fail
+        run: adb -s emulator-5554 emu kill || true
+
+      - name: kill emulator (if needed)
+        run: pkill -f qemu-system || true
       - name: Upload Test Artifact
         if: failure()
         uses: actions/upload-artifact@v4
