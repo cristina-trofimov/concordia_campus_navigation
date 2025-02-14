@@ -70,7 +70,7 @@ jobs:
           cd android
           ./gradlew assembleDebug
         
-      - name: Run Detox tests
+      - name: Start emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 31
