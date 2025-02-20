@@ -70,17 +70,14 @@ jobs:
           cd android
           ./gradlew assembleDebug
         
-      - name: Start emulator
-        uses: reactivecircus/android-emulator-runner@v2
+      - uses: dniHze/maestro-test-action@v1
+      - uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 31
+          api-level: 29
           arch: x86_64
-          avd-name: Android_API31
-          force-avd-creation: true
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
-          disable-animations: false
-          script: adb wait-for-device shell sleep 5
-
+          ram-size: 2048M
+          target: default
+          script: maestro test --format=junit --output=report.xml --no-ansi .maestro
       - name: Install App on Emulator
         run: adb install android/app/build/outputs/apk/debug/app-debug.apk
 
