@@ -82,12 +82,7 @@ jobs:
         run: |
           adb install android/app/build/outputs/apk/debug/app-debug.apk || echo "App install failed"
           adb shell pm list packages | grep "com.cristina.trofimov143.frontend" || echo "App not found!"
-
-      - name: Start Metro Server
-        run: nohup npm start > metro.log 2>&1 &
-
-      - name: Run Maestro tests
-        run: |
+          nohup npm start > metro.log 2>&1 &
           maestro test --format=junit --output=report.xml --no-ansi e2e  
 
       - name: Stop Emulator
