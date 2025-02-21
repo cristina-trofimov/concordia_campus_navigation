@@ -1,4 +1,5 @@
 appId: com.cristina.trofimov143.frontend
 ---
 - launchApp
+- waitForAnimationToEnd
 - assertVisible: "welcomeScreen"
