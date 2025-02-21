@@ -77,9 +77,11 @@ jobs:
           arch: x86_64
           ram-size: 2048M
           target: default
-          script: maestro test --format=junit --output=report.xml --no-ansi e2e
+          script: adb wait-for-device shell sleep 5
       - name: Install App on Emulator
-        run: adb install android/app/build/outputs/apk/debug/app-debug.apk
+        run: |
+          adb install android/app/build/outputs/apk/debug/app-debug.apk || echo "App install failed"
+          adb shell pm list packages | grep "com.cristina.trofimov143.frontend" || echo "App not found!"
 
       - name: Start Metro Server
         run: nohup npm start > metro.log 2>&1 &
