@@ -60,8 +60,8 @@ jobs:
       - name: Set up Gradle
         uses: gradle/gradle-build-action@v2
         with:
-          version: '7.4'  # specify the desired Gradle version
-          distribution: 'bin' 
+          version: '7.4'
+          
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
@@ -78,25 +78,13 @@ jobs:
           ram-size: 2048M
           target: default
           script: |
-            adb wait-for-device shell sleep 5
+            adb wait-for-device
+            sleep 5
             adb install android/app/build/outputs/apk/debug/app-debug.apk || echo "App install failed"
             adb shell pm list packages | grep "com.cristina.trofimov143.frontend" || echo "App not found!"
             nohup npm start > metro.log 2>&1 &
             maestro test --format=junit --output=report.xml --no-ansi e2e  
-
-      - name: Stop Emulator
-        if: always()  # Ensures this runs even if previous steps fail
-        run: adb -s emulator-5554 emu kill || true
-
-      - name: kill emulator (if needed)
-        run: pkill -f qemu-system || true
-      - name: Upload Test Artifact
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: maestro-android-artifacts
-          path: artifacts
-          retention-days: 5
+          
       - name: Upload Test Report
         uses: actions/upload-artifact@v4
         with:
