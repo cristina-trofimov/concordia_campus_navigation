@@ -12,13 +12,17 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container} accessibilityLabel="welcomeScreen">
-      <Text style={styles.title} testID="welcomeScreen" accessibilityLabel="welcomeMessage">Welcome to My React Native Expo App!</Text>
+    <View style={styles.container} accessibilityLabel="welcomeContainer">
+      <Text 
+        style={styles.title} 
+        accessibilityLabel="welcomeScreen"
+      >
+        Welcome to My React Native Expo App!
+      </Text>
       <Text>{message}</Text>
     </View>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
