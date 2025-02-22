@@ -1,13 +1,21 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import Directions from "./Route";
 
-const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU"; 
+const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU";
+const HARDCODED_DESTINATION="1455 Blvd. De Maisonneuve Ouest, Montreal, Quebec H3G 1M8"
 
+interface Prediction {
+  description: string;
+  place_id: string;
+}
 const SearchBar = () => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [origin, setOrigin] = useState<string | null>(null);
+
 
   const fetchSuggestions = async (text: string) => {
     if (text.length < 3) {
@@ -29,6 +37,14 @@ const SearchBar = () => {
       console.error("Error fetching suggestions:", error);
     }
   };
+
+  const handleSuggestionPress = useCallback((item: Prediction) => {
+    const selectedOrigin = item.description;
+    setQuery(selectedOrigin);
+    setSuggestions([]);
+    setOrigin(selectedOrigin);
+}, []);
+  
 
   return (
     <View style={styles.container}>
@@ -56,6 +72,7 @@ const SearchBar = () => {
             style={styles.suggestionItem}
             onPress={() => {
               setQuery(item.description);
+              handleSuggestionPress(item)
               setSuggestions([]); // Hide suggestions on selection
             }}
           >
@@ -63,6 +80,9 @@ const SearchBar = () => {
           </TouchableOpacity>
         )}
       />
+      {origin && (
+                <Directions origin={origin} destination={HARDCODED_DESTINATION} />
+            )}
     </View>
   );
 };
