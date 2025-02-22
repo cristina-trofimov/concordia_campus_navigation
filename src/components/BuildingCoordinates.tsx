@@ -3873,13 +3873,10 @@ const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
     const firstCoord = ring[0];
     const lastCoord = ring[ring.length - 1];
 
-    // Check if the first and last coordinates are the same
     if (firstCoord[0] !== lastCoord[0] || firstCoord[1] !== lastCoord[1]) {
-      // If not, add the first coordinate again to close the polygon
       return [...ring, firstCoord];
     }
 
-    // Otherwise, return the ring as is
     return ring;
   });
 };
@@ -3902,56 +3899,59 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
   const [latitude, longitude] = userCoordinates;
   const swappedUserCoordinates = [longitude, latitude];
 
-  // Fix polygon coordinates
-  const fixedBuildingFeatures = buildingFeatures.map((feature) => {
-    return {
-      ...feature,
-      geometry: {
-        ...feature.geometry,
-        coordinates: fixPolygonCoordinates(feature.geometry.coordinates),
-      },
-    };
-  });
-
-  const updatedFeatures = useMemo(() => {
-    return fixedBuildingFeatures.map((feature) => {
-      const isUserInside = turf.booleanPointInPolygon(
+  // Find the building the user is inside
+  const highlightedBuilding = useMemo(() => {
+    return fixedBuildingFeatures.find((feature) => {
+      return turf.booleanPointInPolygon(
         turf.point(swappedUserCoordinates),
         turf.polygon(feature.geometry.coordinates)
       );
-
-      if (isUserInside) {
-        return {
-          ...feature,
-          properties: {
-            ...feature.properties,
-            color: '#62FF62',
-          },
-        };
-      }
-
-      return feature;
     });
   }, [swappedUserCoordinates]);
 
   return (
-    <Mapbox.ShapeSource
-      id="buildings1"
-      shape={{
-        type: 'FeatureCollection',
-        features: updatedFeatures,
-      }}
-    >
-      <Mapbox.FillExtrusionLayer
-        id="custom-buildings"
-        minZoomLevel={0}
-        maxZoomLevel={22}
-        style={{
-          fillExtrusionColor: ['get', 'color'],
-          fillExtrusionHeight: ['get', 'height'],
-          fillExtrusionOpacity: 0.3,
+    <>
+      {/* Layer for all buildings */}
+      <Mapbox.ShapeSource
+        id="buildings1"
+        shape={{
+          type: 'FeatureCollection',
+          features: fixedBuildingFeatures,
         }}
-      />
-    </Mapbox.ShapeSource>
+      >
+        <Mapbox.FillExtrusionLayer
+          id="all-buildings"
+          minZoomLevel={0}
+          maxZoomLevel={22}
+          style={{
+            fillExtrusionColor: ['get', 'color'],
+            fillExtrusionHeight: ['get', 'height'],
+            fillExtrusionOpacity: 0.3, 
+          }}
+        />
+      </Mapbox.ShapeSource>
+
+      {/* Layer for the highlighted building */}
+      {highlightedBuilding && (
+        <Mapbox.ShapeSource
+          id="highlighted-building"
+          shape={{
+            type: 'FeatureCollection',
+            features: [highlightedBuilding],
+          }}
+        >
+          <Mapbox.FillExtrusionLayer
+            id="highlighted-building-layer"
+            minZoomLevel={0}
+            maxZoomLevel={22}
+            style={{
+              fillExtrusionColor: '#52141F',
+              fillExtrusionHeight: ['get', 'height'],
+              fillExtrusionOpacity: 0.45,
+            }}
+          />
+        </Mapbox.ShapeSource>
+      )}
+    </>
   );
 };
