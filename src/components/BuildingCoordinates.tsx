@@ -3945,7 +3945,7 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
             minZoomLevel={0}
             maxZoomLevel={22}
             style={{
-              fillExtrusionColor: '#52141F',
+              fillExtrusionColor: '#F37413',
               fillExtrusionHeight: ['get', 'height'],
               fillExtrusionOpacity: 0.45,
             }}
