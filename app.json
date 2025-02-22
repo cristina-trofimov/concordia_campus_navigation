@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.cristina.trofimov143.frontend"
     },
     "android": {
       "adaptiveIcon": {
@@ -24,6 +25,19 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "@rnmapbox/maps",
+        {
+          "RNMapboxMapsDownloadToken": "pk.eyJ1IjoibWlkZHkiLCJhIjoiY20zeHMxNnE3MWhuNTJpcHhxYmtlbjExayJ9.J1cN2dCEE7sZshfuhKLVXA"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9208b543-dde0-41be-b9df-6e89049d35ab"
+      }
     }
   }
 }

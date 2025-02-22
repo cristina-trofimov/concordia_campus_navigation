@@ -1,7 +1,16 @@
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+/.idea
 
 # dependencies
 node_modules/
+
+
+# Android
+android/.gradle
+android/.idea
+android/app/build
+android/build
+android/local.properties
 
 # Expo
 .expo/
@@ -28,6 +37,7 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
+/ios
 
 # local env files
 .env*.local
