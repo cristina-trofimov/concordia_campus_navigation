@@ -21,7 +21,11 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Map />
-      <BottomDrawer> </BottomDrawer>
+      <BottomDrawer>
+      <Text>
+      TEST Maestro!
+      </Text>
+      </BottomDrawer>
     </View>
   );
 }
