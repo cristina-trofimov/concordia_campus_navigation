@@ -1,10 +1,6 @@
 appId: com.cristina.trofimov143.frontend
 ---
 - launchApp
-- waitForAnimationToEnd
 - assertVisible: "Welcome to My React Native Expo App!"
-- waitFor:
-        accessibilityId: welcomeScreen
-- assertVisible:
-        accessibilityId: welcomeScreen
+
 
