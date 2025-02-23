@@ -2,5 +2,5 @@ appId: com.cristina.trofimov143.frontend
 ---
 - launchApp
 - assertVisible: "TEST Maestro!"
-
+- assertVisible: { id: "maestro-test-text" }
 
