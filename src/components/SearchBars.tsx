@@ -12,37 +12,51 @@ const SearchBars: React.FC = () => {
     const [originCoords, setOriginCoords] = useState<any>(null);
     const [destinationCoords, setDestinationCoords] = useState<any>(null);
 
-    const getRoute = useCallback(async (currentOrigin: string, currentDestination: string) => {
-        try {
-            const fetchedCoords = await getDirections(currentOrigin, currentDestination);
-            if (fetchedCoords && fetchedCoords.length > 0) {
-                setCoords(fetchedCoords);
-                console.log("Route Coordinates:", fetchedCoords);
-            } else {
-                console.warn("No coordinates received or empty result from getDirections");
-                setCoords(null);
-            }
-        } catch (error) {
-            console.error("Error in getDirections:", error);
-            setCoords(null);
-        }
-    }, [setCoords, getDirections]);
-
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
         setOrigin(selectedOrigin);
         setOriginCoords(coords);
-        if (destinationCoords) {
-            getRoute(selectedOrigin, destination);
+
+        if (destination && selectedOrigin) {
+            try {
+                const fetchedCoords = await getDirections(selectedOrigin, destination);
+                if (fetchedCoords && fetchedCoords.length > 0) {
+                    setCoords(fetchedCoords);
+                    console.log("Route Coordinates:", fetchedCoords);
+                } else {
+                    console.warn("No coordinates received or empty result from getDirections");
+                    setCoords(null);
+                }
+            } catch (error) {
+                console.error("Error in getDirections:", error);
+                setCoords(null);
+            }
+        } else {
+            setCoords(null);
         }
-    }, [destinationCoords, getRoute]);
+    }, [destination, setCoords]);
 
     const handleDestinationSelect = useCallback(async (selectedDestination: string, coords: any) => {
         setDestination(selectedDestination);
         setDestinationCoords(coords);
-        if (originCoords) {
-            getRoute(origin, selectedDestination);
+
+        if (origin && selectedDestination) {
+            try {
+                const fetchedCoords = await getDirections(origin, selectedDestination);
+                if (fetchedCoords && fetchedCoords.length > 0) {
+                    setCoords(fetchedCoords);
+                    console.log("Route Coordinates:", fetchedCoords);
+                } else {
+                    console.warn("No coordinates received or empty result from getDirections");
+                    setCoords(null);
+                }
+            } catch (error) {
+                console.error("Error in getDirections:", error);
+                setCoords(null);
+            }
+        } else {
+            setCoords(null); 
         }
-    }, [originCoords, getRoute]);
+    }, [origin, setCoords]);
 
     return (
         <View style={styles.container}>
