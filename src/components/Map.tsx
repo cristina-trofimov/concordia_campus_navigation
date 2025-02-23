@@ -1,23 +1,20 @@
 // Map.tsx
-import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, View, Image, TouchableOpacity, Animated } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MapView, PointAnnotation, ShapeSource, LineLayer } from '@rnmapbox/maps';
-import * as Location from 'expo-location';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import { Text } from '@rneui/themed';
-import { locations } from '../data/buildingLocation.ts'
+import { locations } from '../data/buildingLocation.ts';
+import * as Location from 'expo-location';
 import { useCoords } from '../data/CoordsContext.tsx';
-
-
 import ToggleButton from './ToggleButton';
 import { HighlightBuilding } from './BuildingCoordinates';
-
-
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
-export default function Map() {
+export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) {
 
   const { coords: routeCoordinates } = useCoords();
 
@@ -204,14 +201,21 @@ export default function Map() {
         )}
       </MapView>
 
-      <View style={styles.buttonContainer}>
+      <Animated.View
+        style={[
+          styles.buttonContainer,
+          {
+            bottom: Animated.add(drawerHeight, 20),
+          },
+        ]}
+      >
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
           <Image
             source={require('../resources/images/currentLocation-button.png')}
             style={styles.buttonImage}
           />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       <View style={styles.toggleButtonContainer}>
         <ToggleButton
