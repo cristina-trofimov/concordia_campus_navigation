@@ -133,7 +133,7 @@ export default function Map() {
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding />
+        <HighlightBuilding userCoordinates={myLocation ? [myLocation.latitude, myLocation.longitude] : null}/>
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17}
