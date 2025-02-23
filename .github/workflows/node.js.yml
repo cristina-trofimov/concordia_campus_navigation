@@ -87,9 +87,7 @@ jobs:
 
             # Wait for Metro Bundler to be ready
             echo "Waiting for Metro Bundler to start..."
-            until curl --silent http://localhost:8081/status; do
-              sleep 5
-            done
+            until curl --silent http://localhost:8081/status; do sleep 5; done
             echo "Metro Bundler is ready!"
             
             # Start the app on the emulator
