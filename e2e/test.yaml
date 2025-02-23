@@ -1,9 +1,9 @@
 appId: com.cristina.trofimov143.frontend
 ---
 - launchApp
-- pause: 5000  # Adding a wait time to allow UI to settle
+- wait: 5000  # Adding a wait time to allow UI to settle
 - assertVisible: "TEST Maestro!"
-- pause: 1000  # Optional: Small wait before checking the next assertion
+- wait: 1000  # Optional: Small wait before checking the next assertion
 - assertVisible: { id: "maestro-test-text" }
 
 #  adb install android/app/build/outputs/apk/debug/app-debug.apk
