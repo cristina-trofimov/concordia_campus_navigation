@@ -20,8 +20,8 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Map id="mapComponent"/>
-      <BottomDrawer id="bottomDrawerComponent">
+      <Map />
+      <BottomDrawer">
       <Text id="maestro-test-text">
       TEST Maestro!
       </Text>
