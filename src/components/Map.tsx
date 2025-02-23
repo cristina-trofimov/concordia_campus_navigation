@@ -1,10 +1,11 @@
 // Map.tsx
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import Mapbox, { Camera, MapView, PointAnnotation, MarkerView } from '@rnmapbox/maps';
+import Mapbox, { Camera, MapView, PointAnnotation, ShapeSource, LineLayer } from '@rnmapbox/maps';
 import * as Location from 'expo-location';
 import { Text } from '@rneui/themed';
 import { locations } from '../data/buildingLocation.ts'
+import { useCoords } from '../data/CoordsContext.tsx';
 
 
 import ToggleButton from './ToggleButton';
@@ -17,6 +18,9 @@ const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map() {
+
+  const { coords: routeCoordinates } = useCoords();
+
   const sgwCoords = {
     latitude: 45.4949968855897,
     longitude: -73.57794614197633,
@@ -35,6 +39,7 @@ export default function Map() {
   const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
+    console.log("routeCoordinates changed:", routeCoordinates)
     // Focus on SGW when the app starts
     const timer = setTimeout(() => {
       if (cameraRef.current) {
@@ -72,7 +77,7 @@ export default function Map() {
         console.warn("Error unsubscribing from location updates:", error);
       });
     }
-  }, []);
+  }, [routeCoordinates]);
 
   // Trigger a re-render when the user location changes
   useEffect(() => {
@@ -161,6 +166,8 @@ export default function Map() {
         ))}
 
 
+
+
         {myLocation && (
           <PointAnnotation
             key={`${myLocation.latitude}-${myLocation.longitude}-${forceUpdate}`}
@@ -172,6 +179,28 @@ export default function Map() {
               style={{ width: 30, height: 30 }}
             />
           </PointAnnotation>
+        )}
+
+        {routeCoordinates && routeCoordinates.length > 1 && (
+          <ShapeSource
+            id="routeSource"
+            shape={{
+              type: 'Feature',  // Must be a Feature
+              geometry: {
+                type: 'LineString',
+                coordinates: routeCoordinates.map(coord => [Number(coord.longitude), Number(coord.latitude)])
+              },
+              properties: {}, // Add an empty properties object. This is important!
+            }}
+          >
+            <LineLayer
+              id="routeLine"
+              style={{
+                lineWidth: 4,
+                lineColor: "blue",
+              }}
+            />
+          </ShapeSource>
         )}
       </MapView>
 

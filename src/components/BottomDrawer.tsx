@@ -7,7 +7,7 @@ import {
   Animated,
   PanResponderGestureState,
 } from "react-native";
-import SearchBar from "./SearchBar"; // Import your search component
+import SearchBars from "./SearchBars";
 //import SearchBarMapbox from "./SearchBarMapbox";
 
 const { height, width } = Dimensions.get("window");
@@ -60,7 +60,7 @@ function BottomDrawer({ children }: { children: ReactNode }) {
       {/* Drag Handle + Search Component */}
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
-        <SearchBar /> {/* Include SearchTry inside the draggable area */}
+        <SearchBars /> {/* Include SearchTry inside the draggable area */}
       </View>
 
       {/* Children components (only visible when expanded) */}

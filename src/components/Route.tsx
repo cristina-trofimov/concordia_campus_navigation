@@ -1,82 +1,44 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { View, Text } from 'react-native'; // Import View and Text
 import Polyline from '@mapbox/polyline';
-
-
-
-interface DirectionsProps {
-    origin: string | null;
-    destination: string | null;
+interface Coords {
+    latitude: number;
+    longitude: number;
 }
 
-function Directions({ origin, destination }: DirectionsProps) {
-    const [directions, setDirections] = useState<any>(null);
-    const [error, setError] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [decodedPolyline, setDecodedPolyline] = useState<any>(null);
-    const [decodedCoords, setDecodedCoords] = useState<any>(null);
+const GOOGLE_MAPS_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU";
 
-    useEffect(() => {
-        async function getDirections(origin: string, destination: string) {
-            setIsLoading(true);
-            try {
-                if (!origin || !destination) {
-                    throw new Error("Origin and destination must be provided.");
-                }
+async function getDirections(origin: string, destination: string): Promise<Coords[] | null> {
+    try {
+        const response = await axios.get('https://maps.googleapis.com/maps/api/directions/json', {
+            params: {
+                origin,
+                destination,
+                key: GOOGLE_MAPS_API_KEY,
+            },
+        });
 
-                const response = await axios.get("https://maps.googleapis.com/maps/api/directions/json", {
-                    params: {
-                        origin,
-                        destination,
-                        key: 'AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU' // **REPLACE WITH YOUR ACTUAL API KEY**
-                    }
-                });
-
-                if (response.data.status === "OK") {
-                    setDirections(response.data);
-                    setDecodedPolyline(Polyline.decode(response.data.routes[0].overview_polyline.points));
-
-                    setError(null);
-                    console.log("Directions API Response:", response.data);
-                    console.log("Polyline:", decodedPolyline);
-                } else {
-                    setDirections(null);
-                }
-            } catch (error: any) {
-                console.error('Error fetching directions:', error);
-                setDirections(null);
-                if (axios.isAxiosError(error)) {
-                    console.error('Axios Response:', error.response);
-                }
-            } finally {
-                setIsLoading(false);
+        if (response.data.status === 'OK') {
+            const routes = response.data.routes;
+            if (routes && routes.length > 0) {
+                const points = Polyline.decode(routes[0].overview_polyline.points);
+                const coords: Coords[] = points.map((point) => ({
+                    longitude: point[1],
+                    latitude: point[0],
+                    
+                }));
+                return coords;
+            } else {
+                console.error("No routes found.");
+                return null;
             }
-        }
-
-        if (origin && destination) {
-            getDirections(origin, destination);
         } else {
-            setDirections(null);
-            setError(null);
-            setIsLoading(false);
+            console.error("Directions API Error:", response.data.status);
+            return null;
         }
-    }, [origin, destination]);
-
-    return (
-        <View>
-            {directions && (
-                <View> {/* Use View */}
-
-                <Text>Decoded Polyline:</Text>
-                <Text>{decodedPolyline}</Text>
-
-                </View>
-            )}
-        </View>
-    );
+    } catch (error) {
+        console.error("Error fetching directions:", error);
+        return null;
+    }
 }
 
-export default Directions;
-
-
+export default getDirections;
