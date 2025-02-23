@@ -83,7 +83,6 @@ jobs:
             adb install android/app/build/outputs/apk/debug/app-debug.apk || echo "App install failed"
             adb shell pm list packages | grep "com.cristina.trofimov143.frontend" || echo "App not found!"
             nohup npm start > metro.log 2>&1 &  
-            // Start-Process -FilePath "cmd.exe" -ArgumentList '/c npm start > metro.log 2>&1'
             maestro test --format=junit --output=report.xml --no-ansi e2e  
           
       - name: Upload Test Report
