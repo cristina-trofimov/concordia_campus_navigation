@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Dimensions, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Dimensions, StyleSheet, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Button, ThemeProvider, createTheme } from "@rneui/themed";
 import Map from "./src/components/Map";
 import BottomDrawer from "./src/components/BottomDrawer";
 
-const { height, width } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
 const theme = createTheme({
   lightColors: {
@@ -17,12 +17,15 @@ const theme = createTheme({
 });
 
 export default function App() {
+  const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
 
   return (
-    <View style={styles.container}>
-      <Map />
-      <BottomDrawer> </BottomDrawer>
-    </View>
+    <ThemeProvider theme={theme}>
+      <View style={styles.container}>
+        <Map drawerHeight={drawerHeight} />
+        <BottomDrawer drawerHeight={drawerHeight} children={undefined} />
+      </View>
+    </ThemeProvider>
   );
 }
 

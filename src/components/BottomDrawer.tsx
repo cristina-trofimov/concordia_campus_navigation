@@ -1,4 +1,4 @@
-import React, { ReactNode, useRef } from "react";
+import React, { ReactNode, useEffect, useRef } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -7,22 +7,27 @@ import {
   Animated,
   PanResponderGestureState,
 } from "react-native";
-import SearchBar from "./SearchBar"; // Import your search component
-//import SearchBarMapbox from "./SearchBarMapbox";
+import SearchBar from "./SearchBar";
 
 const { height, width } = Dimensions.get("window");
-const COLLAPSED_HEIGHT = height * 0.1; // Adjusted search bar visibility
+const COLLAPSED_HEIGHT = height * 0.1;
 const EXPANDED_HEIGHT = height * 0.5;
 const VELOCITY_THRESHOLD = 0.5;
 
-function BottomDrawer({ children }: { children: ReactNode }) {
-  const containerHeight = useRef(new Animated.Value(EXPANDED_HEIGHT)).current;
+function BottomDrawer({
+  children,
+  drawerHeight,
+}: {
+  children: ReactNode;
+  drawerHeight: Animated.Value;
+}) {
   const isExpanded = useRef<boolean>(true);
 
   const animateToPosition = (expanded: boolean) => {
     isExpanded.current = expanded;
-    Animated.spring(containerHeight, {
-      toValue: expanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT,
+    const targetHeight = expanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT;
+    Animated.spring(drawerHeight, {
+      toValue: targetHeight,
       tension: 40,
       friction: 10,
       useNativeDriver: false,
@@ -39,7 +44,7 @@ function BottomDrawer({ children }: { children: ReactNode }) {
           : COLLAPSED_HEIGHT - gesture.dy
       )
     );
-    containerHeight.setValue(newHeight);
+    drawerHeight.setValue(newHeight);
   };
 
   const handlePanResponderRelease = (_: any, gesture: PanResponderGestureState) => {
@@ -56,14 +61,11 @@ function BottomDrawer({ children }: { children: ReactNode }) {
   ).current;
 
   return (
-    <Animated.View style={[styles.container, { height: containerHeight }]}>
-      {/* Drag Handle + Search Component */}
+    <Animated.View style={[styles.container, { height: drawerHeight }]}>
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
-        <SearchBar /> {/* Include SearchTry inside the draggable area */}
+        <SearchBar />
       </View>
-
-      {/* Children components (only visible when expanded) */}
       <View style={styles.contentContainer}>{children}</View>
     </Animated.View>
   );
