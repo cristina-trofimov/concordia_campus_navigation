@@ -2,19 +2,11 @@ import React, { useCallback, useState } from "react";
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import {Prediction, SearchBarProps } from "../interfaces/SearchBar";
 
-const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU"; // **REPLACE WITH YOUR ACTUAL API KEY**
+const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU";
 
-interface Prediction {
-  description: string;
-  place_id: string;
-}
 
-interface SearchBarProps {
-  placeholder: string;
-  onSelect: (selectedPlace: string, coords: any) => void;
-  setCoords: any;
-}
 
 const SearchBarComponent: React.FC<SearchBarProps> = ({ placeholder, onSelect, setCoords }) => {
   const [query, setQuery] = useState("");

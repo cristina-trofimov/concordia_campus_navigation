@@ -8,10 +8,10 @@ import {
   PanResponderGestureState,
 } from "react-native";
 import SearchBars from "./SearchBars";
-//import SearchBarMapbox from "./SearchBarMapbox";
+
 
 const { height, width } = Dimensions.get("window");
-const COLLAPSED_HEIGHT = height * 0.1; // Adjusted search bar visibility
+const COLLAPSED_HEIGHT = height * 0.1;
 const EXPANDED_HEIGHT = height * 0.5;
 const VELOCITY_THRESHOLD = 0.5;
 
@@ -57,13 +57,13 @@ function BottomDrawer({ children }: { children: ReactNode }) {
 
   return (
     <Animated.View style={[styles.container, { height: containerHeight }]}>
-      {/* Drag Handle + Search Component */}
+      
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
-        <SearchBars /> {/* Include SearchTry inside the draggable area */}
+        <SearchBars />
       </View>
 
-      {/* Children components (only visible when expanded) */}
+      
       <View style={styles.contentContainer}>{children}</View>
     </Animated.View>
   );

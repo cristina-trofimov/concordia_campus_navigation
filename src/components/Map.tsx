@@ -153,7 +153,7 @@ export default function Map() {
             style={{ zIndex: 1 }}
           >
             <View style={styles.marker}>
-              {/* <Text style={styles.markerText}><Icon name='map-marker' type='font-awesome' color='red' size={30} /></Text> */}
+              
               <Text style={styles.markerText}>📍</Text>
             </View>
             <Mapbox.Callout title={location.title}>

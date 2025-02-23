@@ -1,9 +1,9 @@
 // SearchBars.tsx
 import React, { useState, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
-import SearchBar from './SearchBar'; // Import your SearchBar component
-import getDirections from './Route'; // Import your getDirections function
-import { useCoords } from '../data/CoordsContext'; // Import your context
+import SearchBar from './SearchBar';
+import getDirections from './Route';
+import { useCoords } from '../data/CoordsContext';
 
 const SearchBars: React.FC = () => {
     const { setCoords } = useCoords();

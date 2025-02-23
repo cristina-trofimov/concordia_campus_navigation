@@ -38,7 +38,7 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
   const [latitude, longitude] = userCoordinates;
   const swappedUserCoordinates = [longitude, latitude];
 
-  // Find the building the user is inside
+
   const highlightedBuilding = useMemo(() => {
     return fixedBuildingFeatures.find((feature) => {
       return turf.booleanPointInPolygon(
@@ -50,7 +50,7 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
 
   return (
     <>
-      {/* Layer for all buildings */}
+
       <Mapbox.ShapeSource
         id="buildings1"
         shape={{
@@ -70,7 +70,7 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
         />
       </Mapbox.ShapeSource>
 
-      {/* Layer for the highlighted building */}
+
       {highlightedBuilding && (
         <Mapbox.ShapeSource
           id="highlighted-building"
