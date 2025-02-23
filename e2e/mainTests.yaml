@@ -1,0 +1,15 @@
+appId: com.cristina.trofimov143.frontend
+---
+- launchApp
+- assertVisible:
+    text: "TEST Maestro!" # Ensure the BottomDrawer text is visible
+
+- tapOn: "SGW"
+- tapOn: "loyola"
+- tapOn:
+    point: 34%, 38%
+- longPressOn: "Where to?"
+- inputText: "Montreal"
+- tapOn: "Montreal, QC, Canada"
+
+- killApp
