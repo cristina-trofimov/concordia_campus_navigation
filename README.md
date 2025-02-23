@@ -57,24 +57,25 @@ node server.js
 npx expo prebuild
 ```
 14. To run Maestro
+- install the app onto the simulator
 ```
 adb install android/app/build/outputs/apk/debug/app-debug.apk
 ```
-install the app onto the simulator
+- Make sure the app is on the simulator
 ```
 adb shell pm list packages | findstr "com.cristina.trofimov143.frontend"
 ```
-Make sure the app is on the simulator
+- run APP in the back end 
 ```
 Start-Process -FilePath "cmd.exe" -ArgumentList '/c npx expo start > metro.log 2>&1'
 ```
-run APP in the back end 
 OR
+- in another terminal
 ```
 npx expo start 
 ```
-in another terminal
+- runs tests in e2e/ folder
 ```
 maestro test e2e/ --format=JUNIT
 ```
-runs tests in e2e/ folder
+
