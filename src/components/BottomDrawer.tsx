@@ -7,7 +7,8 @@ import {
   Animated,
   PanResponderGestureState,
 } from "react-native";
-import SearchBar from "./SearchBar";
+import SearchBars from "./SearchBars";
+
 
 const { height, width } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;
@@ -64,7 +65,7 @@ function BottomDrawer({
     <Animated.View style={[styles.container, { height: drawerHeight }]}>
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
-        <SearchBar />
+        <SearchBars />
       </View>
       <View style={styles.contentContainer}>{children}</View>
     </Animated.View>

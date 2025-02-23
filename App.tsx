@@ -4,6 +4,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Button, ThemeProvider, createTheme } from "@rneui/themed";
 import Map from "./src/components/Map";
 import BottomDrawer from "./src/components/BottomDrawer";
+import { CoordsProvider } from "./src/data/CoordsContext";
 
 const { height } = Dimensions.get("window");
 
@@ -20,12 +21,12 @@ export default function App() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
 
   return (
-    <ThemeProvider theme={theme}>
+    <CoordsProvider>
       <View style={styles.container}>
         <Map drawerHeight={drawerHeight} />
         <BottomDrawer drawerHeight={drawerHeight} children={undefined} />
       </View>
-    </ThemeProvider>
+    </CoordsProvider>
   );
 }
 
