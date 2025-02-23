@@ -4,6 +4,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Button, ThemeProvider, createTheme } from "@rneui/themed";
 import Map from "./src/components/Map";
 import BottomDrawer from "./src/components/BottomDrawer";
+import { CoordsProvider } from "./src/data/CoordsContext";
 
 const { height, width } = Dimensions.get("window");
 
@@ -19,10 +20,13 @@ const theme = createTheme({
 export default function App() {
 
   return (
-    <View style={styles.container}>
-      <Map />
-      <BottomDrawer> </BottomDrawer>
-    </View>
+    <CoordsProvider>
+      <View style={styles.container}>
+        <Map />
+        <BottomDrawer> </BottomDrawer>
+      </View>
+    </CoordsProvider>
+
   );
 }
 
