@@ -2,15 +2,12 @@
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MapView, PointAnnotation, MarkerView } from '@rnmapbox/maps';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import * as Location from 'expo-location';
 import { Text } from '@rneui/themed';
 import { locations } from '../data/buildingLocation.ts'
-
-
 import ToggleButton from './ToggleButton';
 import { HighlightBuilding } from './BuildingCoordinates';
-
-
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
