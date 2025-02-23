@@ -22,7 +22,7 @@ export default function App() {
     <View style={styles.container}>
       <Map />
       <BottomDrawer>
-      <Text>
+      <Text testID="maestro-test-text">
       TEST Maestro!
       </Text>
       </BottomDrawer>
