@@ -2,10 +2,12 @@ appId: com.cristina.trofimov143.frontend
 ---
 - launchApp
 - assertVisible: "TEST Maestro!"
+- assertVisible: { id: "maestro-test-text" }
 
 #  adb install android/app/build/outputs/apk/debug/app-debug.apk
 # adb shell pm list packages | findstr "com.cristina.trofimov143.frontend"
 # Start-Process -FilePath "cmd.exe" -ArgumentList '/c npx expo start > metro.log 2>&1'
 # maestro test e2e/test.yaml --format=JUNIT
+
 
 
