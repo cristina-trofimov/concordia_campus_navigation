@@ -56,11 +56,25 @@ node server.js
 ```
 npx expo prebuild
 ```
-14. Now run the following commands. The first one may take up to 15 min $${\color{red}This \space dosen't \space work \space yet}$$
+14. To run Maestro
 ```
-npx detox build --configuration android.emu.debug
+adb install android/app/build/outputs/apk/debug/app-debug.apk
 ```
+install the app onto the simulator
 ```
-npx detox test --configuration android.emu.debug
+adb shell pm list packages | findstr "com.cristina.trofimov143.frontend"
 ```
-
+Make sure the app is on the simulator
+```
+Start-Process -FilePath "cmd.exe" -ArgumentList '/c npx expo start > metro.log 2>&1'
+```
+run APP in the back end 
+OR
+```
+npx expo start 
+```
+in another terminal
+```
+maestro test e2e/ --format=JUNIT
+```
+runs tests in e2e/ folder
