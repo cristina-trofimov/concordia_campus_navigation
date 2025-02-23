@@ -21,7 +21,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Map />
-      <BottomDrawer">
+      <BottomDrawer>
       <Text id="maestro-test-text">
       TEST Maestro!
       </Text>
