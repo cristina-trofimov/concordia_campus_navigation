@@ -1,12 +1,7 @@
+import { BuildingProperties } from '../interfaces/BuildingProperties';
 import { Feature, Polygon } from 'geojson';
 
 //DID NOT PUT SB BUILDING, PERMANENTLY CLOSED
-
-interface BuildingProperties {
-    height: number;
-    color: string;
-    id: string;
-}
 
 type BuildingFeature = Feature<Polygon, BuildingProperties>;
 
