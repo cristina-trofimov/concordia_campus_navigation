@@ -6,8 +6,11 @@ appId: com.cristina.trofimov143.frontend
 - tapOn: "loyola"
 - tapOn:
     point: 34%, 38%
-- longPressOn: "Where to?"
-- inputText: "Montreal"
-- tapOn: "Montreal, QC, Canada"
+- longPressOn: "Origin"
+- inputText: "Pointe-Claire"
+- tapOn: "Pointe-Claire, QC, Canada"
+- longPressOn: "Destination"
+- inputText: "Fairview Pointe-Claire, Trans-Canada Highway"
+- tapOn: "Fairview Pointe-Claire, Trans-Canada Highway, Pointe-Claire, QC, Canada"
 
 - killApp
