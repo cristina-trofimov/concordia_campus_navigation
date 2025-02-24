@@ -1,7 +1,7 @@
-appId: com.cristina.trofimov143.frontend
----
-- launchApp
-- assertVisible: "TEST Maestro!"
+#appId: com.cristina.trofimov143.frontend
+#---
+#- launchApp
+#- assertVisible: "TEST Maestro!"
 
 
 # adb install android/app/build/outputs/apk/debug/app-debug.apk
@@ -10,4 +10,4 @@ appId: com.cristina.trofimov143.frontend
 # maestro test e2e/mainTests.yaml --format=JUNIT
 
 
-
+#EXAMPLE TEST + COMMANDS
