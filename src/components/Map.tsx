@@ -1,22 +1,23 @@
 // Map.tsx
-import { Dimensions, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
+import { Dimensions, StyleSheet, View, Image, TouchableOpacity, Animated } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import Mapbox, { Camera, MapView, PointAnnotation, MarkerView } from '@rnmapbox/maps';
-import * as Location from 'expo-location';
+import Mapbox, { Camera, MapView, PointAnnotation, ShapeSource, LineLayer } from '@rnmapbox/maps';
+import MapboxGL from '@react-native-mapbox-gl/maps';
 import { Text } from '@rneui/themed';
-import { locations } from '../data/buildingLocation.ts'
-
-
+import { locations } from '../data/buildingLocation.ts';
+import * as Location from 'expo-location';
+import { useCoords } from '../data/CoordsContext.tsx';
 import ToggleButton from './ToggleButton';
 import { HighlightBuilding } from './BuildingCoordinates';
-
-
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
-export default function Map() {
+export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) {
+
+  const { coords: routeCoordinates } = useCoords();
+
   const sgwCoords = {
     latitude: 45.4949968855897,
     longitude: -73.57794614197633,
@@ -35,6 +36,7 @@ export default function Map() {
   const [forceUpdate, setForceUpdate] = useState(0);
 
   useEffect(() => {
+    console.log("routeCoordinates changed:", routeCoordinates)
     // Focus on SGW when the app starts
     const timer = setTimeout(() => {
       if (cameraRef.current) {
@@ -72,7 +74,7 @@ export default function Map() {
         console.warn("Error unsubscribing from location updates:", error);
       });
     }
-  }, []);
+  }, [routeCoordinates]);
 
   // Trigger a re-render when the user location changes
   useEffect(() => {
@@ -133,7 +135,7 @@ export default function Map() {
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding />
+        <HighlightBuilding userCoordinates={myLocation ? [myLocation.latitude, myLocation.longitude] : null}/>
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17}
@@ -148,7 +150,7 @@ export default function Map() {
             style={{ zIndex: 1 }}
           >
             <View style={styles.marker}>
-              {/* <Text style={styles.markerText}><Icon name='map-marker' type='font-awesome' color='red' size={30} /></Text> */}
+              
               <Text style={styles.markerText}>📍</Text>
             </View>
             <Mapbox.Callout title={location.title}>
@@ -159,6 +161,8 @@ export default function Map() {
             </Mapbox.Callout>
           </Mapbox.PointAnnotation>
         ))}
+
+
 
 
         {myLocation && (
@@ -173,16 +177,45 @@ export default function Map() {
             />
           </PointAnnotation>
         )}
+
+        {routeCoordinates && routeCoordinates.length > 1 && (
+          <ShapeSource
+            id="routeSource"
+            shape={{
+              type: 'Feature',  // Must be a Feature
+              geometry: {
+                type: 'LineString',
+                coordinates: routeCoordinates.map(coord => [Number(coord.longitude), Number(coord.latitude)])
+              },
+              properties: {}, // Add an empty properties object. This is important!
+            }}
+          >
+            <LineLayer
+              id="routeLine"
+              style={{
+                lineWidth: 4,
+                lineColor: "blue",
+              }}
+            />
+          </ShapeSource>
+        )}
       </MapView>
 
-      <View style={styles.buttonContainer}>
+      <Animated.View
+        style={[
+          styles.buttonContainer,
+          {
+            bottom: Animated.add(drawerHeight, 20),
+          },
+        ]}
+      >
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
           <Image
             source={require('../resources/images/currentLocation-button.png')}
             style={styles.buttonImage}
           />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
       <View style={styles.toggleButtonContainer}>
         <ToggleButton

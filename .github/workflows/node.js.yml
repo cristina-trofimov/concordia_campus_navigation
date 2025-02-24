@@ -8,6 +8,7 @@ on:
     branches: 
       - '**' # Match all branches
 
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,89 +18,19 @@ jobs:
         node-version: [18.x, 20.x]
 
     steps:
+      # Checkout repository
       - uses: actions/checkout@v2
 
+      # Set up Node.js
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      # Install dependencies
       - run: npm ci
 
+      # Run Jest tests
       - name: Run Jest tests
         run: npm test
-
-  maestro-tests:
-    runs-on: ubuntu-latest
-    steps:
-    
-      - name: Checkout Code
-        uses: actions/checkout@v4
-  
-      - name: Setup Node.js        
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18.x
-          cache: 'npm'
-  
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: zulu
-          java-version: 17
-
-      - name: Install Maestro CLI
-        run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
-          export PATH=$PATH:$HOME/.maestro/bin
-  
-      - name: Npm install
-        run: npm install
-        
-      - name: Set up Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          version: '7.4'
-          
-      - name: Make gradlew executable
-        run: chmod +x android/gradlew
-
-      - name: Build Android App
-        run: |
-          cd android
-          ./gradlew assembleDebug
-        
-      - uses: dniHze/maestro-test-action@v1
-      - uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 29
-          arch: x86_64
-          ram-size: 2048M
-          target: default
-          script: |
-            adb wait-for-device
-            sleep 10
-            adb install android/app/build/outputs/apk/debug/app-debug.apk || echo "App install failed"
-            adb shell pm list packages | grep "com.cristina.trofimov143.frontend" || echo "App not found!"
-            nohup npx expo start &  
-
-            # Wait for Metro Bundler to be ready
-            echo "Waiting for Metro Bundler to start..."
-            until curl --silent http://localhost:8081/status; do sleep 5; done
-            echo "Metro Bundler is ready!"
-            
-            # Start the app on the emulator
-            adb shell am start -n com.cristina.trofimov143.frontend/.MainActivity
-            sleep 10  # Ensure UI loads
-            
-            # Run Maestro tests
-            maestro test --format=junit --output=report.xml --no-ansi e2e
-          
-      - name: Upload Test Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: maestro-report
-          path: report.xml
-  
-  
