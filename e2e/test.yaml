@@ -1,8 +1,8 @@
-#appId: com.cristina.trofimov143.frontend
-#---
-#- launchApp
+appId: com.cristina.trofimov143.frontend
+---
+- launchApp
 #- assertVisible: "TEST Maestro!"
-
+- killApp
 
 # adb install android/app/build/outputs/apk/debug/app-debug.apk
 # adb shell pm list packages | findstr "com.cristina.trofimov143.frontend"
