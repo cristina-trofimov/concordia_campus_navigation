@@ -76,6 +76,6 @@ npx expo start
 ```
 - runs tests in e2e/ folder
 ```
-maestro test e2e/ --format=JUNIT
+maestro test e2e/** --format=JUNIT
 ```
 
