@@ -9,6 +9,8 @@ import * as Location from 'expo-location';
 import { useCoords } from '../data/CoordsContext.tsx';
 import ToggleButton from './ToggleButton';
 import { HighlightBuilding } from './BuildingCoordinates';
+import CalendarButton from './CalendarButton.tsx';
+import SettingsButton from './SettingsButton.tsx';
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
@@ -226,6 +228,12 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
           initialCampus={true}
         />
       </View>
+      <View style={styles.calendarButtonContainer}>
+        <CalendarButton />
+      </View>
+      <View style={styles.settingsButtonContainer}>
+        <SettingsButton />
+      </View>
     </View>
   );
 }
@@ -264,6 +272,18 @@ const styles = StyleSheet.create({
   toggleButtonContainer: {
     position: 'absolute',
     top: 20,
+    alignItems: 'center',
+  },
+  calendarButtonContainer: {
+    position: 'absolute',
+    top: 20,
+    right: 0,
+    alignItems: 'center',
+  },
+  settingsButtonContainer: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
     alignItems: 'center',
   },
   marker: {
