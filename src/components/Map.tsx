@@ -7,14 +7,12 @@ import * as Location from 'expo-location';
 import { useCoords } from '../data/CoordsContext.tsx';
 import ToggleButton from './ToggleButton';
 import Polyline from "@mapbox/polyline"
+import { Coords } from '../interfaces/Map.ts';
 
-interface Coords {
-  latitude: number;
-  longitude: number;
-}
+
+
 import { HighlightBuilding } from './BuildingCoordinates';
 
-// Replace with your actual Mapbox token
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
@@ -75,7 +73,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
       } else {
         console.warn("Camera reference is not available yet");
       }
-    }, 1000);
+    }, 1000);// Increased delay for stability (to make sure that MapView is loaded before setting the camera)
 
     _getLocation();
 
@@ -101,6 +99,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
     }
   }, [routeCoordinates]);
 
+  // Trigger a re-render when the user location changes
   useEffect(() => {
     setForceUpdate((prev) => prev + 1);
   }, [myLocation]);
@@ -219,7 +218,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
           <Mapbox.LineLayer
             id="routeLayer"
             style={{
-              lineColor: '#ff0000', // Red line
+              lineColor: '#ff0000',
               lineWidth: 4,
               lineOpacity: 0.8,
             }}

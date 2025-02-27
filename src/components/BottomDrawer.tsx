@@ -24,7 +24,7 @@ function BottomDrawer({
   children: ReactNode;
   drawerHeight: Animated.Value;
 }) {
-  const { routeData: routeCoordinates } = useCoords(); // Move this line inside the component
+  const { routeData: routeCoordinates } = useCoords();
 
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
 
@@ -34,9 +34,9 @@ function BottomDrawer({
     if (routeCoordinates && routeCoordinates.length > 0) {
       const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => {return step.html_instructions.replace(/<.*?>/g, '');});
       const HtmlContent = ({ instructions }: { instructions: string }) => {return (<div dangerouslySetInnerHTML={{ __html: instructions }} />);};
-      console.log("instructions:",instructions)
+      //console.log("instructions:",instructions)
       setHtmlInstructions(instructions);
-      console.log("HTML changed:", htmlInstructions);
+      //console.log("HTML changed:", htmlInstructions);
     } else {
       setHtmlInstructions([]);
     }
@@ -87,7 +87,6 @@ function BottomDrawer({
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
         <SearchBars />
-        {/* Render the htmlInstructions array as plain text */}
         {htmlInstructions.length > 0 &&
           htmlInstructions.map((instruction, index) => (
             <Text key={index} >
