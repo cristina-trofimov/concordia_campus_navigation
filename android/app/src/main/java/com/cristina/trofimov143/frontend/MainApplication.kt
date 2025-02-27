@@ -2,6 +2,7 @@ package com.cristina.trofimov143.frontend
 
 import android.app.Application
 import android.content.res.Configuration
+import com.smartlook.analytics.reactnative.SmartlookPackage;
 
 import com.facebook.react.PackageList
 import com.facebook.react.ReactApplication
@@ -25,6 +26,9 @@ class MainApplication : Application(), ReactApplication {
             val packages = PackageList(this).packages
             // Packages that cannot be autolinked yet can be added manually here, for example:
             // packages.add(new MyReactNativePackage());
+            packages.add(new SmartlookPackage());
+
+
             return packages
           }
 
