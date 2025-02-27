@@ -1,0 +1,16 @@
+appId: com.cristina.trofimov143.frontend
+---
+- launchApp
+
+- tapOn: "SGW"
+- tapOn: "loyola"
+- tapOn:
+    point: 34%, 38%
+- longPressOn: "Origin"
+- inputText: "Pointe-Claire"
+- tapOn: "Pointe-Claire, QC, Canada"
+- longPressOn: "Destination"
+- inputText: "Fairview Pointe-Claire, Trans-Canada Highway"
+- tapOn: "Fairview Pointe-Claire, Trans-Canada Highway, Pointe-Claire, QC, Canada"
+
+- killApp
