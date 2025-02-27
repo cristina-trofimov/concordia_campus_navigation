@@ -32,7 +32,8 @@ function BottomDrawer({
     console.log("routeCoordinates changed:", routeCoordinates);
 
     if (routeCoordinates && routeCoordinates.length > 0) {
-      const instructions =routeCoordinates[0].legs[0].steps.map((step: any) => step.html_instructions);
+      const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => {return step.html_instructions.replace(/<.*?>/g, '');});
+      const HtmlContent = ({ instructions }: { instructions: string }) => {return (<div dangerouslySetInnerHTML={{ __html: instructions }} />);};
       console.log("instructions:",instructions)
       setHtmlInstructions(instructions);
       console.log("HTML changed:", htmlInstructions);
@@ -86,7 +87,6 @@ function BottomDrawer({
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
         <SearchBars />
-        <Text>htmlInstructions</Text>
         {/* Render the htmlInstructions array as plain text */}
         {htmlInstructions.length > 0 &&
           htmlInstructions.map((instruction, index) => (
