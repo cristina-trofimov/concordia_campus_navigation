@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -6,8 +6,10 @@ import {
   PanResponder,
   Animated,
   PanResponderGestureState,
+  Text,
 } from "react-native";
 import SearchBars from "./SearchBars";
+import { useCoords } from "../data/CoordsContext";
 
 
 const { height, width } = Dimensions.get("window");
@@ -22,6 +24,24 @@ function BottomDrawer({
   children: ReactNode;
   drawerHeight: Animated.Value;
 }) {
+  const { routeData: routeCoordinates } = useCoords(); // Move this line inside the component
+
+  const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
+
+  useEffect(() => {
+    console.log("routeCoordinates changed:", routeCoordinates);
+
+    if (routeCoordinates && routeCoordinates.length > 0) {
+      const instructions =routeCoordinates[0].legs[0].steps.map((step: any) => step.html_instructions);
+      console.log("instructions:",instructions)
+      setHtmlInstructions(instructions);
+      console.log("HTML changed:", htmlInstructions);
+    } else {
+      setHtmlInstructions([]);
+    }
+
+  }, [routeCoordinates]);
+
   const isExpanded = useRef<boolean>(true);
 
   const animateToPosition = (expanded: boolean) => {
@@ -66,6 +86,14 @@ function BottomDrawer({
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
         <SearchBars />
+        <Text>htmlInstructions</Text>
+        {/* Render the htmlInstructions array as plain text */}
+        {htmlInstructions.length > 0 &&
+          htmlInstructions.map((instruction, index) => (
+            <Text key={index} >
+              {instruction}
+            </Text>
+          ))}
       </View>
       <View style={styles.contentContainer}>{children}</View>
     </Animated.View>

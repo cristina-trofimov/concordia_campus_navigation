@@ -40,10 +40,10 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
   const [forceUpdate, setForceUpdate] = useState(0);
 
   const [decodedPolyline, setDecodedPolyline] = useState<Coords[]>([]);
-  const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
+
 
   useEffect(() => {
-    console.log("routeCoordinates changed:", routeCoordinates);
+    //console.log("routeCoordinates changed:", routeCoordinates);
 
     if (routeCoordinates && routeCoordinates.length > 0) {
       try {
@@ -52,19 +52,15 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
         const finaldecoded = decoded.map(coord => ({ latitude: coord.latitude, longitude: coord.longitude }))
         setDecodedPolyline(finaldecoded);
 
-        const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => step.html_instructions);
-        setHtmlInstructions(instructions);
-
-        console.log("decoded polyline:", decoded);
-        console.log("html:", instructions);
+        //console.log("decoded polyline:", decoded);
       } catch (error) {
         console.error("Error processing route coordinates:", error);
         setDecodedPolyline([]);
-        setHtmlInstructions([]);
+
       }
     } else {
       setDecodedPolyline([]);
-      setHtmlInstructions([]);
+
     }
 
     // Focus on SGW when the app starts
