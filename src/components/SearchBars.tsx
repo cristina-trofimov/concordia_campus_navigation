@@ -6,7 +6,7 @@ import getDirections from './Route';
 import { useCoords } from '../data/CoordsContext';
 
 const SearchBars: React.FC = () => {
-    const { setCoords } = useCoords();
+    const { setRouteData } = useCoords();
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
     const [originCoords, setOriginCoords] = useState<any>(null);
@@ -20,20 +20,20 @@ const SearchBars: React.FC = () => {
             try {
                 const fetchedCoords = await getDirections(selectedOrigin, destination);
                 if (fetchedCoords && fetchedCoords.length > 0) {
-                    setCoords(fetchedCoords);
-                    console.log("Route Coordinates:", fetchedCoords);
+                    setRouteData(fetchedCoords);
+                    //console.log("Route Coordinates:", fetchedCoords);
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
-                    setCoords(null);
+                    setRouteData(null);
                 }
             } catch (error) {
                 console.error("Error in getDirections:", error);
-                setCoords(null);
+                setRouteData(null);
             }
         } else {
-            setCoords(null);
+            setRouteData(null);
         }
-    }, [destination, setCoords]);
+    }, [destination, setRouteData]);
 
     const handleDestinationSelect = useCallback(async (selectedDestination: string, coords: any) => {
         setDestination(selectedDestination);
@@ -43,20 +43,20 @@ const SearchBars: React.FC = () => {
             try {
                 const fetchedCoords = await getDirections(origin, selectedDestination);
                 if (fetchedCoords && fetchedCoords.length > 0) {
-                    setCoords(fetchedCoords);
-                    console.log("Route Coordinates:", fetchedCoords);
+                    setRouteData(fetchedCoords);
+                    //console.log("Route Coordinates:", fetchedCoords);
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
-                    setCoords(null);
+                    setRouteData(null);
                 }
             } catch (error) {
                 console.error("Error in getDirections:", error);
-                setCoords(null);
+                setRouteData(null);
             }
         } else {
-            setCoords(null); 
+            setRouteData(null); 
         }
-    }, [origin, setCoords]);
+    }, [origin, setRouteData]);
 
     return (
         <View style={styles.container}>
