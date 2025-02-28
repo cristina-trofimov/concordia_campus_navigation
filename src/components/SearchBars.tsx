@@ -131,7 +131,17 @@ const SearchBars: React.FC = () => {
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.button, { backgroundColor: isInsideBuilding ? "white" : "#ddd" }, { borderColor: isInsideBuilding ? "#912338" : "grey" }]}>
+                        <TouchableOpacity 
+                            style={[
+                                styles.button, 
+                                { 
+                                    backgroundColor: isInsideBuilding ? "white" : "#ddd", 
+                                    borderColor: isInsideBuilding ? "#912338" : "grey",
+                                    opacity: isInsideBuilding ? 1 : 0.5
+                                }
+                            ]}
+                            disabled={!isInsideBuilding} // Disable button when user is outside
+                        >
                             <View style={styles.buttonContent}>
                                 <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
                                 <Text style={[styles.buttonText, { color: isInsideBuilding ? "#912338" : "grey"}]}>Floor View</Text>
