@@ -1,5 +1,5 @@
 // SearchBars.tsx
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import SearchBar from './SearchBar';
 import getDirections from './Route';
@@ -14,12 +14,12 @@ const SearchBars: React.FC = () => {
     const [originCoords, setOriginCoords] = useState<any>(null);
     const [destinationCoords, setDestinationCoords] = useState<any>(null);
     const [transportModes, setTransportModes] = useState([
-        { mode: "car", icon: "car-outline", label: "Drive", time: "0" },
-        { mode: "publicTransport", icon: "bus-outline", label: "Public Transport", time: "0" },
-        { mode: "walk", icon: "walk-outline", label: "Walk", time: "0" },
-        { mode: "bike", icon: "bicycle-outline", label: "Bicycle", time: "0" },
-    ]);  
-    const [selectedMode, setSelectedMode] = useState("walk");
+        { mode: "driving", icon: "car-outline", label: "Drive", time: "0" },
+        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "0" },
+        { mode: "walking", icon: "walk-outline", label: "Walk", time: "0" },
+        { mode: "biking", icon: "bicycle-outline", label: "Bicycle", time: "0" },
+    ]);
+    const [selectedMode, setSelectedMode] = useState("driving");
     const { isInsideBuilding } = useCoords();
 
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
@@ -28,7 +28,7 @@ const SearchBars: React.FC = () => {
 
         if (destination && selectedOrigin) {
             try {
-                const fetchedCoords = await getDirections(selectedOrigin, destination);
+                const fetchedCoords = await getDirections(selectedOrigin, destination,selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
                     //console.log("Route Coordinates:", fetchedCoords);
@@ -43,7 +43,7 @@ const SearchBars: React.FC = () => {
         } else {
             setRouteData(null);
         }
-    }, [destination, setRouteData]);
+    }, [destination, setRouteData,selectedMode]);
 
     const handleDestinationSelect = useCallback(async (selectedDestination: string, coords: any) => {
         setDestination(selectedDestination);
@@ -51,7 +51,7 @@ const SearchBars: React.FC = () => {
 
         if (origin && selectedDestination) {
             try {
-                const fetchedCoords = await getDirections(origin, selectedDestination);
+                const fetchedCoords = await getDirections(origin, selectedDestination,selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
                     //console.log("Route Coordinates:", fetchedCoords);
@@ -64,9 +64,16 @@ const SearchBars: React.FC = () => {
                 setRouteData(null);
             }
         } else {
-            setRouteData(null); 
+            setRouteData(null);
         }
-    }, [origin, setRouteData]);
+    }, [origin, setRouteData,selectedMode]);
+
+    useEffect(() => {
+        if (origin && destination) {
+            console.log("Hello",selectedMode)
+            handleDestinationSelect(destination, destinationCoords);
+        }
+    }, [selectedMode, origin, destination, originCoords, destinationCoords, handleOriginSelect, handleDestinationSelect]);
 
     return (
         <View style={styles.container}>
@@ -89,7 +96,7 @@ const SearchBars: React.FC = () => {
                             {transportModes.find((t) => t.mode === selectedMode)?.label}
                         </Text>
                     </View>
-              
+                
                     {/* Transport Buttons with Time Estimates */}
                     <View style={styles.transportButtonContainer}>
                         {transportModes.map(({ mode, icon, time }) => (
