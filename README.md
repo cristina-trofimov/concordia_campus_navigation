@@ -79,3 +79,7 @@ npx expo start
 maestro test e2e/** --format=JUNIT
 ```
 
+15. To run firebase analytics
+```
+npm install patch-package
+```
