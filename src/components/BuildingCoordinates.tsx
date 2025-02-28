@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import Mapbox from '@rnmapbox/maps';
 import * as turf from '@turf/turf';
 import { buildingFeatures } from '../data/buildingFeatures.ts'
+import { useCoords } from "../data/CoordsContext";
 
 interface HighlightBuildingProps {
   userCoordinates: [number, number] | null;
@@ -31,6 +32,8 @@ const fixedBuildingFeatures = buildingFeatures.map((feature) => {
 });
 
 export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) => {
+  const { setIsInsideBuilding } = useCoords();
+
   if (!userCoordinates) {
     return null;
   }
@@ -47,6 +50,9 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
       );
     });
   }, [swappedUserCoordinates]);
+
+  // Update the context state whenever user location changes
+  setIsInsideBuilding(!!highlightedBuilding);
 
   return (
     <>
@@ -65,7 +71,7 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
           style={{
             fillExtrusionColor: ['get', 'color'],
             fillExtrusionHeight: ['get', 'height'],
-            fillExtrusionOpacity: 0.3, 
+            fillExtrusionOpacity: 0.3,
           }}
         />
       </Mapbox.ShapeSource>

@@ -14,12 +14,13 @@ const SearchBars: React.FC = () => {
     const [originCoords, setOriginCoords] = useState<any>(null);
     const [destinationCoords, setDestinationCoords] = useState<any>(null);
     const [transportModes, setTransportModes] = useState([
-        { mode: "car", icon: "car-outline", label: "Driving", time: "0" },
-        { mode: "bus", icon: "bus-outline", label: "Transit", time: "0" },
-        { mode: "walk", icon: "walk-outline", label: "Walking", time: "0" },
-        { mode: "bike", icon: "bicycle-outline", label: "Cycling", time: "0" },
+        { mode: "car", icon: "car-outline", label: "Drive", time: "0" },
+        { mode: "publicTransport", icon: "bus-outline", label: "Public Transport", time: "0" },
+        { mode: "walk", icon: "walk-outline", label: "Walk", time: "0" },
+        { mode: "bike", icon: "bicycle-outline", label: "Bicycle", time: "0" },
     ]);  
     const [selectedMode, setSelectedMode] = useState("walk");
+    const { isInsideBuilding } = useCoords();
 
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
         setOrigin(selectedOrigin);
@@ -123,17 +124,17 @@ const SearchBars: React.FC = () => {
 
                         {/* Buttons Container */}
                         <View style={styles.buttonsContainer}>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: "#912338" }]}>
+                        <TouchableOpacity style={[styles.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}>
                             <View style={styles.buttonContent}>
                                 <Entypo name="direction" size={20} color="white" />
                                 <Text style={[styles.buttonText, { color: "white"}]}>Start</Text>
                             </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.button, { backgroundColor: "#ddd" }]}>
+                        <TouchableOpacity style={[styles.button, { backgroundColor: isInsideBuilding ? "white" : "#ddd" }, { borderColor: isInsideBuilding ? "#912338" : "grey" }]}>
                             <View style={styles.buttonContent}>
-                                <Entypo name="location" size={20} color="grey" />
-                                <Text style={[styles.buttonText, { color: "grey"}]}>Floor View</Text>
+                                <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
+                                <Text style={[styles.buttonText, { color: isInsideBuilding ? "#912338" : "grey"}]}>Floor View</Text>
                             </View>
                         </TouchableOpacity>
 
@@ -220,12 +221,13 @@ const styles = StyleSheet.create({
         gap: 30,
       },
       button: {
-        paddingVertical: 8, 
+        paddingVertical: 7, 
         paddingHorizontal: 15,
         borderRadius: 25,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
+        borderWidth: 1,
     },    
       buttonContent: {
         flexDirection: "row", 
