@@ -1,13 +1,16 @@
-// Map.tsx
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity, Animated } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Mapbox, { Camera, MapView, PointAnnotation, ShapeSource, LineLayer } from '@rnmapbox/maps';
-import MapboxGL from '@react-native-mapbox-gl/maps';
 import { Text } from '@rneui/themed';
 import { locations } from '../data/buildingLocation.ts';
 import * as Location from 'expo-location';
 import { useCoords } from '../data/CoordsContext.tsx';
 import ToggleButton from './ToggleButton';
+import Polyline from "@mapbox/polyline"
+import { Coords } from '../interfaces/Map.ts';
+
+
+
 import { HighlightBuilding } from './BuildingCoordinates';
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
@@ -15,8 +18,7 @@ const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) {
-
-  const { coords: routeCoordinates } = useCoords();
+  const { routeData: routeCoordinates } = useCoords();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -25,7 +27,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
 
   const loyolaCoords = {
     latitude: 45.45830498353995,
-    longitude: -73.63917964725294
+    longitude: -73.63917964725294,
   };
 
   const cameraRef = useRef<Camera | null>(null);
@@ -35,8 +37,30 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
 
+  const [decodedPolyline, setDecodedPolyline] = useState<Coords[]>([]);
+
+
   useEffect(() => {
-    console.log("routeCoordinates changed:", routeCoordinates)
+    //console.log("routeCoordinates changed:", routeCoordinates);
+
+    if (routeCoordinates && routeCoordinates.length > 0) {
+      try {
+        const points = Polyline.decode(routeCoordinates[0].overview_polyline.points);
+        const decoded = points.map(([lat, lng]) => ({ latitude: lat, longitude: lng }));
+        const finaldecoded = decoded.map(coord => ({ latitude: coord.latitude, longitude: coord.longitude }))
+        setDecodedPolyline(finaldecoded);
+
+        //console.log("decoded polyline:", decoded);
+      } catch (error) {
+        console.error("Error processing route coordinates:", error);
+        setDecodedPolyline([]);
+
+      }
+    } else {
+      setDecodedPolyline([]);
+
+    }
+
     // Focus on SGW when the app starts
     const timer = setTimeout(() => {
       if (cameraRef.current) {
@@ -49,7 +73,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
       } else {
         console.warn("Camera reference is not available yet");
       }
-    }, 1000); // Increased delay for stability (to make sure that MapView is loaded before setting the camera)
+    }, 1000);// Increased delay for stability (to make sure that MapView is loaded before setting the camera)
 
     _getLocation();
 
@@ -67,7 +91,6 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
 
     return () => {
       clearTimeout(timer);
-
       locationSubscription.then((subscription) => {
         subscription.remove();
       }).catch((error) => {
@@ -99,7 +122,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
   };
 
   const focusOnLocation = () => {
-    if (!myLocation || !cameraRef.current || !mapLoaded) { // Check mapLoaded
+    if (!myLocation || !cameraRef.current || !mapLoaded) {
       console.warn("User location, camera, or map not available.");
       return;
     }
@@ -128,6 +151,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
     }
   };
 
+
   return (
     <View style={styles.container}>
       <MapView
@@ -135,7 +159,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding userCoordinates={myLocation ? [myLocation.latitude, myLocation.longitude] : null}/>
+        <HighlightBuilding userCoordinates={myLocation ? [myLocation.latitude, myLocation.longitude] : null} />
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17}
@@ -150,7 +174,6 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
             style={{ zIndex: 1 }}
           >
             <View style={styles.marker}>
-              
               <Text style={styles.markerText}>📍</Text>
             </View>
             <Mapbox.Callout title={location.title}>
@@ -162,12 +185,9 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
           </Mapbox.PointAnnotation>
         ))}
 
-
-
-
         {myLocation && (
           <PointAnnotation
-            key={`${myLocation.latitude}-${myLocation.longitude}-${forceUpdate}`}
+            key={`<span class="math-inline">\{myLocation\.latitude\}\-</span>{myLocation.longitude}-${forceUpdate}`}
             id="my-location"
             coordinate={[myLocation.longitude, myLocation.latitude]}
           >
@@ -178,28 +198,39 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
           </PointAnnotation>
         )}
 
-        {routeCoordinates && routeCoordinates.length > 1 && (
-          <ShapeSource
-            id="routeSource"
-            shape={{
-              type: 'Feature',  // Must be a Feature
-              geometry: {
-                type: 'LineString',
-                coordinates: routeCoordinates.map(coord => [Number(coord.longitude), Number(coord.latitude)])
+{decodedPolyline.length > 0 && (
+        <Mapbox.ShapeSource
+          id="routeSource"
+          shape={{
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'LineString',
+                  coordinates:decodedPolyline.map(point => [point.longitude, point.latitude]),
+                },
+                properties: {},
               },
-              properties: {}, // Add an empty properties object. This is important!
+            ],
+          }}
+        >
+          <Mapbox.LineLayer
+            id="routeLayer"
+            style={{
+              lineColor: '#ff0000',
+              lineWidth: 4,
+              lineOpacity: 0.8,
             }}
-          >
-            <LineLayer
-              id="routeLine"
-              style={{
-                lineWidth: 4,
-                lineColor: "blue",
-              }}
-            />
-          </ShapeSource>
-        )}
+          />
+        </Mapbox.ShapeSource>
+      )}
+
+
+
       </MapView>
+
+
 
       <Animated.View
         style={[

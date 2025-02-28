@@ -6,43 +6,57 @@ import getDirections from './Route';
 import { useCoords } from '../data/CoordsContext';
 
 const SearchBars: React.FC = () => {
-    const { setCoords } = useCoords();
+    const { setRouteData } = useCoords();
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
     const [originCoords, setOriginCoords] = useState<any>(null);
     const [destinationCoords, setDestinationCoords] = useState<any>(null);
 
-    const getRoute = useCallback(async (currentOrigin: string, currentDestination: string) => {
-        try {
-            const fetchedCoords = await getDirections(currentOrigin, currentDestination);
-            if (fetchedCoords && fetchedCoords.length > 0) {
-                setCoords(fetchedCoords);
-                console.log("Route Coordinates:", fetchedCoords);
-            } else {
-                console.warn("No coordinates received or empty result from getDirections");
-                setCoords(null);
-            }
-        } catch (error) {
-            console.error("Error in getDirections:", error);
-            setCoords(null);
-        }
-    }, [setCoords, getDirections]);
-
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
         setOrigin(selectedOrigin);
         setOriginCoords(coords);
-        if (destinationCoords) {
-            getRoute(selectedOrigin, destination);
+
+        if (destination && selectedOrigin) {
+            try {
+                const fetchedCoords = await getDirections(selectedOrigin, destination);
+                if (fetchedCoords && fetchedCoords.length > 0) {
+                    setRouteData(fetchedCoords);
+                    //console.log("Route Coordinates:", fetchedCoords);
+                } else {
+                    console.warn("No coordinates received or empty result from getDirections");
+                    setRouteData(null);
+                }
+            } catch (error) {
+                console.error("Error in getDirections:", error);
+                setRouteData(null);
+            }
+        } else {
+            setRouteData(null);
         }
-    }, [destinationCoords, getRoute]);
+    }, [destination, setRouteData]);
 
     const handleDestinationSelect = useCallback(async (selectedDestination: string, coords: any) => {
         setDestination(selectedDestination);
         setDestinationCoords(coords);
-        if (originCoords) {
-            getRoute(origin, selectedDestination);
+
+        if (origin && selectedDestination) {
+            try {
+                const fetchedCoords = await getDirections(origin, selectedDestination);
+                if (fetchedCoords && fetchedCoords.length > 0) {
+                    setRouteData(fetchedCoords);
+                    //console.log("Route Coordinates:", fetchedCoords);
+                } else {
+                    console.warn("No coordinates received or empty result from getDirections");
+                    setRouteData(null);
+                }
+            } catch (error) {
+                console.error("Error in getDirections:", error);
+                setRouteData(null);
+            }
+        } else {
+            setRouteData(null); 
         }
-    }, [originCoords, getRoute]);
+    }, [origin, setRouteData]);
 
     return (
         <View style={styles.container}>
