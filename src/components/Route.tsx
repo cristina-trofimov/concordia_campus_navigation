@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Polyline from '@mapbox/polyline';
+
 interface Coords {
     latitude: number;
     longitude: number;
@@ -20,13 +20,7 @@ async function getDirections(origin: string, destination: string): Promise<Coord
         if (response.data.status === 'OK') {
             const routes = response.data.routes;
             if (routes && routes.length > 0) {
-                const points = Polyline.decode(routes[0].overview_polyline.points);
-                const coords: Coords[] = points.map((point) => ({
-                    longitude: point[1],
-                    latitude: point[0],
-                    
-                }));
-                return coords;
+                return routes;
             } else {
                 console.error("No routes found.");
                 return null;
