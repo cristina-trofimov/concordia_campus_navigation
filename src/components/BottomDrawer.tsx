@@ -7,9 +7,11 @@ import {
   Animated,
   PanResponderGestureState,
   Text,
+  TouchableOpacity
 } from "react-native";
 import SearchBars from "./SearchBars";
 import { useCoords } from "../data/CoordsContext";
+import { Ionicons } from "@expo/vector-icons";
 
 
 const { height, width } = Dimensions.get("window");
@@ -24,9 +26,10 @@ function BottomDrawer({
   children: ReactNode;
   drawerHeight: Animated.Value;
 }) {
-  const { routeData: routeCoordinates } = useCoords();
 
+  const { routeData: routeCoordinates } = useCoords();
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
+  const [selectedMode, setSelectedMode] = useState("walk"); // Default to walking
 
   useEffect(() => {
     console.log("routeCoordinates changed:", routeCoordinates);
@@ -82,17 +85,57 @@ function BottomDrawer({
     })
   ).current;
 
+  const transportModes = [
+    { mode: "car", icon: "car-outline", label: "Driving", time: "12 min" },
+    { mode: "bus", icon: "bus-outline", label: "Transit", time: "20 min" },
+    { mode: "walk", icon: "walk-outline", label: "Walking", time: "35 min" },
+    { mode: "bike", icon: "bicycle-outline", label: "Cycling", time: "18 min" },
+  ];
+
   return (
     <Animated.View style={[styles.container, { height: drawerHeight }]}>
       <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
         <SearchBars />
-        {htmlInstructions.length > 0 &&
-          htmlInstructions.map((instruction, index) => (
-            <Text key={index} >
-              {instruction}
-            </Text>
-          ))}
+        {htmlInstructions.length > 0 && (
+          <>
+            {/* Selected Transport Mode Title */}
+            <View style={styles.selectedModeContainer}>
+              <Text style={styles.selectedModeText}>
+                {transportModes.find((t) => t.mode === selectedMode)?.label}
+              </Text>
+            </View>
+  
+            {/* Transport Buttons with Time Estimates */}
+            <View style={styles.transportButtonContainer}>
+              {transportModes.map(({ mode, icon, time }) => (
+                <TouchableOpacity
+                  key={mode}
+                  style={[
+                    styles.transportButton,
+                  ]}
+                  onPress={() => setSelectedMode(mode)}
+                >
+                  <View style={styles.transportButtonContent}>
+                    <Ionicons
+                      name={icon as keyof typeof Ionicons.glyphMap}
+                      size={24}
+                      color={selectedMode === mode ? "#912338" : "black"}
+                    />
+                    <Text style={[styles.timeText, { color: selectedMode === mode ? "#912338" : "black" }]}>{time}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+  
+            {/* Instructions */}
+            {htmlInstructions.map((instruction, index) => (
+              <View key={index} style={styles.instructionContainer}>
+                <Text>{instruction}</Text>
+              </View>
+            ))}
+          </>
+        )}
       </View>
       <View style={styles.contentContainer}>{children}</View>
     </Animated.View>
@@ -123,6 +166,44 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     padding: 16,
+  },
+  transportButtonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    width: "100%",
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  transportButton: {
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 8,
+  },
+  instructionContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  selectedModeContainer: {
+    width: "100%",
+    alignItems: "flex-start",
+    paddingHorizontal: 20,
+  },
+  selectedModeText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "left",
+    marginVertical: 5,
+  },
+  transportButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6, 
+  },
+  timeText: {
+    fontSize: 12,
   },
 });
 
