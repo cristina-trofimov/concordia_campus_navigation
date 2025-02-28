@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Mapbox from '@rnmapbox/maps';
 import * as turf from '@turf/turf';
 import { buildingFeatures } from '../data/buildingFeatures.ts'
@@ -34,25 +34,30 @@ const fixedBuildingFeatures = buildingFeatures.map((feature) => {
 export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) => {
   const { setIsInsideBuilding } = useCoords();
 
-  if (!userCoordinates) {
-    return null;
-  }
-
-  const [latitude, longitude] = userCoordinates;
-  const swappedUserCoordinates = [longitude, latitude];
-
+  const swappedUserCoordinates = useMemo(() => {
+    if (!userCoordinates) return null;
+    const [latitude, longitude] = userCoordinates;
+    return [longitude, latitude];
+  }, [userCoordinates]);
 
   const highlightedBuilding = useMemo(() => {
-    return fixedBuildingFeatures.find((feature) => {
-      return turf.booleanPointInPolygon(
+    if (!swappedUserCoordinates) return null;
+    return fixedBuildingFeatures.find((feature) =>
+      turf.booleanPointInPolygon(
         turf.point(swappedUserCoordinates),
         turf.polygon(feature.geometry.coordinates)
-      );
-    });
+      )
+    );
   }, [swappedUserCoordinates]);
 
   // Update the context state whenever user location changes
-  setIsInsideBuilding(!!highlightedBuilding);
+  useEffect(() => {
+    setIsInsideBuilding(!!highlightedBuilding);
+  }, [highlightedBuilding, setIsInsideBuilding]);
+
+  if (!userCoordinates) {
+    return null;
+  }
 
   return (
     <>
