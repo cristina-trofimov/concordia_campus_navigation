@@ -5,8 +5,13 @@ import { Button, ThemeProvider, createTheme } from "@rneui/themed";
 import Map from "./src/components/Map";
 import BottomDrawer from "./src/components/BottomDrawer";
 import { CoordsProvider } from "./src/data/CoordsContext";
+import HomeScreen from './src/screens/HomeScreen';
+import CalendarScreen from "./src/screens/CalendarScreen";
+// import { NavigationContainer } from '@react-navigation/native';
+// import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const { height } = Dimensions.get("window");
+// const Stack = createNativeStackNavigator();
 
 const theme = createTheme({
   lightColors: {
@@ -21,14 +26,21 @@ export default function App() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
 
   return (
-    <CoordsProvider>
-      <View style={styles.container}>
-        <Map drawerHeight={drawerHeight} />
-        <BottomDrawer drawerHeight={drawerHeight} children={undefined} />
-      </View>
-    </CoordsProvider>
+    // <CalendarScreen />
+    <HomeScreen />
+    // <GestureHandlerRootView style={{ flex: 1 }}>
+    //   <NavigationContainer>
+    //     <Stack.Navigator initialRouteName="Home">
+    //       <Stack.Screen name="Home" component={HomeScreen} />
+    //       <Stack.Screen name="Calendar" component={CalendarScreen} />
+    //     </Stack.Navigator>
+    //   </NavigationContainer>
+    // // </GestureHandlerRootView>
   );
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {
