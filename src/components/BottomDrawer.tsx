@@ -29,14 +29,14 @@ function BottomDrawer({
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log("routeCoordinates changed:", routeCoordinates);
+
 
     if (routeCoordinates && routeCoordinates.length > 0) {
-      const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => {return step.html_instructions.replace(/<.*?>/g, '');});
-      const HtmlContent = ({ instructions }: { instructions: string }) => {return (<div dangerouslySetInnerHTML={{ __html: instructions }} />);};
-      //console.log("instructions:",instructions)
+      const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => { return step.html_instructions.replace(/<.*?>/g, ''); });
+
+
       setHtmlInstructions(instructions);
-      //console.log("HTML changed:", htmlInstructions);
+
     } else {
       setHtmlInstructions([]);
     }
