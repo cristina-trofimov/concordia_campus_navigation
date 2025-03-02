@@ -7,7 +7,7 @@ interface Coords {
 
 const GOOGLE_MAPS_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU";
 
-async function getDirections(origin: string, destination: string, mode:string): Promise<Coords[] | null> {
+async function getDirections(origin: string, destination: string, mode: string): Promise<Coords[] | null> {
     try {
         const response = await axios.get('https://maps.googleapis.com/maps/api/directions/json', {
             params: {

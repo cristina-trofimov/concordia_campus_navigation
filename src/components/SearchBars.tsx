@@ -28,10 +28,10 @@ const SearchBars: React.FC = () => {
 
         if (destination && selectedOrigin) {
             try {
-                const fetchedCoords = await getDirections(selectedOrigin, destination,selectedMode);
+                const fetchedCoords = await getDirections(selectedOrigin, destination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
-                    //console.log("Route Coordinates:", fetchedCoords);
+
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
                     setRouteData(null);
@@ -43,7 +43,7 @@ const SearchBars: React.FC = () => {
         } else {
             setRouteData(null);
         }
-    }, [destination, setRouteData,selectedMode]);
+    }, [destination, setRouteData, selectedMode]);
 
     const handleDestinationSelect = useCallback(async (selectedDestination: string, coords: any) => {
         setDestination(selectedDestination);
@@ -51,10 +51,10 @@ const SearchBars: React.FC = () => {
 
         if (origin && selectedDestination) {
             try {
-                const fetchedCoords = await getDirections(origin, selectedDestination,selectedMode);
+                const fetchedCoords = await getDirections(origin, selectedDestination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
-                    //console.log("Route Coordinates:", fetchedCoords);
+
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
                     setRouteData(null);
@@ -66,11 +66,11 @@ const SearchBars: React.FC = () => {
         } else {
             setRouteData(null);
         }
-    }, [origin, setRouteData,selectedMode]);
+    }, [origin, setRouteData, selectedMode]);
 
     useEffect(() => {
         if (origin && destination) {
-            console.log("Hello",selectedMode)
+
             handleDestinationSelect(destination, destinationCoords);
         }
     }, [selectedMode, origin, destination, originCoords, destinationCoords, handleOriginSelect, handleDestinationSelect]);
@@ -87,7 +87,7 @@ const SearchBars: React.FC = () => {
                 onSelect={handleDestinationSelect}
                 setCoords={setDestinationCoords}
             />
-        
+
             {origin.length > 0 && destination.length > 0 && (
                 <>
                     {/* Selected Transport Mode Title */}
@@ -96,7 +96,7 @@ const SearchBars: React.FC = () => {
                             {transportModes.find((t) => t.mode === selectedMode)?.label}
                         </Text>
                     </View>
-                
+
                     {/* Transport Buttons with Time Estimates */}
                     <View style={styles.transportButtonContainer}>
                         {transportModes.map(({ mode, icon, time }) => (
@@ -131,31 +131,31 @@ const SearchBars: React.FC = () => {
 
                         {/* Buttons Container */}
                         <View style={styles.buttonsContainer}>
-                        <TouchableOpacity style={[styles.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}>
-                            <View style={styles.buttonContent}>
-                                <Entypo name="direction" size={20} color="white" />
-                                <Text style={[styles.buttonText, { color: "white"}]}>Start</Text>
-                            </View>
-                        </TouchableOpacity>
+                            <TouchableOpacity style={[styles.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}>
+                                <View style={styles.buttonContent}>
+                                    <Entypo name="direction" size={20} color="white" />
+                                    <Text style={[styles.buttonText, { color: "white" }]}>Start</Text>
+                                </View>
+                            </TouchableOpacity>
 
-                        <TouchableOpacity 
-                            style={[
-                                styles.button, 
-                                { 
-                                    backgroundColor: isInsideBuilding ? "white" : "#ddd", 
-                                    borderColor: isInsideBuilding ? "#912338" : "grey",
-                                    opacity: isInsideBuilding ? 1 : 0.5
-                                }
-                            ]}
-                            disabled={!isInsideBuilding} // Disable button when user is outside
-                        >
-                            <View style={styles.buttonContent}>
-                                <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
-                                <Text style={[styles.buttonText, { color: isInsideBuilding ? "#912338" : "grey"}]}>Floor View</Text>
-                            </View>
-                        </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[
+                                    styles.button,
+                                    {
+                                        backgroundColor: isInsideBuilding ? "white" : "#ddd",
+                                        borderColor: isInsideBuilding ? "#912338" : "grey",
+                                        opacity: isInsideBuilding ? 1 : 0.5
+                                    }
+                                ]}
+                                disabled={!isInsideBuilding} // Disable button when user is outside
+                            >
+                                <View style={styles.buttonContent}>
+                                    <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
+                                    <Text style={[styles.buttonText, { color: isInsideBuilding ? "#912338" : "grey" }]}>Floor View</Text>
+                                </View>
+                            </TouchableOpacity>
 
-                            {/* When implementing floor plans, switch between floor and outside view !!!
+                            {/* When implementing floor plans, switch between floor and outside view !!! WILL BE USED IN THE FUTURE
                             <TouchableOpacity style={styles.button}>
                                 <View style={styles.buttonContent}>
                                     <Entypo name="tree" size={20} color="black" />
@@ -184,77 +184,77 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderBottomWidth: 1,
         borderBottomColor: "#ddd",
-      },
-      transportButton: {
+    },
+    transportButton: {
         alignItems: "center",
         padding: 10,
         borderRadius: 8,
-      },
-      instructionContainer: {
+    },
+    instructionContainer: {
         padding: 10,
         borderBottomWidth: 1,
         borderBottomColor: "#ddd",
-      },
-      selectedModeContainer: {
+    },
+    selectedModeContainer: {
         width: "100%",
         alignItems: "flex-start",
         paddingHorizontal: 20,
-      },
-      selectedModeText: {
+    },
+    selectedModeText: {
         fontSize: 18,
         fontWeight: "bold",
         textAlign: "left",
         marginVertical: 5,
-      },
-      transportButtonContent: {
+    },
+    transportButtonContent: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 6, 
-      },
-      timeText: {
+        gap: 6,
+    },
+    timeText: {
         fontSize: 12,
-      },
-      timeAndButtonsContainer: {
+    },
+    timeAndButtonsContainer: {
         flexDirection: "row",
-        alignItems: "center", 
-        justifyContent: "space-between", 
+        alignItems: "center",
+        justifyContent: "space-between",
         paddingHorizontal: 30,
         paddingVertical: 20,
-      },
-      timeContainer: {
+    },
+    timeContainer: {
         alignItems: "center",
         marginRight: 10,
-      },
-      timeValue: {
+    },
+    timeValue: {
         fontSize: 18,
         fontWeight: "bold",
-      },
-      timeUnit: {
+    },
+    timeUnit: {
         fontSize: 14,
         color: "#666",
-      },
-      buttonsContainer: {
+    },
+    buttonsContainer: {
         flexDirection: "row",
         gap: 30,
-      },
-      button: {
-        paddingVertical: 7, 
+    },
+    button: {
+        paddingVertical: 7,
         paddingHorizontal: 15,
         borderRadius: 25,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         borderWidth: 1,
-    },    
-      buttonContent: {
-        flexDirection: "row", 
+    },
+    buttonContent: {
+        flexDirection: "row",
         alignItems: "center",
         gap: 6,
     },
     buttonText: {
         fontSize: 15,
         fontWeight: "500",
-    },    
+    },
 });
 
 export default SearchBars;
