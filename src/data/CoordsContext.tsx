@@ -1,26 +1,24 @@
-// CoordsContext.tsx
 import React, { createContext, useState, useContext } from 'react';
-
-interface Coords {
-    latitude: number;
-    longitude: number;
-}
-
-interface CoordsContextType {
-    coords: Coords[] | null; // Array of Coords or null
-    setCoords: (coords: Coords[] | null) => void;
-}
+import { CoordsContextType } from '../interfaces/CoordsContextType';
 
 export const CoordsContext = createContext<CoordsContextType>({
-    coords: null,
-    setCoords: () => { },
+    routeData: null,
+    setRouteData: () => {},
+    isInsideBuilding: false,
+    setIsInsideBuilding: () => {}
 });
 
 export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [coords, setCoords] = useState<Coords[] | null>(null); // State is an array
+    const [routeData, setRouteData] = useState<any>(null);
+    const [isInsideBuilding, setIsInsideBuilding] = useState<boolean>(false);
 
     return (
-        <CoordsContext.Provider value={{ coords, setCoords }}>
+        <CoordsContext.Provider value={{
+            routeData,
+            setRouteData,
+            isInsideBuilding,
+            setIsInsideBuilding
+        }}>
             {children}
         </CoordsContext.Provider>
     );
