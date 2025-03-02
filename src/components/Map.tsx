@@ -9,6 +9,9 @@ import * as Location from 'expo-location';
 import { useCoords } from '../data/CoordsContext.tsx';
 import ToggleButton from './ToggleButton';
 import { HighlightBuilding } from './BuildingCoordinates';
+import BuildingInformation from './BuildingInformation.tsx';
+import { BuildingProperties } from '../interfaces/BuildingProperties.ts';
+import BuildingLocation from '../interfaces/buildingLocation.ts';
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
@@ -34,6 +37,21 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
   const [currentCoords, setCurrentCoords] = useState(sgwCoords);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
+
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+
+  const [selectedBuilding, setSelectedBuilding] = useState<BuildingLocation | null>(null);
+
+  console.log({ selectedBuilding });
+
+  const openOverlay = (building: BuildingLocation) => {
+    setSelectedBuilding(building);
+    setIsOverlayVisible(true);
+  };
+
+  const closeOverlay = () => {
+    setIsOverlayVisible(false);
+  };
 
   useEffect(() => {
     console.log("routeCoordinates changed:", routeCoordinates)
@@ -128,14 +146,21 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
     }
   };
 
+  console.log(isOverlayVisible)
+
   return (
     <View style={styles.container}>
+      <BuildingInformation
+        isVisible={isOverlayVisible}
+        onClose={closeOverlay}
+        buildingLocation={selectedBuilding}
+      />
       <MapView
         style={styles.map}
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding userCoordinates={myLocation ? [myLocation.latitude, myLocation.longitude] : null}/>
+        <HighlightBuilding userCoordinates={myLocation ? [myLocation.latitude, myLocation.longitude] : null} />
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17}
@@ -148,17 +173,18 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
             id={`point-${location.id}`}
             coordinate={location.coordinates}
             style={{ zIndex: 1 }}
+            onSelected={() => { openOverlay(location); }}
           >
-            <View style={styles.marker}>
-              
-              <Text style={styles.markerText}>📍</Text>
+            <View style={styles.marker} >
+
+              <Text style={styles.markerText} >📍</Text>
             </View>
-            <Mapbox.Callout title={location.title}>
+            {/* <Mapbox.Callout title={location.title}>
               <View style={styles.callout}>
                 <Text style={styles.calloutTitle}>{location.title}</Text>
                 <Text style={styles.calloutDescription}>{location.description}</Text>
               </View>
-            </Mapbox.Callout>
+            </Mapbox.Callout> */}
           </Mapbox.PointAnnotation>
         ))}
 
