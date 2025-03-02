@@ -1,11 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
-
-interface CoordsContextType {
-    routeData: any;
-    setRouteData: (data: any) => void;
-    isInsideBuilding: boolean;
-    setIsInsideBuilding: (inside: boolean) => void;
-}
+import { CoordsContextType } from '../interfaces/CoordsContextType';
 
 export const CoordsContext = createContext<CoordsContextType>({
     routeData: null,
