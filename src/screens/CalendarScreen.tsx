@@ -1,7 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native';
 import { CalendarBody, CalendarContainer, CalendarHeader } from '@howljs/calendar-kit';
-// import CalendarButton from '../components/CalendarButton';
 
 const CalendarScreen = () => {
     const handleGoingBack = () => {
@@ -16,7 +15,7 @@ const CalendarScreen = () => {
           <CalendarBody />
         </CalendarContainer> */}
         <View >
-          <Text>This is the calendar screen FINALLY.</Text> 
+          <Text>This is the calendar screen FINALLY.</Text>
         </View>
       </View>
     );
