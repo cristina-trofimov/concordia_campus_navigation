@@ -8,6 +8,7 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnable
 import com.facebook.react.defaults.DefaultReactActivityDelegate
 import expo.modules.ReactActivityDelegateWrapper
 import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
 
 class MainActivity : ReactActivity() {
 
