@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.1",
+    "@expo/vector-icons": "^14.0.4",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-native-fontawesome": "^0.3.2",
     "@mapbox/polyline": "^1.2.1",

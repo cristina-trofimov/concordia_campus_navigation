@@ -7,10 +7,10 @@ import {
   Animated,
   PanResponderGestureState,
   Text,
+  TouchableOpacity
 } from "react-native";
 import SearchBars from "./SearchBars";
 import { useCoords } from "../data/CoordsContext";
-
 
 const { height, width } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;
@@ -24,8 +24,8 @@ function BottomDrawer({
   children: ReactNode;
   drawerHeight: Animated.Value;
 }) {
-  const { routeData: routeCoordinates } = useCoords();
 
+  const { routeData: routeCoordinates } = useCoords();
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
 
   useEffect(() => {
