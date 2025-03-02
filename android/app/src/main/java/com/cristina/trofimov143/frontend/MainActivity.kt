@@ -10,8 +10,9 @@ import expo.modules.ReactActivityDelegateWrapper
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 
-class MainActivity : ReactActivity() {
 
+class MainActivity : ReactActivity() {
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
     override fun onCreate(savedInstanceState: Bundle?) {
         // Set the theme to AppTheme BEFORE onCreate to support
         // coloring the background, status bar, and navigation bar.
@@ -20,6 +21,9 @@ class MainActivity : ReactActivity() {
 
         // Initialize Firebase here
         FirebaseApp.initializeApp(this)
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this)
+        Log.d("Firebase", "Firebase Analytics Initialized")
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, null)
 
         super.onCreate(savedInstanceState)
     }
