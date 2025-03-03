@@ -8,9 +8,17 @@ import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 
 const SearchBars: React.FC = () => {
-    const { setRouteData } = useCoords();
+    const { setRouteData, myLocationString } = useCoords();
+
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
+
+    useEffect(() => {
+        if (myLocationString) {
+            setOrigin(myLocationString);
+        }
+    }, [myLocationString]);
+
     const [originCoords, setOriginCoords] = useState<any>(null);
     const [destinationCoords, setDestinationCoords] = useState<any>(null);
     const [transportModes, setTransportModes] = useState([
@@ -31,7 +39,6 @@ const SearchBars: React.FC = () => {
                 const fetchedCoords = await getDirections(selectedOrigin, destination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
-
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
                     setRouteData(null);
@@ -54,7 +61,6 @@ const SearchBars: React.FC = () => {
                 const fetchedCoords = await getDirections(origin, selectedDestination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
-
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
                     setRouteData(null);
@@ -68,36 +74,46 @@ const SearchBars: React.FC = () => {
         }
     }, [origin, setRouteData, selectedMode]);
 
+    const handleClearDestination = useCallback(() => {
+        setDestination("");
+        setDestinationCoords(null);
+        setRouteData(null);
+    }, [setRouteData]);
+
     useEffect(() => {
         if (origin && destination) {
-
             handleDestinationSelect(destination, destinationCoords);
         }
     }, [selectedMode, origin, destination, originCoords, destinationCoords, handleOriginSelect, handleDestinationSelect]);
 
     return (
         <View style={styles.container}>
-            <SearchBar
-                placeholder="Origin"
-                onSelect={handleOriginSelect}
-                setCoords={setOriginCoords}
-            />
+
+            {destination.length > 0 && (
+                <SearchBar
+                    placeholder="Origin"
+                    onSelect={handleOriginSelect}
+                    setCoords={setOriginCoords}
+                    defaultValue={origin}
+                />
+            )}
             <SearchBar
                 placeholder="Destination"
                 onSelect={handleDestinationSelect}
                 setCoords={setDestinationCoords}
+                defaultValue={destination}
+                showClearButton={true}
+                onClear={handleClearDestination}
             />
 
             {origin.length > 0 && destination.length > 0 && (
                 <>
-                    {/* Selected Transport Mode Title */}
                     <View style={styles.selectedModeContainer}>
                         <Text style={styles.selectedModeText}>
                             {transportModes.find((t) => t.mode === selectedMode)?.label}
                         </Text>
                     </View>
 
-                    {/* Transport Buttons with Time Estimates */}
                     <View style={styles.transportButtonContainer}>
                         {transportModes.map(({ mode, icon, time }) => (
                             <TouchableOpacity
@@ -119,9 +135,7 @@ const SearchBars: React.FC = () => {
                         ))}
                     </View>
 
-                    {/* Total Time, Start Button, and Floor/Outside View Button */}
                     <View style={styles.timeAndButtonsContainer}>
-                        {/* Time Container */}
                         <View style={styles.timeContainer}>
                             <Text style={styles.timeValue}>
                                 {transportModes.find((t) => t.mode === selectedMode)?.time}
@@ -129,7 +143,6 @@ const SearchBars: React.FC = () => {
                             <Text style={styles.timeUnit}>min</Text>
                         </View>
 
-                        {/* Buttons Container */}
                         <View style={styles.buttonsContainer}>
                             <TouchableOpacity style={[styles.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}>
                                 <View style={styles.buttonContent}>
@@ -147,21 +160,13 @@ const SearchBars: React.FC = () => {
                                         opacity: isInsideBuilding ? 1 : 0.5
                                     }
                                 ]}
-                                disabled={!isInsideBuilding} // Disable button when user is outside
+                                disabled={!isInsideBuilding}
                             >
                                 <View style={styles.buttonContent}>
                                     <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
                                     <Text style={[styles.buttonText, { color: isInsideBuilding ? "#912338" : "grey" }]}>Floor View</Text>
                                 </View>
                             </TouchableOpacity>
-
-                            {/* When implementing floor plans, switch between floor and outside view !!! WILL BE USED IN THE FUTURE
-                            <TouchableOpacity style={styles.button}>
-                                <View style={styles.buttonContent}>
-                                    <Entypo name="tree" size={20} color="black" />
-                                    <Text style={styles.buttonText}>Outside View</Text>
-                                </View>
-                            </TouchableOpacity> */}
                         </View>
                     </View>
                 </>
@@ -171,6 +176,7 @@ const SearchBars: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+    // Styles remain the same
     container: {
         width: '100%',
         paddingHorizontal: 16,

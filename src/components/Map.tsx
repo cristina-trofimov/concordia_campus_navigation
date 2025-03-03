@@ -18,7 +18,7 @@ const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) {
-  const { routeData: routeCoordinates } = useCoords();
+  const { routeData: routeCoordinates, setmyLocationString, myLocationString } = useCoords();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -39,6 +39,14 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
 
   const [decodedPolyline, setDecodedPolyline] = useState<Coords[]>([]);
 
+
+  useEffect(() => {
+    if (myLocation) {
+      const { latitude, longitude } = myLocation;
+      const locationString = `${latitude},${longitude}`;
+      setmyLocationString(locationString);
+    }
+  }, [myLocation, setmyLocationString]);
 
   useEffect(() => {
 
