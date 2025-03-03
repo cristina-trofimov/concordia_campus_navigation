@@ -108,12 +108,13 @@ const SearchBars: React.FC = () => {
 
             {origin.length > 0 && destination.length > 0 && (
                 <>
+                    {/* Selected Transport Mode Title */}
                     <View style={styles.selectedModeContainer}>
                         <Text style={styles.selectedModeText}>
                             {transportModes.find((t) => t.mode === selectedMode)?.label}
                         </Text>
                     </View>
-
+                    {/* Transport Buttons with Time Estimates */}
                     <View style={styles.transportButtonContainer}>
                         {transportModes.map(({ mode, icon, time }) => (
                             <TouchableOpacity
@@ -134,7 +135,7 @@ const SearchBars: React.FC = () => {
                             </TouchableOpacity>
                         ))}
                     </View>
-
+                    {/* Total Time, Start Button, and Floor/Outside View Button */}
                     <View style={styles.timeAndButtonsContainer}>
                         <View style={styles.timeContainer}>
                             <Text style={styles.timeValue}>
@@ -142,7 +143,7 @@ const SearchBars: React.FC = () => {
                             </Text>
                             <Text style={styles.timeUnit}>min</Text>
                         </View>
-
+                        {/* Buttons Container */}
                         <View style={styles.buttonsContainer}>
                             <TouchableOpacity style={[styles.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}>
                                 <View style={styles.buttonContent}>
@@ -160,13 +161,20 @@ const SearchBars: React.FC = () => {
                                         opacity: isInsideBuilding ? 1 : 0.5
                                     }
                                 ]}
-                                disabled={!isInsideBuilding}
+                                disabled={!isInsideBuilding} // Disable button when user is outside
                             >
                                 <View style={styles.buttonContent}>
                                     <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
                                     <Text style={[styles.buttonText, { color: isInsideBuilding ? "#912338" : "grey" }]}>Floor View</Text>
                                 </View>
                             </TouchableOpacity>
+                        {/* When implementing floor plans, switch between floor and outside view !!! WILL BE USED IN THE FUTURE
+                            <TouchableOpacity style={styles.button}>
+                                <View style={styles.buttonContent}>
+                                    <Entypo name="tree" size={20} color="black" />
+                                    <Text style={styles.buttonText}>Outside View</Text>
+                                </View>
+                            </TouchableOpacity> */}
                         </View>
                     </View>
                 </>
@@ -176,7 +184,7 @@ const SearchBars: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    // Styles remain the same
+
     container: {
         width: '100%',
         paddingHorizontal: 16,

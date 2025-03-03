@@ -2,8 +2,8 @@ import React, { useCallback, useState, useEffect } from "react";
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { Prediction } from "../interfaces/SearchBar";
-import { SearchBarProps } from "../interfaces/SearchBar";
+import { Prediction,SearchBarProps } from "../interfaces/SearchBar";
+
 
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU";
