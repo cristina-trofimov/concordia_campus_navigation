@@ -17,11 +17,13 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
   showClearButton = false,
   onClear
 }) => {
+  //QUERY IS TEXT BEING WRITTEN
+  //DISPLAYED TEXT IS LOCATION SELECTD
   const [query, setQuery] = useState("");
   const [displayedPlace, setDisplayedPlace] = useState(defaultValue || "");
   const [suggestions, setSuggestions] = useState<Prediction[]>([]);
 
-
+  //WHEN YOU ADD A DEFAULT VALUE, IT WILL SET IT AS THE LOCATION SELECTED
   useEffect(() => {
     if (defaultValue) {
       setDisplayedPlace(defaultValue);
@@ -102,6 +104,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
             fetchSuggestions(text);
           }}
         />
+        {/* CLEAR BUTTON */}
         {(showClearButton && displayedPlace) && (
           <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
             <MaterialIcons name="close" size={20} color="#666" />

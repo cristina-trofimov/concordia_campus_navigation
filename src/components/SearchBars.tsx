@@ -13,6 +13,7 @@ const SearchBars: React.FC = () => {
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
 
+    //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {
         if (myLocationString) {
             setOrigin(myLocationString);
@@ -30,15 +31,18 @@ const SearchBars: React.FC = () => {
     const [selectedMode, setSelectedMode] = useState("driving");
     const { isInsideBuilding } = useCoords();
 
+    //WHEN ORIGIN SEARCH BAR VALUE CHANGES METHOD HERE TO GETROUTEDATA
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
         setOrigin(selectedOrigin);
         setOriginCoords(coords);
 
         if (destination && selectedOrigin) {
             try {
+                //GETS THE COORDS FOR THE PATHLINE
                 const fetchedCoords = await getDirections(selectedOrigin, destination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
+                //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
                     setRouteData(null);
@@ -52,6 +56,7 @@ const SearchBars: React.FC = () => {
         }
     }, [destination, setRouteData, selectedMode]);
 
+    //WHEN DESTINATION SEARCH BAR VALUE CHANGES METHOD HERE TO GETROUTEDATA
     const handleDestinationSelect = useCallback(async (selectedDestination: string, coords: any) => {
         setDestination(selectedDestination);
         setDestinationCoords(coords);
@@ -61,6 +66,7 @@ const SearchBars: React.FC = () => {
                 const fetchedCoords = await getDirections(origin, selectedDestination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
+                    //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
                     setRouteData(null);
@@ -74,6 +80,7 @@ const SearchBars: React.FC = () => {
         }
     }, [origin, setRouteData, selectedMode]);
 
+    // WHEN YOU CLICK THE LITTLE X ON THE DESTINATION BAR IT DELETES ALL VALUE
     const handleClearDestination = useCallback(() => {
         setDestination("");
         setDestinationCoords(null);
