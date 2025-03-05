@@ -40,6 +40,7 @@ export default function App() {
             options={{ headerShown: false }} // Hide the header for this screen only
           />
           <Stack.Screen name="Calendar" component={CalendarScreen}
+            options={{ headerShown: false }}
           // options={{
           //   headerTitle: () => <Text>Custom Title</Text>, // Custom title
           //   headerRight: () => (

@@ -1,6 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { CalendarBody, CalendarContainer, CalendarHeader, } from "@howljs/calendar-kit";
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Disables strict mode
+});
 
 const CalendarScreen = () => {
   // const handleGoingBack = () => {
@@ -14,7 +20,6 @@ const CalendarScreen = () => {
         <CalendarHeader />
         <CalendarBody />
       </CalendarContainer>
-      <Text>This is the calendar screen.</Text>
     </View>
   );
 };
@@ -22,8 +27,8 @@ const CalendarScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignItems: "center",
   },
 });
 
