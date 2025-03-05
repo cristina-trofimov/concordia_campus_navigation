@@ -71,5 +71,8 @@
     },
     "test-runner": "jest"
   },
-  "private": true
+  "private": true,
+  "jest": {
+    "preset": "react-native"
+  }
 }
