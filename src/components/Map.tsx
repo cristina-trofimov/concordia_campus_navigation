@@ -13,7 +13,7 @@ import { Coords } from '../interfaces/Map.ts';
 
 import { HighlightBuilding } from './BuildingCoordinates';
 import CalendarButton from './CalendarButton.tsx';
-import SettingsButton from './SettingsButton.tsx';
+import LeftDrawerButton from './LeftDrawerButton.tsx';
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
@@ -262,8 +262,8 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
       <View style={styles.calendarButtonContainer}>
         <CalendarButton />
       </View>
-      <View style={styles.settingsButtonContainer}>
-        <SettingsButton />
+      <View style={styles.LeftDrawerButtonContainer}>
+        <LeftDrawerButton />
       </View>
     </View>
   );
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
   },
-  settingsButtonContainer: {
+  LeftDrawerButtonContainer: {
     position: 'absolute',
     top: 20,
     left: 0,

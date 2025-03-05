@@ -1,17 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Animated, Dimensions, StyleSheet, Text, View } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Button, ThemeProvider, createTheme } from "@rneui/themed";
-import Map from "./src/components/Map";
-import BottomDrawer from "./src/components/BottomDrawer";
-import { CoordsProvider } from "./src/data/CoordsContext";
-import HomeScreen from './src/screens/HomeScreen';
-import CalendarScreen from "./src/screens/CalendarScreen";
-// import { NavigationContainer } from '@react-navigation/native';
-// import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useRef, Button, Text } from "react";
+import { Animated, Dimensions, StyleSheet } from "react-native";
+import { createTheme } from "@rneui/themed";
+import HomeScreen from './src/components/screens/HomeScreen';
+import CalendarScreen from "./src/components/screens/CalendarScreen";
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import LeftDrawer from "./src/components/LeftDrawer";
 
 const { height } = Dimensions.get("window");
-// const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator();
+// const Drawer = createDrawerNavigator();
+
 
 const theme = createTheme({
   lightColors: {
@@ -26,21 +26,40 @@ export default function App() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
 
   return (
-    // <CalendarScreen />
-    <HomeScreen />
-    // <GestureHandlerRootView style={{ flex: 1 }}>
-    //   <NavigationContainer>
-    //     <Stack.Navigator initialRouteName="Home">
-    //       <Stack.Screen name="Home" component={HomeScreen} />
-    //       <Stack.Screen name="Calendar" component={CalendarScreen} />
-    //     </Stack.Navigator>
-    //   </NavigationContainer>
-    // // </GestureHandlerRootView>
+      <NavigationContainer>
+        {/* Don't delete for now */}
+        {/* <Drawer.Navigator initialRouteName="Home">
+          <Drawer.Screen name="Home" component={HomeScreen} />
+          <Drawer.Screen name="LeftDrawer" component={LeftDrawer} />
+        </Drawer.Navigator> */}
+
+
+
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen name="Home" component={HomeScreen}
+            options={{ headerShown: false }} // Hide the header for this screen only
+          />
+          <Stack.Screen name="Calendar" component={CalendarScreen}
+          // options={{
+          //   headerTitle: () => <Text>Custom Title</Text>, // Custom title
+          //   headerRight: () => (
+          //     <Button
+          //       title="Info"
+          //       onPress={() => alert('Info button pressed!')} // Custom button
+          //     />
+          //   ),
+          //   headerLeft: () => (
+          //     <Button
+          //       title="Back"
+          //       onPress={() => navigation.goBack()} // Custom back button
+          //     />
+          //   ),
+          // }}
+        />
+        </Stack.Navigator>
+      </NavigationContainer>
   );
 }
-
-
-
 
 const styles = StyleSheet.create({
   container: {

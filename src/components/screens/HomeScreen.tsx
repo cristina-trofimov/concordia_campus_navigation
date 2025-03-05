@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
 import { Animated, Dimensions, StyleSheet, View } from "react-native";
 import { createTheme } from "@rneui/themed";
-import Map from "../components/Map";
-import BottomDrawer from "../components/BottomDrawer";
-import { CoordsProvider } from "../data/CoordsContext";
+import Map from "../Map";
+import BottomDrawer from "../BottomDrawer";
+import { CoordsProvider } from "../../data/CoordsContext";
 
 const { height } = Dimensions.get("window");
 
