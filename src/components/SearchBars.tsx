@@ -8,10 +8,11 @@ import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 
 const SearchBars: React.FC = () => {
-    const { setRouteData, myLocationString } = useCoords();
+    const { setRouteData, myLocationString,routeData } = useCoords();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
+    const [time, setTime]=useState('');
 
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {
@@ -23,10 +24,10 @@ const SearchBars: React.FC = () => {
     const [originCoords, setOriginCoords] = useState<any>(null);
     const [destinationCoords, setDestinationCoords] = useState<any>(null);
     const [transportModes, setTransportModes] = useState([
-        { mode: "driving", icon: "car-outline", label: "Drive", time: "0" },
-        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "0" },
-        { mode: "walking", icon: "walk-outline", label: "Walk", time: "0" },
-        { mode: "biking", icon: "bicycle-outline", label: "Bicycle", time: "0" },
+        { mode: "driving", icon: "car-outline", label: "Drive", time: "-" },
+        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "-" },
+        { mode: "walking", icon: "walk-outline", label: "Walk", time: "-" },
+        { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-" },
     ]);
     const [selectedMode, setSelectedMode] = useState("driving");
     const { isInsideBuilding } = useCoords();
@@ -42,6 +43,8 @@ const SearchBars: React.FC = () => {
                 const fetchedCoords = await getDirections(selectedOrigin, destination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
+                    setTime(fetchedCoords[0].legs[0].duration.text);
+                    console.log("Origin",time);
                 //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
@@ -66,6 +69,10 @@ const SearchBars: React.FC = () => {
                 const fetchedCoords = await getDirections(origin, selectedDestination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
+                    let durationText = fetchedCoords[0].legs[0].duration.text;
+                    durationText = durationText.replace(/hours?/g, 'h').replace(/mins?/g,'');
+                    setTime(durationText)
+                    console.log("Destination",time);
                     //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
@@ -123,7 +130,7 @@ const SearchBars: React.FC = () => {
                     </View>
                     {/* Transport Buttons with Time Estimates */}
                     <View style={styles.transportButtonContainer}>
-                        {transportModes.map(({ mode, icon, time }) => (
+                        {transportModes.map(({ mode, icon}) => (
                             <TouchableOpacity
                                 key={mode}
                                 style={styles.transportButton}
@@ -136,7 +143,7 @@ const SearchBars: React.FC = () => {
                                         color={selectedMode === mode ? "#912338" : "black"}
                                     />
                                     <Text style={[styles.timeText, { color: selectedMode === mode ? "#912338" : "black" }]}>
-                                        {time} min
+                                        {selectedMode === mode ? time : transportModes.find(t => t.mode === mode)?.time} min
                                     </Text>
                                 </View>
                             </TouchableOpacity>
@@ -146,9 +153,9 @@ const SearchBars: React.FC = () => {
                     <View style={styles.timeAndButtonsContainer}>
                         <View style={styles.timeContainer}>
                             <Text style={styles.timeValue}>
-                                {transportModes.find((t) => t.mode === selectedMode)?.time}
+                                {time}min
                             </Text>
-                            <Text style={styles.timeUnit}>min</Text>
+                            
                         </View>
                         {/* Buttons Container */}
                         <View style={styles.buttonsContainer}>

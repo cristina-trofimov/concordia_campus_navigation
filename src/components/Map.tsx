@@ -226,7 +226,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
             <Mapbox.LineLayer
               id="routeLayer"
               style={{
-                lineColor: '#ff0000',
+                lineColor: '#3399FF',
                 lineWidth: 4,
                 lineOpacity: 0.8,
               }}
