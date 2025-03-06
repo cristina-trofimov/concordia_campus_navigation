@@ -1,38 +1,62 @@
-import React, { ReactNode, useRef } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   StyleSheet,
-  Text,
   View,
   PanResponder,
   Animated,
   PanResponderGestureState,
+  Text,
+  TouchableOpacity
 } from "react-native";
+import SearchBars from "./SearchBars";
+import { useCoords } from "../data/CoordsContext";
 
 const { height, width } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;
 const EXPANDED_HEIGHT = height * 0.5;
-const VELOCITY_THRESHOLD = 0.5; // swipe speed
+const VELOCITY_THRESHOLD = 0.5;
 
-function BottomDrawer ({children} : {children : ReactNode} ) {
-  const containerHeight = useRef(new Animated.Value(EXPANDED_HEIGHT)).current;
+function BottomDrawer({
+  children,
+  drawerHeight,
+}: {
+  children: ReactNode;
+  drawerHeight: Animated.Value;
+}) {
+
+  const { routeData: routeCoordinates } = useCoords();
+  const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
+
+  useEffect(() => {
+
+
+    if (routeCoordinates && routeCoordinates.length > 0) {
+      const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => { return step.html_instructions.replace(/<.*?>/g, ''); });
+
+
+      setHtmlInstructions(instructions);
+
+    } else {
+      setHtmlInstructions([]);
+    }
+
+  }, [routeCoordinates]);
+
   const isExpanded = useRef<boolean>(true);
-  const gestureStartY = useRef<number>(0);
 
   const animateToPosition = (expanded: boolean) => {
     isExpanded.current = expanded;
-    Animated.spring(containerHeight, {
-      toValue: expanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT,
+    const targetHeight = expanded ? EXPANDED_HEIGHT : COLLAPSED_HEIGHT;
+    Animated.spring(drawerHeight, {
+      toValue: targetHeight,
       tension: 40,
       friction: 10,
       useNativeDriver: false,
     }).start();
   };
 
-  const handlePanResponderMove = (
-    _: any,
-    gesture: PanResponderGestureState
-  ) => {
+  const handlePanResponderMove = (_: any, gesture: PanResponderGestureState) => {
     const newHeight = Math.max(
       COLLAPSED_HEIGHT,
       Math.min(
@@ -42,82 +66,63 @@ function BottomDrawer ({children} : {children : ReactNode} ) {
           : COLLAPSED_HEIGHT - gesture.dy
       )
     );
-    containerHeight.setValue(newHeight);
+    drawerHeight.setValue(newHeight);
   };
 
-  const handlePanResponderGrant = (
-    _: any,
-    gesture: PanResponderGestureState
-  ) => {
-    gestureStartY.current = gesture.y0;
-  };
-
-  const handlePanResponderRelease = (
-    _: any,
-    gesture: PanResponderGestureState
-  ) => {
-    const totalDistance = gesture.dy;
-    const heightDifference = EXPANDED_HEIGHT - COLLAPSED_HEIGHT;
-
-    if (Math.abs(gesture.vy) > VELOCITY_THRESHOLD) {
-      animateToPosition(gesture.vy < 0);
-    } else {
-      const shouldExpand = isExpanded.current
-        ? Math.abs(totalDistance) < heightDifference / 2
-        : -totalDistance > heightDifference / 2;
-
-      animateToPosition(shouldExpand);
-    }
+  const handlePanResponderRelease = (_: any, gesture: PanResponderGestureState) => {
+    const shouldExpand = gesture.vy < 0 || (isExpanded.current && gesture.dy < 0);
+    animateToPosition(shouldExpand);
   };
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: handlePanResponderGrant,
       onPanResponderMove: handlePanResponderMove,
       onPanResponderRelease: handlePanResponderRelease,
     })
   ).current;
 
   return (
-    <Animated.View
-    testId="bottom-drawer"
-      style={[
-        styles.container,
-        {
-          height: containerHeight,
-        },
-      ]}
-    >
-      <View {...panResponder.panHandlers} style={styles.dragHandle} testID="drag-handle">
+    <Animated.View style={[styles.container, { height: drawerHeight }]}>
+      <View {...panResponder.panHandlers} style={styles.dragHandle}>
         <View style={styles.dragIndicator} />
-        { children }
+        <SearchBars />
+        {htmlInstructions.length > 0 &&
+          htmlInstructions.map((instruction, index) => (
+            <Text key={index} >
+              {instruction}
+            </Text>
+          ))}
       </View>
+      <View style={styles.contentContainer}>{children}</View>
     </Animated.View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    padding: 20,
     width: width,
+    position: "absolute",
+    bottom: 0,
   },
   dragHandle: {
     width: width,
-    height: 30,
     alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
-    top: 0,
+    paddingVertical: 10,
   },
   dragIndicator: {
     width: 60,
     height: 5,
     backgroundColor: "#8F8F8F",
     borderRadius: 3,
+    marginBottom: 10,
+  },
+  contentContainer: {
+    flex: 1,
+    padding: 16,
   },
 });
 

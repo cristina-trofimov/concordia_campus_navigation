@@ -1,6 +1,5 @@
-// ToggleButton.tsx
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 
 interface ToggleButtonProps {
@@ -11,28 +10,83 @@ interface ToggleButtonProps {
     initialCampus?: boolean;
 }
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ mapRef, sgwCoords, loyolaCoords, onCampusChange, initialCampus = true }) => {
+const ToggleButton: React.FC<ToggleButtonProps> = ({ 
+    mapRef, 
+    sgwCoords, 
+    loyolaCoords, 
+    onCampusChange, 
+    initialCampus = true // false = Loyola, true = SGW
+}) => {
+
+    const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+    
+    const toggleWidth = Math.min(200, screenWidth * 0.50);
+    const toggleHeight = Math.min(40, screenHeight * 0.05);
+    const knobWidth = toggleWidth / 2;
+    
     const [isSGW, setIsSGW] = useState(initialCampus);
-    const translateX = useRef(new Animated.Value(initialCampus ? 0 : 40)).current;
+    const translateX = useRef(new Animated.Value(initialCampus ? knobWidth : 0)).current;
 
     const toggleSwitch = () => {
+        const newIsSGW = !isSGW;
+        setIsSGW(newIsSGW);
+        
         Animated.timing(translateX, {
-            toValue: isSGW ? 40 : 0,
-            duration: 300,
-            useNativeDriver: true, //Allows for smoother scroll motionn
-        }).start(() => {
-            const newIsSGW = !isSGW;
-            setIsSGW(newIsSGW);
-            onCampusChange(newIsSGW);
-        });
+            toValue: newIsSGW ? knobWidth : 0,
+            duration: 250,
+            useNativeDriver: true,
+        }).start();
+        
+        onCampusChange(newIsSGW);
     };
 
     return (
-        <View style={styles.container} testID="toggle-container">
-            <TouchableOpacity style={styles.slider} onPress={toggleSwitch} activeOpacity={1} testID="toggle-button">
-                <Animated.View style={[styles.knob, { transform: [{ translateX }] }]} testID="knob">
-                    <Text style={styles.label}>{isSGW ? 'SGW' : 'Loyola'}</Text>
-                </Animated.View>
+        <View style={styles.container}>
+            <TouchableOpacity 
+                style={[
+                    styles.slider,
+                    {
+                        width: toggleWidth,
+                        height: toggleHeight,
+                        borderRadius: toggleHeight / 2,
+                    }
+                ]}
+                onPress={toggleSwitch}
+                activeOpacity={0.9}
+            >
+                <Animated.View 
+                    style={[
+                        styles.knob, 
+                        {
+                            width: knobWidth,
+                            height: toggleHeight,
+                            borderRadius: toggleHeight / 2,
+                            transform: [{ translateX }]
+                        }
+                    ]}
+                />
+                
+                <View style={styles.labelsContainer}>
+                    <View style={styles.labelContainer}>
+                        <Text style={[
+                            styles.labelText, 
+                            !isSGW ? styles.activeLabel : styles.inactiveLabel,
+                            { fontSize: Math.max(14, toggleHeight * 0.38) }
+                        ]}>
+                            Loyola
+                        </Text>
+                    </View>
+                    
+                    <View style={styles.labelContainer}>
+                        <Text style={[
+                            styles.labelText, 
+                            isSGW ? styles.activeLabel : styles.inactiveLabel,
+                            { fontSize: Math.max(14, toggleHeight * 0.38) }
+                        ]}>
+                            SGW
+                        </Text>
+                    </View>
+                </View>
             </TouchableOpacity>
         </View>
     );
@@ -43,31 +97,44 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 10,
-        marginTop: 10,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        borderRadius: 20,
     },
     slider: {
-        width: 80,
-        height: 40,
-        backgroundColor: '#ccc',
-        borderRadius: 20,
+        backgroundColor: 'white',
         justifyContent: 'center',
-        padding: 5,
+        position: 'relative',
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 20 },
+        shadowOpacity: 0.4,
+        shadowRadius: 5,
+        elevation: 10,
     },
     knob: {
-        width:40,
-        height: 40,
-        backgroundColor: '#eb5321',
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
+        backgroundColor: '#8D1919',
+        position: 'absolute',
+        top: 0,
+        left: 0,
     },
-    label: {
-        fontSize: 12,
+    labelsContainer: {
+        flexDirection: 'row',
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        zIndex: 1,
+    },
+    labelContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    labelText: {
         fontWeight: 'bold',
+    },
+    activeLabel: {
         color: 'white',
+    },
+    inactiveLabel: {
+        color: 'black',
     },
 });
 
