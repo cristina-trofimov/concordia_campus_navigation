@@ -12,6 +12,11 @@ const { height } = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
 // const Drawer = createDrawerNavigator();
 
+export type RootStackParamList = {
+  Home: undefined;
+  Calendar: undefined;
+};
+
 
 const theme = createTheme({
   lightColors: {

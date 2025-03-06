@@ -1,11 +1,14 @@
 import React from "react";
 import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from "../../App";
 
 const CalendarButton = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const goToCalendar = () => {
+    // fetch from google calendar here??
     navigation.navigate("Calendar");
   };
 
