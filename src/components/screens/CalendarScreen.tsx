@@ -12,6 +12,47 @@ import MyModal from "../MyModal";
 
 const { height, width } = Dimensions.get('window');
 
+const testEvents: EventItem[] = [
+  {
+    id: '1',
+    title: 'Meeting with Team',
+    start: { dateTime: '2025-03-15T10:00:00Z' },
+    end: { dateTime: '2025-03-15T12:00:00Z' },
+    color: '#4285F4',
+  },
+  {
+    id: '2',
+    title: 'Conference',
+    start: { dateTime: '2025-03-17T00:00:00', timeZone: 'America/New_York' },
+    end: { dateTime: '2025-03-18T00:00:00', timeZone: 'America/New_York' },
+    color: '#34A853',
+  },
+  {
+    id: '3',
+    title: 'Weekly Team Sync',
+    start: { dateTime: '2025-03-18T15:00:00Z' },
+    end: { dateTime: '2025-03-18T16:00:00Z' },
+    color: '#FBBC05',
+    recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=MO'
+  },
+  {
+    id: '4',
+    title: 'Weekly Team Building Day',
+    start: { date: '2025-03-07' },
+    end: { date: '2025-03-07' },
+    color: '#34A853',
+    recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=FR'
+  },
+  {
+    id: '5',
+    title: 'Weekly Team Building Day',
+    start: { dateTime: '2025-03-08T08:00:00', timeZone: 'America/New_York' },
+    end: { dateTime: '2025-03-08T18:00:00', timeZone: 'America/New_York' },
+    color: '#34A853',
+    // recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=FR'
+  },
+];
+
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false, // Disables strict mode
@@ -133,7 +174,8 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         allowDragToCreate={true}
         // onDragCreateEventStart={handleDragCreateStart}
         onDragCreateEventEnd={handleDragCreateEvent}
-        events={events}
+        events={testEvents}
+        // events={events}
         dragStep={15}
         onPressEvent={handleEventPress}
       >
