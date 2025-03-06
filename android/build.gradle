@@ -1,10 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
     ext {
         buildToolsVersion = findProperty('android.buildToolsVersion') ?: '35.0.0'
         minSdkVersion = Integer.parseInt(findProperty('android.minSdkVersion') ?: '24')
@@ -14,32 +10,14 @@ buildscript {
 
         ndkVersion = "26.1.10909125"
     }
-
-    dependencies {
-        classpath('com.android.tools.build:gradle:8.0.2')
-        classpath('com.facebook.react:react-native-gradle-plugin')
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
-        classpath('com.google.gms:google-services:4.3.15')
+    repositories {
+        google()
+        mavenCentral()
     }
-}
-
-plugins {
-  id "org.sonarqube" version "6.0.1.5171"
-  }
-
-sonar {
-    properties {
-        property "sonar.projectKey", "cristina-trofimov_concordia_campus_navigation"
-        property "sonar.organization", "the-niners"
-        property "sonar.host.url", "https://sonarcloud.io"
-
-        // Read PR variables if they exist
-        if (System.getenv("GITHUB_ACTIONS") == "true") {
-            property "sonar.pullrequest.key", System.getenv("GITHUB_PR_NUMBER")
-            property "sonar.pullrequest.branch", System.getenv("GITHUB_PR_BRANCH")
-            property "sonar.pullrequest.base", System.getenv("GITHUB_PR_BASE")
-        }
+    dependencies {
+        classpath('com.android.tools.build:gradle')
+        classpath('com.facebook.react:react-native-gradle-plugin')
+        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
     }
 }
 
@@ -65,15 +43,14 @@ allprojects {
 
 allprojects {
   repositories {
-      google()
-      maven {
-          url 'https://api.mapbox.com/downloads/v2/releases/maven'
-          authentication { basic(BasicAuthentication) }
-          credentials {
-              username = 'mapbox'
-              password = project.properties['MAPBOX_TOKEN'] ?: ""
-          }
+    maven {
+      url 'https://api.mapbox.com/downloads/v2/releases/maven'
+      authentication { basic(BasicAuthentication) }
+      credentials {
+        username = 'mapbox'
+        password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
       }
+    }
   }
 }
 
