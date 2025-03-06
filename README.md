@@ -56,7 +56,11 @@ node server.js
 ```
 npx expo prebuild
 ```
-14. To run Maestro
+14. To run Maestro 
+-IF NO APK FILE RUN
+```
+./gradlew assembleDebug
+```
 - install the app onto the simulator
 ```
 adb install android/app/build/outputs/apk/debug/app-debug.apk

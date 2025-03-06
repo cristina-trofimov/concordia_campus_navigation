@@ -1,0 +1,32 @@
+appId: com.cristina.trofimov143.frontend
+---
+- launchApp
+- longPressOn: "Origin"
+- inputText: "MATCHA ZANMAI"
+- tapOn: "MATCHA ZANMAI, Mackay Street, Montreal, QC, Canada"
+- longPressOn: "Destination"
+- inputText: "Poulet Rouge Ste-Catherine"
+- tapOn: "Poulet Rouge Ste-Catherine, Saint-Catherine Street West, Montreal, QC, Canada"
+- swipe:
+    start: 50%, 50% # From (90% of width, 50% of height)
+    end: 50%, 90% # To (10% of width, 50% of height)
+- waitForAnimationToEnd:
+    timeout: 500
+- swipe:
+    start: 50%, 90% # From (90% of width, 50% of height)
+    end: 50%, 50% # To (10% of width, 50% of height)
+- tapOn:
+    point: 62%, 66%
+- waitForAnimationToEnd:
+    timeout: 500
+- swipe:
+    start: 50%, 50% # From (90% of width, 50% of height)
+    end: 50%, 90% # To (10% of width, 50% of height)
+# adb install android/app/build/outputs/apk/debug/app-debug.apk
+# adb shell pm list packages | findstr "com.cristina.trofimov143.frontend"
+# Start-Process -FilePath "cmd.exe" -ArgumentList '/c npx expo start > metro.log 2>&1'
+# maestro test e2e/Feature1_Map.yaml --format=JUNIT
+
+
+#EXAMPLE TEST + COMMANDS
+
