@@ -200,12 +200,6 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
 
               <Text style={styles.markerText} >📍</Text>
             </View>
-            {/* <Mapbox.Callout title={location.title}>
-              <View style={styles.callout}>
-                <Text style={styles.calloutTitle}>{location.title}</Text>
-                <Text style={styles.calloutDescription}>{location.description}</Text>
-              </View>
-            </Mapbox.Callout> */}
           </Mapbox.PointAnnotation>
         ))}
 
@@ -253,9 +247,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
 
 
       </MapView>
-
-
-
+      
       <Animated.View
         style={[
           styles.buttonContainer,
