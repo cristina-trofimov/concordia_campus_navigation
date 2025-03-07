@@ -8,30 +8,44 @@ import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 
 const SearchBars: React.FC = () => {
-    const { setRouteData } = useCoords();
+    const { setRouteData, myLocationString,routeData } = useCoords();
+
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
+    const [time, setTime]=useState('');
+
+    //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
+    useEffect(() => {
+        if (myLocationString) {
+            setOrigin(myLocationString);
+        }
+    }, [myLocationString]);
+
     const [originCoords, setOriginCoords] = useState<any>(null);
     const [destinationCoords, setDestinationCoords] = useState<any>(null);
     const [transportModes, setTransportModes] = useState([
-        { mode: "driving", icon: "car-outline", label: "Drive", time: "0" },
-        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "0" },
-        { mode: "walking", icon: "walk-outline", label: "Walk", time: "0" },
-        { mode: "biking", icon: "bicycle-outline", label: "Bicycle", time: "0" },
+        { mode: "driving", icon: "car-outline", label: "Drive", time: "-" },
+        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "-" },
+        { mode: "walking", icon: "walk-outline", label: "Walk", time: "-" },
+        { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-" },
     ]);
     const [selectedMode, setSelectedMode] = useState("driving");
     const { isInsideBuilding } = useCoords();
 
+    //WHEN ORIGIN SEARCH BAR VALUE CHANGES METHOD HERE TO GETROUTEDATA
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
         setOrigin(selectedOrigin);
         setOriginCoords(coords);
 
         if (destination && selectedOrigin) {
             try {
+                //GETS THE COORDS FOR THE PATHLINE
                 const fetchedCoords = await getDirections(selectedOrigin, destination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
-
+                    setTime(fetchedCoords[0].legs[0].duration.text);
+                    console.log("Origin",time);
+                //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
                     setRouteData(null);
@@ -45,6 +59,7 @@ const SearchBars: React.FC = () => {
         }
     }, [destination, setRouteData, selectedMode]);
 
+    //WHEN DESTINATION SEARCH BAR VALUE CHANGES METHOD HERE TO GETROUTEDATA
     const handleDestinationSelect = useCallback(async (selectedDestination: string, coords: any) => {
         setDestination(selectedDestination);
         setDestinationCoords(coords);
@@ -54,7 +69,11 @@ const SearchBars: React.FC = () => {
                 const fetchedCoords = await getDirections(origin, selectedDestination, selectedMode);
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
-
+                    let durationText = fetchedCoords[0].legs[0].duration.text;
+                    durationText = durationText.replace(/hours?/g, 'h').replace(/mins?/g,'');
+                    setTime(durationText)
+                    console.log("Destination",time);
+                    //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
                     setRouteData(null);
@@ -68,24 +87,37 @@ const SearchBars: React.FC = () => {
         }
     }, [origin, setRouteData, selectedMode]);
 
+    // WHEN YOU CLICK THE LITTLE X ON THE DESTINATION BAR IT DELETES ALL VALUE
+    const handleClearDestination = useCallback(() => {
+        setDestination("");
+        setDestinationCoords(null);
+        setRouteData(null);
+    }, [setRouteData]);
+
     useEffect(() => {
         if (origin && destination) {
-
             handleDestinationSelect(destination, destinationCoords);
         }
     }, [selectedMode, origin, destination, originCoords, destinationCoords, handleOriginSelect, handleDestinationSelect]);
 
     return (
         <View style={styles.container}>
-            <SearchBar
-                placeholder="Origin"
-                onSelect={handleOriginSelect}
-                setCoords={setOriginCoords}
-            />
+
+            {destination.length > 0 && (
+                <SearchBar
+                    placeholder="Origin"
+                    onSelect={handleOriginSelect}
+                    setCoords={setOriginCoords}
+                    defaultValue={origin}
+                />
+            )}
             <SearchBar
                 placeholder="Destination"
                 onSelect={handleDestinationSelect}
                 setCoords={setDestinationCoords}
+                defaultValue={destination}
+                showClearButton={true}
+                onClear={handleClearDestination}
             />
 
             {origin.length > 0 && destination.length > 0 && (
@@ -96,10 +128,9 @@ const SearchBars: React.FC = () => {
                             {transportModes.find((t) => t.mode === selectedMode)?.label}
                         </Text>
                     </View>
-
                     {/* Transport Buttons with Time Estimates */}
                     <View style={styles.transportButtonContainer}>
-                        {transportModes.map(({ mode, icon, time }) => (
+                        {transportModes.map(({ mode, icon}) => (
                             <TouchableOpacity
                                 key={mode}
                                 style={styles.transportButton}
@@ -112,23 +143,20 @@ const SearchBars: React.FC = () => {
                                         color={selectedMode === mode ? "#912338" : "black"}
                                     />
                                     <Text style={[styles.timeText, { color: selectedMode === mode ? "#912338" : "black" }]}>
-                                        {time} min
+                                        {selectedMode === mode ? time : transportModes.find(t => t.mode === mode)?.time} min
                                     </Text>
                                 </View>
                             </TouchableOpacity>
                         ))}
                     </View>
-
                     {/* Total Time, Start Button, and Floor/Outside View Button */}
                     <View style={styles.timeAndButtonsContainer}>
-                        {/* Time Container */}
                         <View style={styles.timeContainer}>
                             <Text style={styles.timeValue}>
-                                {transportModes.find((t) => t.mode === selectedMode)?.time}
+                                {time}min
                             </Text>
-                            <Text style={styles.timeUnit}>min</Text>
+                            
                         </View>
-
                         {/* Buttons Container */}
                         <View style={styles.buttonsContainer}>
                             <TouchableOpacity style={[styles.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}>
@@ -154,8 +182,7 @@ const SearchBars: React.FC = () => {
                                     <Text style={[styles.buttonText, { color: isInsideBuilding ? "#912338" : "grey" }]}>Floor View</Text>
                                 </View>
                             </TouchableOpacity>
-
-                            {/* When implementing floor plans, switch between floor and outside view !!! WILL BE USED IN THE FUTURE
+                        {/* When implementing floor plans, switch between floor and outside view !!! WILL BE USED IN THE FUTURE
                             <TouchableOpacity style={styles.button}>
                                 <View style={styles.buttonContent}>
                                     <Entypo name="tree" size={20} color="black" />
@@ -171,6 +198,7 @@ const SearchBars: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+
     container: {
         width: '100%',
         paddingHorizontal: 16,

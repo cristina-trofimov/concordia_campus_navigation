@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 
 interface ToggleButtonProps {
@@ -10,31 +10,82 @@ interface ToggleButtonProps {
     initialCampus?: boolean;
 }
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ mapRef, sgwCoords, loyolaCoords, onCampusChange, initialCampus = true }) => {
+const ToggleButton: React.FC<ToggleButtonProps> = ({
+    mapRef,
+    sgwCoords,
+    loyolaCoords,
+    onCampusChange,
+    initialCampus = true // false = Loyola, true = SGW
+}) => {
+
+    const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
+    const toggleWidth = Math.min(200, screenWidth * 0.50);
+    const toggleHeight = Math.min(40, screenHeight * 0.05);
+    const knobWidth = toggleWidth / 2;
+
     const [isSGW, setIsSGW] = useState(initialCampus);
-    const translateX = useRef(new Animated.Value(initialCampus ? 0 : 80)).current;
+    const translateX = useRef(new Animated.Value(initialCampus ? knobWidth : 0)).current;
 
     const toggleSwitch = () => {
+        const newIsSGW = !isSGW;
+        setIsSGW(newIsSGW);
+
         Animated.timing(translateX, {
-            toValue: isSGW ? 80 : 0,
-            duration: 300,
+            toValue: newIsSGW ? knobWidth : 0,
+            duration: 250,
             useNativeDriver: true,
-        }).start(() => {
-            const newIsSGW = !isSGW;
-            setIsSGW(newIsSGW);
-            onCampusChange(newIsSGW);
-        });
+        }).start();
+
+        onCampusChange(newIsSGW);
     };
 
     return (
-        <View >
-            <TouchableOpacity style={styles.slider} onPress={toggleSwitch} activeOpacity={1}>
-                <Animated.View style={[styles.knob, { transform: [{ translateX }] }]}>
-                    <Text style={styles.label}>{isSGW ? 'SGW' : 'Loyola'}</Text>
-                </Animated.View>
+        <View style={styles.container}>
+            <TouchableOpacity
+                style={[
+                    styles.slider,
+                    {
+                        width: toggleWidth,
+                        height: toggleHeight,
+                        borderRadius: toggleHeight / 2,
+                    }
+                ]}
+                onPress={toggleSwitch}
+                activeOpacity={0.9}
+            >
+                <Animated.View
+                    style={[
+                        styles.knob,
+                        {
+                            width: knobWidth,
+                            height: toggleHeight,
+                            borderRadius: toggleHeight / 2,
+                            transform: [{ translateX }]
+                        }
+                    ]}
+                />
+
                 <View style={styles.labelsContainer}>
-                    <Text style={[styles.labelText, isSGW ? styles.activeLabel : styles.inactiveLabel]}>{isSGW ? '' : 'SGW'}</Text>
-                    <Text style={[styles.labelText, !isSGW ? styles.activeLabel : styles.inactiveLabel]}>{!isSGW ? '' : 'Loyola'}</Text>
+                    <View style={styles.labelContainer}>
+                        <Text style={[
+                            styles.labelText,
+                            !isSGW ? styles.activeLabel : styles.inactiveLabel,
+                            { fontSize: Math.max(14, toggleHeight * 0.38) }
+                        ]}>
+                            Loyola
+                        </Text>
+                    </View>
+
+                    <View style={styles.labelContainer}>
+                        <Text style={[
+                            styles.labelText,
+                            isSGW ? styles.activeLabel : styles.inactiveLabel,
+                            { fontSize: Math.max(14, toggleHeight * 0.38) }
+                        ]}>
+                            SGW
+                        </Text>
+                    </View>
                 </View>
             </TouchableOpacity>
         </View>
@@ -42,51 +93,47 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ mapRef, sgwCoords, loyolaCo
 };
 
 const styles = StyleSheet.create({
-    slider: {
-        margin: 10,
-        width: 160,
-        height: 40, // Height of the slider
-        backgroundColor: 'rgba(255, 255, 255, 0.7)',
-        borderRadius: 20,
-        justifyContent: 'center',
-        paddingBottom: 0,
-        paddingTop: 0,
-        padding: 5, // Adjust padding to ensure the knob fits perfectly
-        position: 'relative',
-        overflow: 'hidden', // Ensure the knob doesn't overflow the slider
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
-    },
-    knob: {
-        paddingBottom: 0,
-        width: 90, // Width of the knob
-        height: '100%', // Knob takes the full height of the slider
-        backgroundColor: '#912338',
-        borderRadius: 20, // Match the slider's borderRadius
+    container: {
         alignItems: 'center',
         justifyContent: 'center',
-        position: 'absolute',
-        top: 0, // Align to the top of the slider
     },
-    label: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: 'white',
+    slider: {
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        position: 'relative',
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 20 },
+        shadowOpacity: 0.4,
+        shadowRadius: 5,
+        elevation: 10,
+    },
+    knob: {
+        backgroundColor: '#8D1919',
+        position: 'absolute',
+        top: 0,
+        left: 0,
     },
     labelsContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingHorizontal: 10,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        zIndex: 1,
+    },
+    labelContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     labelText: {
-        fontSize: 14,
         fontWeight: 'bold',
-        color: '#666',
     },
     activeLabel: {
-        color: 'rgba(255, 255, 255, 0.7)',
+        color: 'white',
     },
     inactiveLabel: {
-        color: '#666',
+        color: 'black',
     },
 });
 
