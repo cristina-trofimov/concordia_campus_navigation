@@ -90,25 +90,6 @@ const CalendarScreen = () => {
   const [eventTitle, setEventTitle] = useState(editingEvent?.title || '');
 
 
-  const handleDragCreateEvent = useCallback((event: OnCreateEventResponse) => {
-      const newEvent :EventItem = {
-        id: Math.random().toString(36).substr(2, 9),
-        title: 'New Event',
-        start: event.start,
-        end: event.end,
-        color: 'red',
-        recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=MO'
-      };
-      setEvents((prevEvents) => [...prevEvents, newEvent]);
-      setEditingEvent(newEvent);
-      setModalVisible(true);
-    }, []);
-
-  const handleEventPress = useCallback((event: EventItem) => {
-    setEditingEvent(event);
-    setModalVisible(true);
-  }, []);
-
   const handleSaveEvent = () => {
     console.log('Save button pressed');
     if (editingEvent) {
@@ -194,11 +175,11 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         ref={calendarRef}
         allowDragToCreate={true}
         // onDragCreateEventStart={handleDragCreateStart}
-        onDragCreateEventEnd={handleDragCreateEvent}
+        // onDragCreateEventEnd={handleDragCreateEvent}
         events={testEvents}
         // events={events}
         dragStep={15}
-        onPressEvent={handleEventPress}
+        // onPressEvent={handleEventPress}
       >
         <CalendarHeader />
         <CalendarBody renderDraggingEvent={renderDraggingEvent} />
