@@ -75,7 +75,6 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
         const finaldecoded = decoded.map(coord => ({ latitude: coord.latitude, longitude: coord.longitude }))
         setDecodedPolyline(finaldecoded);
 
-
       } catch (error) {
         console.error("Error processing route coordinates:", error);
         setDecodedPolyline([]);
@@ -109,7 +108,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
         distanceInterval: 1,
       },
       (location) => {
-
+        console.log("User location updated:", location.coords);
         setMyLocation(location.coords);
       }
     );
@@ -139,7 +138,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
       }
 
       let location = await Location.getCurrentPositionAsync({});
-
+      console.log("User location received:", location.coords);
       setMyLocation(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
@@ -224,23 +223,31 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
           </PointAnnotation>
         )}
 
-        {decodedPolyline.length > 0 && (
-          <Mapbox.ShapeSource
-            id="routeSource"
-            shape={{
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'LineString',
-                    coordinates: decodedPolyline.map(point => [point.longitude, point.latitude]),
-                  },
-                  properties: {},
+{decodedPolyline.length > 0 && (
+        <Mapbox.ShapeSource
+          id="routeSource"
+          shape={{
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'LineString',
+                  coordinates:decodedPolyline.map(point => [point.longitude, point.latitude]),
                 },
-              ],
+                properties: {},
+              },
+            ],
+          }}
+        >
+          <Mapbox.LineLayer
+            id="routeLayer"
+            style={{
+              lineColor: '#ff0000',
+              lineWidth: 4,
+              lineOpacity: 0.8,
             }}
-          >
+          />
             <Mapbox.LineLayer
               id="routeLayer"
               style={{

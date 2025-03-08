@@ -4,6 +4,7 @@ import Modal from 'react-native-modal';
 import { Icon } from 'react-native-elements'; 
 import BuildingInfo from '../interfaces/buildingLocationInfo';
 import BuildingLocation from '../interfaces/buildingLocation';
+import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
 
 interface BuildingInformationProps {
     isVisible: boolean;
@@ -18,12 +19,12 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
 
     return (
         <Modal isVisible={isVisible} onBackdropPress={onClose} onBackButtonPress={onClose}>
-            <View style={styles.modalContent}>
+            <View style={BuildingInfoStyle.modalContent}>
                 <ScrollView>
-                    <View style={styles.card}>
-                        <View style={styles.titleContainer}>
-                            <Text style={styles.title}>{title}</Text>
-                            <TouchableOpacity style={styles.actionButton} onPress={() => console.log('Button Pressed')}>
+                    <View style={BuildingInfoStyle.card}>
+                        <View style={BuildingInfoStyle.titleContainer}>
+                            <Text style={BuildingInfoStyle.title}>{title}</Text>
+                            <TouchableOpacity style={BuildingInfoStyle.actionButton} onPress={() => console.log('Button Pressed')}>
                                 <Icon
                                     name="directions"
                                     type="material"  
@@ -33,39 +34,39 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                             </TouchableOpacity>
                         </View>
 
-                        <View style={styles.divider} />
+                        <View style={BuildingInfoStyle.divider} />
                         {photo && (
                             <Image
                                 source={{ uri: photo }}
-                                style={styles.image}
+                                style={BuildingInfoStyle.image}
                             />
                         )}
                         {address && (
-                            <View style={styles.infoRow}>
+                            <View style={BuildingInfoStyle.infoRow}>
                                 <Icon name="map-pin" type="font-awesome" size={16} color="grey" />
-                                <Text style={styles.address}>{address}</Text>
+                                <Text style={BuildingInfoStyle.address}>{address}</Text>
                             </View>
                         )}
                         {description && (
-                            <View style={styles.infoRow}>
-                                <Text style={styles.description}>{description}</Text>
+                            <View style={BuildingInfoStyle.infoRow}>
+                                <Text style={BuildingInfoStyle.description}>{description}</Text>
                             </View>
                         )}
                         {departments && departments.length > 0 && (
-                            <View style={styles.infoSection}>
-                                <Text style={styles.sectionTitle}>Departments:</Text>
+                            <View style={BuildingInfoStyle.infoSection}>
+                                <Text style={BuildingInfoStyle.sectionTitle}>Departments:</Text>
                                 {departments.map((dept, index) => (
-                                    <Text key={index} style={styles.listItem}>
+                                    <Text key={index} style={BuildingInfoStyle.listItem}>
                                         {dept}
                                     </Text>
                                 ))}
                             </View>
                         )}
                         {services && services.length > 0 && (
-                            <View style={styles.infoSection}>
-                                <Text style={styles.sectionTitle}>Services:</Text>
+                            <View style={BuildingInfoStyle.infoSection}>
+                                <Text style={BuildingInfoStyle.sectionTitle}>Services:</Text>
                                 {services.map((service, index) => (
-                                    <Text key={index} style={styles.listItem}>
+                                    <Text key={index} style={BuildingInfoStyle.listItem}>
                                         {service}
                                     </Text>
                                 ))}
@@ -79,98 +80,5 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
     );
 };
 
-const styles = StyleSheet.create({
-    titleContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    actionButton: {
-        backgroundColor: '#912338',
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 5,
-    },
-    actionButtonText: {
-        color: 'white',
-        fontSize: 14,
-        fontWeight: 'bold',
-    },
-    modalContent: {
-        backgroundColor: 'white',
-        borderRadius: 8,
-        padding: 0,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-        maxHeight: '80%',
-    },
-    card: {
-        backgroundColor: 'white',
-        borderRadius: 8,
-        padding: 16,
-        margin: 8,
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 8,
-    },
-    divider: {
-        height: 1,
-        backgroundColor: '#e1e8ee',
-        marginVertical: 8,
-    },
-    image: {
-        width: '100%',
-        height: 200,
-        resizeMode: 'cover',
-        borderRadius: 8,
-        marginBottom: 8,
-    },
-    infoRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
-    address: {
-        fontSize: 16,
-        marginLeft: 8,
-    },
-    description: {
-        fontSize: 14,
-        marginTop: 8,
-        marginBottom: 16,
-    },
-    infoSection: {
-        marginTop: 16,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 8,
-    },
-    listItem: {
-        fontSize: 16,
-        marginBottom: 4,
-    },
-    closeButton: {
-        backgroundColor: 'rgba(39, 39, 39, 1)',
-        padding: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginTop: 16,
-    },
-    closeButtonText: {
-        color: 'white',
-        fontSize: 16,
-    },
-});
 
 export default BuildingInformation;

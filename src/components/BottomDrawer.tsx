@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import SearchBars from "./SearchBars";
 import { useCoords } from "../data/CoordsContext";
+import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
 
 const { height, width } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;
@@ -83,9 +84,9 @@ function BottomDrawer({
   ).current;
 
   return (
-    <Animated.View style={[styles.container, { height: drawerHeight }]}>
-      <View {...panResponder.panHandlers} style={styles.dragHandle}>
-        <View style={styles.dragIndicator} />
+    <Animated.View style={[BottomDrawerStyle.container, { height: drawerHeight }]}>
+      <View {...panResponder.panHandlers} style={BottomDrawerStyle.dragHandle}>
+        <View style={BottomDrawerStyle.dragIndicator} />
         <SearchBars />
         {htmlInstructions.length > 0 &&
           htmlInstructions.map((instruction, index) => (
@@ -94,36 +95,11 @@ function BottomDrawer({
             </Text>
           ))}
       </View>
-      <View style={styles.contentContainer}>{children}</View>
+      <View style={BottomDrawerStyle.contentContainer}>{children}</View>
     </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    width: width,
-    position: "absolute",
-    bottom: 0,
-  },
-  dragHandle: {
-    width: width,
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  dragIndicator: {
-    width: 60,
-    height: 5,
-    backgroundColor: "#8F8F8F",
-    borderRadius: 3,
-    marginBottom: 10,
-  },
-  contentContainer: {
-    flex: 1,
-    padding: 16,
-  },
-});
+
 
 export default BottomDrawer;
