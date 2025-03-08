@@ -6,11 +6,37 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
 import { StackNavigationProp } from '@react-navigation/stack';
 import MyModal from "../MyModal";
+import RNCalendarEvents from 'react-native-calendar-events';
 
-// const windowWidth = Dimensions.get('window').width;
-// const windowHeight = Dimensions.get('window').height;
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Disables strict mode
+});
 
 const { height, width } = Dimensions.get('window');
+
+const theme = {
+  calendarBackground: '#f0f0f0',
+  dayTextColor: '#333',
+  selectedDayBackground: '#007bff',
+};
+
+const currentWeek = (currentDate?: Date): string => {
+  const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
+  const today = currentDate || new Date();
+  const dayOfWeek = today.getDay(); // 0 = Sun, 1 = Mon, etc
+  const firstDay = new Date(today);
+  firstDay.setDate(today.getDate() - dayOfWeek + ( dayOfWeek === 0 ? -6 : 1 )) // First day is monday
+  const lastDay = new Date(firstDay);
+  lastDay.setDate(firstDay.getDate() + 6);
+
+  let month;
+  if (firstDay.getDate() > lastDay.getDate()) {
+    return `${months[today.getMonth()]} ${firstDay.getDate()} - ${months[lastDay.getMonth()]} ${lastDay.getDate()}, ${today.getFullYear()}`;
+  } else {
+    return `${months[today.getMonth()]} ${firstDay.getDate()} - ${lastDay.getDate()}, ${today.getFullYear()}`;
+  }
+}
 
 const testEvents: EventItem[] = [
   {
@@ -53,10 +79,6 @@ const testEvents: EventItem[] = [
   },
 ];
 
-configureReanimatedLogger({
-  level: ReanimatedLogLevel.warn,
-  strict: false, // Disables strict mode
-});
 
 const CalendarScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -64,6 +86,7 @@ const CalendarScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
+  const [currentDay, setCurrentDate] = useState<Date>(new Date());
 
   const [eventTitle, setEventTitle] = useState(editingEvent?.title || '');
 
@@ -140,7 +163,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
   return (
     <View style={styles.container}>
       <TextInput
-          style={styles.input}
+          // style={styles.input}
           // onChangeText={onChangeText}
           // value={""}
         />
@@ -152,24 +175,34 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             />
           </TouchableOpacity>
           <View style={styles.buttonContainer} >
-            <TouchableOpacity onPress={ () => { calendarRef.current?.goToPrevPage(true); console.log("prev") } }>
+            <TouchableOpacity
+              onPress={ () => {
+                calendarRef.current?.goToPrevPage(true);
+                setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() - 7)));
+              }}
+            >
               <Image style={styles.image} source={require("../../resources/images/icons8-chevron-left.png")} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={ () => { calendarRef.current?.goToNextPage(true); console.log("next") } } >
+            <TouchableOpacity
+              onPress={ () => {
+                calendarRef.current?.goToNextPage(true);
+                setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() + 7)));
+              }}
+            >
               <Image style={styles.image} source={require("../../resources/images/icons8-chevron-right.png")}
               />
             </TouchableOpacity>
-            <Text style={{ paddingLeft: 10 }} >Date here</Text>
+            <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDay)}</Text>
           </View>
         </View>
         <TouchableOpacity style={styles.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
           <Text style={{ color: "white", fontWeight: "bold" }} >TODAY</Text>
         </TouchableOpacity>
-        {/* <Button title="Today" color={"#912338"} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} /> */}
       </View>
 
       {/* Renders the calendar view */}
       <CalendarContainer
+        // theme={theme}
         ref={calendarRef}
         allowDragToCreate={true}
         // onDragCreateEventStart={handleDragCreateStart}
@@ -251,6 +284,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#912338",
     padding: 5,
     justifyContent: "center",
+    borderRadius: 15,
   },
   image: {
     height: 20,

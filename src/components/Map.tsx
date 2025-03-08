@@ -13,7 +13,7 @@ import { Coords } from '../interfaces/Map.ts';
 
 import { HighlightBuilding } from './BuildingCoordinates';
 import CalendarButton from './CalendarButton.tsx';
-import LeftDrawerButton from './LeftDrawerButton.tsx';
+import LeftDrawerButton from './LeftDrawer.tsx';
 import BuildingInformation from './BuildingInformation.tsx';
 import { BuildingProperties } from '../interfaces/BuildingProperties.ts';
 import BuildingLocation from '../interfaces/buildingLocation.ts';

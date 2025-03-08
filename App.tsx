@@ -1,16 +1,13 @@
-import React, { useRef, Button, Text } from "react";
+import React, { useRef } from "react";
 import { Animated, Dimensions, StyleSheet } from "react-native";
 import { createTheme } from "@rneui/themed";
 import HomeScreen from './src/components/screens/HomeScreen';
 import CalendarScreen from "./src/components/screens/CalendarScreen";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import LeftDrawer from "./src/components/LeftDrawer";
 
 const { height } = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
-// const Drawer = createDrawerNavigator();
 
 export type RootStackParamList = {
   Home: undefined;
@@ -32,14 +29,6 @@ export default function App() {
 
   return (
       <NavigationContainer>
-        {/* Don't delete for now */}
-        {/* <Drawer.Navigator initialRouteName="Home">
-          <Drawer.Screen name="Home" component={HomeScreen} />
-          <Drawer.Screen name="LeftDrawer" component={LeftDrawer} />
-        </Drawer.Navigator> */}
-
-
-
         <Stack.Navigator initialRouteName="Home">
           <Stack.Screen name="Home" component={HomeScreen}
             options={{ headerShown: false }} // Hide the header for this screen only
