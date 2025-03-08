@@ -75,7 +75,6 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
         const finaldecoded = decoded.map(coord => ({ latitude: coord.latitude, longitude: coord.longitude }))
         setDecodedPolyline(finaldecoded);
 
-        //console.log("decoded polyline:", decoded);
       } catch (error) {
         console.error("Error processing route coordinates:", error);
         setDecodedPolyline([]);

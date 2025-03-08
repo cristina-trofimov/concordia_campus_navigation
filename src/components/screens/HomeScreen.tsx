@@ -6,6 +6,7 @@ import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
 import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
+import { HomeStyle } from "../../styles/HomeStyle";
 
 const { height } = Dimensions.get("window");
 
@@ -23,7 +24,7 @@ export default function HomeScreen() {
 
   return (
     <CoordsProvider>
-      <View style={styles.container}>
+      <View style={HomeStyle.container}>
         <CalendarButton />
         <LeftDrawer />
         <Map drawerHeight={drawerHeight} />
@@ -32,17 +33,3 @@ export default function HomeScreen() {
     </CoordsProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-});

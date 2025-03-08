@@ -1,19 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity, Dimensions, } from "react-native";
+import { View, Text, Button, Modal, TextInput, TouchableOpacity, } from "react-native";
 import { CalendarBody, CalendarContainer, CalendarHeader, DraggingEvent, DraggingEventProps, OnCreateEventResponse, EventItem, CalendarKitHandle, } from "@howljs/calendar-kit";
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
 import { StackNavigationProp } from '@react-navigation/stack';
 import Feather from '@expo/vector-icons/Feather';
-import MyModal from "../MyModal";
+import { CalendarStyle } from "../../styles/CalendarStyle";
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false, // Disables strict mode
 });
 
-const { height, width } = Dimensions.get('window');
 
 const theme = {
   calendarBackground: '#f0f0f0',
@@ -137,14 +136,14 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
   }, [modalVisible]);
 
   return (
-    <View style={styles.container}>
+    <View style={CalendarStyle.container}>
       {/* Header */}
-      <View style={styles.headerContainer}>
+      <View style={CalendarStyle.headerContainer}>
         <View style={{ flexDirection: "row" }} >
           <TouchableOpacity onPress={ () => { navigation.navigate("Home") } } >
             <Feather name="arrow-left-circle" size={40} color="black" style={{ marginTop: 5 }} />
           </TouchableOpacity>
-          <View style={styles.buttonContainer} >
+          <View style={CalendarStyle.headerButtonsContainer} >
             <TouchableOpacity
               onPress={ () => {
                 calendarRef.current?.goToPrevPage(true);
@@ -164,7 +163,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDay)}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
+        <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
           <Text style={{ color: "white", fontWeight: "bold" }} >TODAY</Text>
         </TouchableOpacity>
       </View>
@@ -185,9 +184,6 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         <CalendarBody renderDraggingEvent={renderDraggingEvent} />
       </CalendarContainer>
 
-      {/* Testing another modal */}
-      {/* <MyModal visible={modalVisible} onClose={ () => { setModalVisible(!modalVisible) } } /> */}
-
       {/* Modal to edit an event */}
       <Modal
         transparent={true}
@@ -198,12 +194,12 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         }}
         animationType="fade"
       >
-        <View style={styles.modalContainer} >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalText}>Edit Event</Text>
-            <TextInput style={styles.input} />
+        <View style={CalendarStyle.modalContainer} >
+          <View style={CalendarStyle.modalContent}>
+            <Text style={CalendarStyle.modalText}>Edit Event</Text>
+            <TextInput style={CalendarStyle.input} />
             <TextInput
-              style={styles.input}
+              style={CalendarStyle.input}
               value={editingEvent?.title || ''}
               onChangeText={(text) => {
                 if (editingEvent) {
@@ -225,65 +221,6 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: "relative",
-  },
-  headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 10,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 3,
-    padding: 10,
-  },
-  todayBTN: {
-    height: 40,
-    width: 55,
-    backgroundColor: "#912338",
-    padding: 5,
-    justifyContent: "center",
-    borderRadius: 15,
-  },
-  modalContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    width: width,
-    height: height,
-  },
-  modalContent: {
-    width: width * 0.8,
-    height: height * 0.8,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 20,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    zIndex: 1000,
-    elevation: 15,
-  },
-  modalText: {
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  input: {
-    height: 40,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    width: "80%",
-  },
-});
+
 
 export default CalendarScreen;
