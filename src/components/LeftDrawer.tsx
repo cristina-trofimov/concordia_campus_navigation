@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TouchableOpacity, Image, StyleSheet, Modal, View, Animated, Dimensions, GestureResponderEvent, Text, } from "react-native";
-import HandleGoogle from "./HandleGoogle";
+// import HandleGoogle from "./HandleGoogle";
 
 const { width } = Dimensions.get("window");
 
@@ -59,7 +59,7 @@ const LeftDrawer = () => {
             <TouchableOpacity activeOpacity={1}>
               {/* Content */}
               <View style={styles.contentContainer} >
-                <HandleGoogle />
+                {/* <HandleGoogle /> */}
 
                 <TouchableOpacity onPress={ () => { console.log("your favorites was presses") } } >
                   <View style={{ flexDirection: 'row', alignItems: 'center', }} >
