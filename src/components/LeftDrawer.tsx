@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TouchableOpacity, Image, StyleSheet, Modal, View, Animated, Dimensions, GestureResponderEvent, Text, } from "react-native";
-// import HandleGoogle from "./HandleGoogle";
+import Feather from '@expo/vector-icons/Feather';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 
 const { width } = Dimensions.get("window");
 
@@ -31,13 +33,11 @@ const LeftDrawer = () => {
   }, [isDrawerVisible, slideAnim]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container} >
+      <View style={{ flex: 1 }}>
       {/* Button */}
-      <TouchableOpacity style={styles.button} onPress={ () => { setIsDrawerVisible(!isDrawerVisible); } }>
-        <Image
-          source={require("../../src/resources/images/icons8-menu.png")}
-          style={styles.image}
-        />
+      <TouchableOpacity style={styles.button} onPress={ () => { setIsDrawerVisible(!isDrawerVisible); } } >
+        <Ionicons name="reorder-three-outline" size={40} color="black" />
       </TouchableOpacity>
 
       {/* Drawer */}
@@ -63,44 +63,49 @@ const LeftDrawer = () => {
 
                 <TouchableOpacity onPress={ () => { console.log("your favorites was presses") } } >
                   <View style={{ flexDirection: 'row', alignItems: 'center', }} >
-                    <Image source={require("../resources/images/icons8-heart.png")} style={styles.contentImage} />
+                    <Feather name="heart" size={20} color="black" style={styles.contentImage} />
                     <Text style={{ fontWeight: "bold" }} >Your Favorites</Text>
                   </View>
-                  {/* Divider */}
-                  {/* <View style={{ height: 1, backgroundColor: '#928f8f', width: "100%", marginTop: 5, }} /> */}
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={ () => { console.log("your timeline was presses") } } >
                   <View style={{ flexDirection: 'row', alignItems: 'center', }} >
-                    <Image source={require("../resources/images/icons8-line-chart.png")} style={styles.contentImage} />
+                    <Ionicons name="analytics-outline" size={20} color="black" style={styles.contentImage} />
                     <Text style={{ fontWeight: "bold" }} >Your Timeline</Text>
                   </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={ () => { console.log("help & feedback was presses") } } >
                   <View style={{ flexDirection: 'row', alignItems: 'center', }} >
-                    <Image source={require("../resources/images/icons8-chat-bubble.png")} style={styles.contentImage} />
+                    <Feather name="help-circle" size={20} color="black" style={styles.contentImage} />
                     <Text style={{ fontWeight: "bold" }} >Help & Feedback</Text>
                   </View>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={ () => { console.log("settings was presses") } } >
                   <View style={{ flexDirection: 'row', alignItems: 'center', }} >
-                    <Image source={require("../resources/images/icons8-settings.png")} style={styles.contentImage} />
+                    <Feather name="settings" size={20} color="black" style={styles.contentImage} />
                     <Text style={{ fontWeight: "bold" }} >Settings</Text>
                   </View>
                 </TouchableOpacity>
-            </View>
-            </TouchableOpacity>
-          </Animated.View>
-        </TouchableOpacity>
-      </View>
-    </Modal>
+              </View>
+              </TouchableOpacity>
+            </Animated.View>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    alignItems: 'center',
+  },
   button: {
     position: "absolute",
     top: 10,

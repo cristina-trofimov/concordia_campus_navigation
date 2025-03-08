@@ -33,24 +33,7 @@ export default function App() {
           <Stack.Screen name="Home" component={HomeScreen}
             options={{ headerShown: false }} // Hide the header for this screen only
           />
-          <Stack.Screen name="Calendar" component={CalendarScreen}
-            options={{ headerShown: false }}
-          // options={{
-          //   headerTitle: () => <Text>Custom Title</Text>, // Custom title
-          //   headerRight: () => (
-          //     <Button
-          //       title="Info"
-          //       onPress={() => alert('Info button pressed!')} // Custom button
-          //     />
-          //   ),
-          //   headerLeft: () => (
-          //     <Button
-          //       title="Back"
-          //       onPress={() => navigation.goBack()} // Custom back button
-          //     />
-          //   ),
-          // }}
-        />
+          <Stack.Screen name="Calendar" component={CalendarScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
       </NavigationContainer>
   );

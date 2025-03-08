@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity, Dimensions, Image } from "react-native";
+import { View, Text, StyleSheet, Button, Modal, TextInput, TouchableOpacity, Dimensions, } from "react-native";
 import { CalendarBody, CalendarContainer, CalendarHeader, DraggingEvent, DraggingEventProps, OnCreateEventResponse, EventItem, CalendarKitHandle, } from "@howljs/calendar-kit";
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
 import { StackNavigationProp } from '@react-navigation/stack';
+import Feather from '@expo/vector-icons/Feather';
 import MyModal from "../MyModal";
-import RNCalendarEvents from 'react-native-calendar-events';
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -75,7 +75,6 @@ const testEvents: EventItem[] = [
     start: { dateTime: '2025-03-08T08:00:00', timeZone: 'America/New_York' },
     end: { dateTime: '2025-03-08T18:00:00', timeZone: 'America/New_York' },
     color: '#34A853',
-    // recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=FR'
   },
 ];
 
@@ -91,28 +90,24 @@ const CalendarScreen = () => {
   const [eventTitle, setEventTitle] = useState(editingEvent?.title || '');
 
 
-  // const handleDragCreateStart = useCallback((event: OnCreateEventResponse) => {
-  //   console.log('Started creating event at:', event.start);
-  // }, []);
+  const handleDragCreateEvent = useCallback((event: OnCreateEventResponse) => {
+      const newEvent :EventItem = {
+        id: Math.random().toString(36).substr(2, 9),
+        title: 'New Event',
+        start: event.start,
+        end: event.end,
+        color: 'red',
+        recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=MO'
+      };
+      setEvents((prevEvents) => [...prevEvents, newEvent]);
+      setEditingEvent(newEvent);
+      setModalVisible(true);
+    }, []);
 
-  // const handleDragCreateEvent = useCallback((event: OnCreateEventResponse) => {
-  //     const newEvent :EventItem = {
-  //       id: Math.random().toString(36).substr(2, 9),
-  //       title: 'New Event',
-  //       start: event.start,
-  //       end: event.end,
-  //       color: 'red',
-  //       recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=MO'
-  //     };
-  //     setEvents((prevEvents) => [...prevEvents, newEvent]);
-  //     setEditingEvent(newEvent);
-  //     setModalVisible(true);
-  //   }, []);
-
-  // const handleEventPress = useCallback((event: EventItem) => {
-  //   setEditingEvent(event);
-  //   setModalVisible(true);
-  // }, []);
+  const handleEventPress = useCallback((event: EventItem) => {
+    setEditingEvent(event);
+    setModalVisible(true);
+  }, []);
 
   const handleSaveEvent = () => {
     console.log('Save button pressed');
@@ -162,17 +157,11 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
 
   return (
     <View style={styles.container}>
-      <TextInput
-          // style={styles.input}
-          // onChangeText={onChangeText}
-          // value={""}
-        />
       {/* Header */}
       <View style={styles.headerContainer}>
         <View style={{ flexDirection: "row" }} >
           <TouchableOpacity onPress={ () => { navigation.navigate("Home") } } >
-            <Image style={styles.backBTN} source={require("../../resources/images/icons8-back.png")}
-            />
+            <Feather name="arrow-left-circle" size={40} color="black" style={{ marginTop: 5 }} />
           </TouchableOpacity>
           <View style={styles.buttonContainer} >
             <TouchableOpacity
@@ -181,7 +170,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
                 setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() - 7)));
               }}
             >
-              <Image style={styles.image} source={require("../../resources/images/icons8-chevron-left.png")} />
+              <Feather name="chevron-left" size={28} color="black" />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={ () => {
@@ -189,8 +178,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
                 setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() + 7)));
               }}
             >
-              <Image style={styles.image} source={require("../../resources/images/icons8-chevron-right.png")}
-              />
+              <Feather name="chevron-right" size={28} color="black" />
             </TouchableOpacity>
             <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDay)}</Text>
           </View>
@@ -206,11 +194,11 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         ref={calendarRef}
         allowDragToCreate={true}
         // onDragCreateEventStart={handleDragCreateStart}
-        // onDragCreateEventEnd={handleDragCreateEvent}
+        onDragCreateEventEnd={handleDragCreateEvent}
         events={testEvents}
         // events={events}
         dragStep={15}
-        // onPressEvent={handleEventPress}
+        onPressEvent={handleEventPress}
       >
         <CalendarHeader />
         <CalendarBody renderDraggingEvent={renderDraggingEvent} />
@@ -221,7 +209,6 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
 
       {/* Modal to edit an event */}
       <Modal
-        // animationType="slide"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
@@ -237,7 +224,6 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             <TextInput
               style={styles.input}
               value={editingEvent?.title || ''}
-              // onChangeText={(text) => setEventTitle(text)}
               onChangeText={(text) => {
                 if (editingEvent) {
                   setEditingEvent({ ...editingEvent, title: text });
@@ -274,10 +260,6 @@ const styles = StyleSheet.create({
     marginTop: 3,
     padding: 10,
   },
-  backBTN: {
-    height: 45,
-    width: 45,
-  },
   todayBTN: {
     height: 40,
     width: 55,
@@ -286,18 +268,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 15,
   },
-  image: {
-    height: 20,
-    width: 20,
-  },
   modalContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     width: width,
     height: height,
-    // zIndex: 1000,
-    // elevation: 10,
   },
   modalContent: {
     width: width * 0.8,
@@ -320,9 +296,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
-  // modalBTN: {
-  //   zIndex: 10,
-  // },
   input: {
     height: 40,
     margin: 12,

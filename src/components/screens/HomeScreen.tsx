@@ -4,6 +4,8 @@ import { createTheme } from "@rneui/themed";
 import Map from "../Map";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
+import LeftDrawer from "../LeftDrawer";
+import CalendarButton from "../CalendarButton";
 
 const { height } = Dimensions.get("window");
 
@@ -22,6 +24,8 @@ export default function HomeScreen() {
   return (
     <CoordsProvider>
       <View style={styles.container}>
+        <CalendarButton />
+        <LeftDrawer />
         <Map drawerHeight={drawerHeight} />
         <BottomDrawer drawerHeight={drawerHeight} children={undefined} />
       </View>

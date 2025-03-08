@@ -12,8 +12,6 @@ import { Coords } from '../interfaces/Map.ts';
 
 
 import { HighlightBuilding } from './BuildingCoordinates';
-import CalendarButton from './CalendarButton.tsx';
-import LeftDrawerButton from './LeftDrawer.tsx';
 import BuildingInformation from './BuildingInformation.tsx';
 import { BuildingProperties } from '../interfaces/BuildingProperties.ts';
 import BuildingLocation from '../interfaces/buildingLocation.ts';
@@ -291,12 +289,6 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
           initialCampus={true}
         />
       </View>
-      <View style={styles.calendarButtonContainer}>
-        <CalendarButton />
-      </View>
-      <View style={styles.LeftDrawerButtonContainer}>
-        <LeftDrawerButton />
-      </View>
     </View>
   );
 }
@@ -335,18 +327,6 @@ const styles = StyleSheet.create({
   toggleButtonContainer: {
     position: 'absolute',
     top: 20,
-    alignItems: 'center',
-  },
-  calendarButtonContainer: {
-    position: 'absolute',
-    top: 20,
-    right: 0,
-    alignItems: 'center',
-  },
-  LeftDrawerButtonContainer: {
-    position: 'absolute',
-    top: 20,
-    left: 0,
     alignItems: 'center',
   },
   marker: {

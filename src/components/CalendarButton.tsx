@@ -1,8 +1,9 @@
 import React from "react";
-import { Image, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from "../../App";
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 const CalendarButton = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -13,16 +14,21 @@ const CalendarButton = () => {
   };
 
   return (
-    <TouchableOpacity style={styles.button} onPress={goToCalendar}>
-      <Image
-        source={require("../../src/resources/images/icons8-calendar-icon.png")}
-        style={styles.image}
-      />
+    <View style={styles.calendarButtonContainer} >
+      <TouchableOpacity style={styles.button} onPress={goToCalendar}>
+      <FontAwesome name="calendar" size={26} color="white" style={styles.image} />
     </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  calendarButtonContainer: {
+    position: 'absolute',
+    top: 20,
+    right: 0,
+    alignItems: 'center',
+  },
   button: {
     position: "absolute",
     top: 10,
@@ -35,9 +41,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   image: {
-    margin: 5,
-    height: 30,
-    width: 30,
+    margin: 7,
   },
 });
 
