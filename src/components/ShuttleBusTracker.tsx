@@ -46,18 +46,14 @@ const ShuttleBusTracker: React.FC = () => {
 
     if (loading) {
         return (
-            <View style={styles.container}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
         );
     }
 
     if (error) {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.errorText}>Error: {error}</Text>
-            </View>
-        );
+        console.log(error);
     }
 
     if (!busData || !busData.Points) {
@@ -84,18 +80,5 @@ const ShuttleBusTracker: React.FC = () => {
         </>
     );
 };
-
-// Styles
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorText: {
-        fontSize: 18,
-        color: 'red',
-    },
-});
 
 export default ShuttleBusTracker;
