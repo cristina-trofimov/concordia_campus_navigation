@@ -5,6 +5,7 @@ import { Button, ThemeProvider, createTheme } from "@rneui/themed";
 import Map from "./src/components/Map";
 import BottomDrawer from "./src/components/BottomDrawer";
 import { CoordsProvider } from "./src/data/CoordsContext";
+import ShuttleBusTracker from "./src/data/ShuttleBusTracker";
 
 const { height } = Dimensions.get("window");
 
@@ -24,6 +25,7 @@ export default function App() {
     <CoordsProvider>
       <View style={styles.container}>
         <Map drawerHeight={drawerHeight} />
+        <ShuttleBusTracker />
         <BottomDrawer drawerHeight={drawerHeight} children={undefined} />
       </View>
     </CoordsProvider>
