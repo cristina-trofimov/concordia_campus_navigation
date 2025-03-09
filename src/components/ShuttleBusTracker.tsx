@@ -53,7 +53,7 @@ const ShuttleBusTracker: React.FC = () => {
     }
 
     if (error) {
-        console.log(error);
+        return null;
     }
 
     if (!busData || !busData.Points) {
