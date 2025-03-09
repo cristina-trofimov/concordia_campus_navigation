@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --config=tests/jest.config.js",
+    "test": "jest",
     "detox-build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
     "detox-test": "detox test --configuration android.emu.debug",
     "start": "expo start --dev-client",
