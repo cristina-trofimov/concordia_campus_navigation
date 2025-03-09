@@ -2,11 +2,14 @@ import React, { useEffect, useMemo } from 'react';
 import Mapbox from '@rnmapbox/maps';
 import * as turf from '@turf/turf';
 import { buildingFeatures } from '../data/buildingFeatures.ts'
+import { hallFeatures } from '../data/indoor/hallFeatures.ts'
 import { useCoords } from "../data/CoordsContext";
 
 interface HighlightBuildingProps {
   userCoordinates: [number, number] | null;
 }
+
+const allIndoorFeatures = [...hallFeatures];
 
 const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
   return coordinates.map((ring) => {
@@ -21,15 +24,22 @@ const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
   });
 };
 
-const fixedBuildingFeatures = buildingFeatures.map((feature) => {
-  return {
-    ...feature,
-    geometry: {
-      ...feature.geometry,
-      coordinates: fixPolygonCoordinates(feature.geometry.coordinates),
-    },
-  };
-});
+const fixFeatureCoordinates = (feature: any) => {
+  if (feature.geometry.type === 'Polygon') {
+    return {
+      ...feature,
+      geometry: {
+        ...feature.geometry,
+        coordinates: fixPolygonCoordinates(feature.geometry.coordinates),
+      },
+    };
+  }
+  return feature; 
+};
+
+const fixedBuildingFeatures = buildingFeatures.map(fixFeatureCoordinates);
+const fixedIndoorFeatures = allIndoorFeatures.map(fixFeatureCoordinates);
+const fixedAllFeatures = [...fixedBuildingFeatures, ...fixedIndoorFeatures];
 
 export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) => {
   const { setIsInsideBuilding } = useCoords();
@@ -40,20 +50,23 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
     return [longitude, latitude];
   }, [userCoordinates]);
 
-  const highlightedBuilding = useMemo(() => {
+  const highlightedFeature = useMemo(() => {
     if (!swappedUserCoordinates) return null;
-    return fixedBuildingFeatures.find((feature) =>
-      turf.booleanPointInPolygon(
-        turf.point(swappedUserCoordinates),
-        turf.polygon(feature.geometry.coordinates)
-      )
-    );
+    return fixedAllFeatures.find((feature) => {
+      if (feature.geometry.type === 'Polygon') {
+        return turf.booleanPointInPolygon(
+          turf.point(swappedUserCoordinates),
+          turf.polygon(feature.geometry.coordinates)
+        );
+      }
+      return false; // Skip non-Polygon features
+    });
   }, [swappedUserCoordinates]);
 
   // Update the context state whenever user location changes
   useEffect(() => {
-    setIsInsideBuilding(!!highlightedBuilding);
-  }, [highlightedBuilding, setIsInsideBuilding]);
+    setIsInsideBuilding(!!highlightedFeature);
+  }, [highlightedFeature, setIsInsideBuilding]);
 
   if (!userCoordinates) {
     return null;
@@ -66,7 +79,7 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
         id="buildings1"
         shape={{
           type: 'FeatureCollection',
-          features: fixedBuildingFeatures,
+          features: fixedAllFeatures,
         }}
       >
         <Mapbox.FillExtrusionLayer
@@ -82,16 +95,17 @@ export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) =
       </Mapbox.ShapeSource>
 
 
-      {highlightedBuilding && (
+      {/* Highlight the feature the user is inside */}
+      {highlightedFeature && (
         <Mapbox.ShapeSource
-          id="highlighted-building"
+          id="highlighted-feature"
           shape={{
             type: 'FeatureCollection',
-            features: [highlightedBuilding],
+            features: [highlightedFeature],
           }}
         >
           <Mapbox.FillExtrusionLayer
-            id="highlighted-building-layer"
+            id="highlighted-feature-layer"
             minZoomLevel={0}
             maxZoomLevel={22}
             style={{
