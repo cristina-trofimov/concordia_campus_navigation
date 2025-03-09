@@ -6,6 +6,7 @@ import getDirections from './Route';
 import { useCoords } from '../data/CoordsContext';
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
+import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 
 const SearchBars: React.FC = () => {
     const { setRouteData, myLocationString,routeData } = useCoords();
@@ -101,7 +102,7 @@ const SearchBars: React.FC = () => {
     }, [selectedMode, origin, destination, originCoords, destinationCoords, handleOriginSelect, handleDestinationSelect]);
 
     return (
-        <View style={styles.container}>
+        <View style={SearchBarsStyle.container}>
 
             {destination.length > 0 && (
                 <SearchBar
@@ -123,26 +124,26 @@ const SearchBars: React.FC = () => {
             {origin.length > 0 && destination.length > 0 && (
                 <>
                     {/* Selected Transport Mode Title */}
-                    <View style={styles.selectedModeContainer}>
-                        <Text style={styles.selectedModeText}>
+                    <View style={SearchBarsStyle.selectedModeContainer}>
+                        <Text style={SearchBarsStyle.selectedModeText}>
                             {transportModes.find((t) => t.mode === selectedMode)?.label}
                         </Text>
                     </View>
                     {/* Transport Buttons with Time Estimates */}
-                    <View style={styles.transportButtonContainer}>
+                    <View style={SearchBarsStyle.transportButtonContainer}>
                         {transportModes.map(({ mode, icon}) => (
                             <TouchableOpacity
                                 key={mode}
-                                style={styles.transportButton}
+                                style={SearchBarsStyle.transportButton}
                                 onPress={() => setSelectedMode(mode)}
                             >
-                                <View style={styles.transportButtonContent}>
+                                <View style={SearchBarsStyle.transportButtonContent}>
                                     <Ionicons
                                         name={icon as keyof typeof Ionicons.glyphMap}
                                         size={24}
                                         color={selectedMode === mode ? "#912338" : "black"}
                                     />
-                                    <Text style={[styles.timeText, { color: selectedMode === mode ? "#912338" : "black" }]}>
+                                    <Text style={[SearchBarsStyle.timeText, { color: selectedMode === mode ? "#912338" : "black" }]}>
                                         {selectedMode === mode ? time : transportModes.find(t => t.mode === mode)?.time} min
                                     </Text>
                                 </View>
@@ -150,25 +151,25 @@ const SearchBars: React.FC = () => {
                         ))}
                     </View>
                     {/* Total Time, Start Button, and Floor/Outside View Button */}
-                    <View style={styles.timeAndButtonsContainer}>
-                        <View style={styles.timeContainer}>
-                            <Text style={styles.timeValue}>
+                    <View style={SearchBarsStyle.timeAndButtonsContainer}>
+                        <View style={SearchBarsStyle.timeContainer}>
+                            <Text style={SearchBarsStyle.timeValue}>
                                 {time}min
                             </Text>
                             
                         </View>
                         {/* Buttons Container */}
-                        <View style={styles.buttonsContainer}>
-                            <TouchableOpacity style={[styles.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}>
-                                <View style={styles.buttonContent}>
+                        <View style={SearchBarsStyle.buttonsContainer}>
+                            <TouchableOpacity style={[SearchBarsStyle.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}>
+                                <View style={SearchBarsStyle.buttonContent}>
                                     <Entypo name="direction" size={20} color="white" />
-                                    <Text style={[styles.buttonText, { color: "white" }]}>Start</Text>
+                                    <Text style={[SearchBarsStyle.buttonText, { color: "white" }]}>Start</Text>
                                 </View>
                             </TouchableOpacity>
 
                             <TouchableOpacity
                                 style={[
-                                    styles.button,
+                                    SearchBarsStyle.button,
                                     {
                                         backgroundColor: isInsideBuilding ? "white" : "#ddd",
                                         borderColor: isInsideBuilding ? "#912338" : "grey",
@@ -177,9 +178,9 @@ const SearchBars: React.FC = () => {
                                 ]}
                                 disabled={!isInsideBuilding} // Disable button when user is outside
                             >
-                                <View style={styles.buttonContent}>
+                                <View style={SearchBarsStyle.buttonContent}>
                                     <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
-                                    <Text style={[styles.buttonText, { color: isInsideBuilding ? "#912338" : "grey" }]}>Floor View</Text>
+                                    <Text style={[SearchBarsStyle.buttonText, { color: isInsideBuilding ? "#912338" : "grey" }]}>Floor View</Text>
                                 </View>
                             </TouchableOpacity>
                         {/* When implementing floor plans, switch between floor and outside view !!! WILL BE USED IN THE FUTURE
@@ -197,92 +198,5 @@ const SearchBars: React.FC = () => {
     );
 };
 
-const styles = StyleSheet.create({
-
-    container: {
-        width: '100%',
-        paddingHorizontal: 16,
-        paddingBottom: 10,
-    },
-    transportButtonContainer: {
-        flexDirection: "row",
-        justifyContent: "space-around",
-        alignItems: "center",
-        width: "100%",
-        paddingHorizontal: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: "#ddd",
-    },
-    transportButton: {
-        alignItems: "center",
-        padding: 10,
-        borderRadius: 8,
-    },
-    instructionContainer: {
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: "#ddd",
-    },
-    selectedModeContainer: {
-        width: "100%",
-        alignItems: "flex-start",
-        paddingHorizontal: 20,
-    },
-    selectedModeText: {
-        fontSize: 18,
-        fontWeight: "bold",
-        textAlign: "left",
-        marginVertical: 5,
-    },
-    transportButtonContent: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6,
-    },
-    timeText: {
-        fontSize: 12,
-    },
-    timeAndButtonsContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 30,
-        paddingVertical: 20,
-    },
-    timeContainer: {
-        alignItems: "center",
-        marginRight: 10,
-    },
-    timeValue: {
-        fontSize: 18,
-        fontWeight: "bold",
-    },
-    timeUnit: {
-        fontSize: 14,
-        color: "#666",
-    },
-    buttonsContainer: {
-        flexDirection: "row",
-        gap: 30,
-    },
-    button: {
-        paddingVertical: 7,
-        paddingHorizontal: 15,
-        borderRadius: 25,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        borderWidth: 1,
-    },
-    buttonContent: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6,
-    },
-    buttonText: {
-        fontSize: 15,
-        fontWeight: "500",
-    },
-});
 
 export default SearchBars;
