@@ -5,7 +5,6 @@ import { Button, ThemeProvider, createTheme } from "@rneui/themed";
 import Map from "./src/components/Map";
 import BottomDrawer from "./src/components/BottomDrawer";
 import { CoordsProvider } from "./src/data/CoordsContext";
-import ShuttleBusTracker from "./src/data/ShuttleBusTracker";
 
 const { height } = Dimensions.get("window");
 
@@ -20,13 +19,11 @@ const theme = createTheme({
 
 export default function App() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
-  const [busData, setBusData] = useState(null);
 
   return (
     <CoordsProvider>
       <View style={styles.container}>
-        <Map drawerHeight={drawerHeight} busData={busData}  />
-        <ShuttleBusTracker setBusData={setBusData} />
+        <Map drawerHeight={drawerHeight} />
         <BottomDrawer drawerHeight={drawerHeight} children={undefined} />
       </View>
     </CoordsProvider>
