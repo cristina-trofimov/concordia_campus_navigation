@@ -1,9 +1,9 @@
 import { RoomProperties } from '../../interfaces/roomProperties';
 import { Feature, Polygon, Point, LineString } from 'geojson';
 
-type RoomFeature = Feature<Polygon, RoomProperties> | Feature<Point, RoomProperties> | Feature<LineString, RoomProperties>;
+type HallFeature = Feature<Polygon, RoomProperties> | Feature<Point, RoomProperties> | Feature<LineString, RoomProperties>;
 
-export const roomFeatures: RoomFeature[] = [
+export const hallFeatures: HallFeature[] = [
             {
                 "type": "Feature",
                 "properties": {
