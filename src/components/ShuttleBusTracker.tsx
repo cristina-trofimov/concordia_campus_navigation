@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet, Image, Text } from 'react-native';
 import { PointAnnotation } from '@rnmapbox/maps';
 import axios from 'axios';
-import { GoogleObject, BusDataResponse } from '../interfaces/ShuttleBusLocation'; // Import the types
+import { GoogleObject, BusDataResponse } from '../interfaces/ShuttleBusLocation'; 
 
 const ShuttleBusTracker: React.FC = () => {
     const [busData, setBusData] = useState<GoogleObject | null>(null);
@@ -23,6 +23,7 @@ const ShuttleBusTracker: React.FC = () => {
                     }
                 }
             );
+            console.log("Bus Data:", postResponse);
 
             // Set the bus data to state
             setBusData(postResponse.data.d);
