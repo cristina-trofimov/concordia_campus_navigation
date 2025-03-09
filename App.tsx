@@ -20,12 +20,13 @@ const theme = createTheme({
 
 export default function App() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
+  const [busData, setBusData] = useState(null);
 
   return (
     <CoordsProvider>
       <View style={styles.container}>
-        <Map drawerHeight={drawerHeight} />
-        <ShuttleBusTracker />
+        <Map drawerHeight={drawerHeight} busData={busData}  />
+        <ShuttleBusTracker setBusData={setBusData} />
         <BottomDrawer drawerHeight={drawerHeight} children={undefined} />
       </View>
     </CoordsProvider>
