@@ -34,8 +34,8 @@ const ShuttleBusMarkers: React.FC<ShuttleBusMarkersProps> = ({ busData }) => {
                     coordinate={[point.Longitude, point.Latitude]}
                 >
                     <Image
-                        source={require('../resources/images/ShuttleBus-Icon.png')} // Add a bus icon image to your project
-                        style={{ width: 100, height: 50 }}
+                        source={require('../resources/images/ShuttleBus-Icon.png')} 
+                        style={{ width: 100, height: 40 }}
                     />
                 </PointAnnotation>
             ))}
