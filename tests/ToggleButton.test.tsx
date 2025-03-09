@@ -2,6 +2,7 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import ToggleButton from '../src/components/ToggleButton';
 
+
 // Mock Mapbox
 jest.mock('@rnmapbox/maps', () => ({
   MapView: 'MapView',
