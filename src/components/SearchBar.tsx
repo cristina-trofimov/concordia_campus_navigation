@@ -1,17 +1,34 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { Prediction, SearchBarProps } from "../interfaces/SearchBar";
+import { Prediction,SearchBarProps } from "../interfaces/SearchBar";
+
+
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU";
 
 
-
-const SearchBarComponent: React.FC<SearchBarProps> = ({ placeholder, onSelect, setCoords }) => {
+const SearchBarComponent: React.FC<SearchBarProps> = ({
+  placeholder,
+  onSelect,
+  setCoords,
+  defaultValue = null,
+  showClearButton = false,
+  onClear
+}) => {
+  //QUERY IS TEXT BEING WRITTEN
+  //DISPLAYED TEXT IS LOCATION SELECTD
   const [query, setQuery] = useState("");
-  const [displayedPlace, setDisplayedPlace] = useState("");
+  const [displayedPlace, setDisplayedPlace] = useState(defaultValue || "");
   const [suggestions, setSuggestions] = useState<Prediction[]>([]);
+
+  //WHEN YOU ADD A DEFAULT VALUE, IT WILL SET IT AS THE LOCATION SELECTED
+  useEffect(() => {
+    if (defaultValue) {
+      setDisplayedPlace(defaultValue);
+    }
+  }, [defaultValue]);
 
   const fetchSuggestions = async (text: string) => {
     if (text.length < 3) {
@@ -63,7 +80,15 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({ placeholder, onSelect, s
     } catch (error) {
       console.error("Error in geocoding:", error);
     }
-  }, [onSelect]);
+  }, [onSelect, setCoords]);
+
+  const handleClear = () => {
+    setDisplayedPlace("");
+    setQuery("");
+    if (onClear) {
+      onClear();
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -79,19 +104,27 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({ placeholder, onSelect, s
             fetchSuggestions(text);
           }}
         />
-      </View>
-      <FlatList
-        data={suggestions}
-        keyExtractor={(item) => item.place_id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.suggestionItem}
-            onPress={() => handleSuggestionPress(item)}
-          >
-            <Text>{item.description}</Text>
+        {/* CLEAR BUTTON */}
+        {(showClearButton && displayedPlace) && (
+          <TouchableOpacity onPress={handleClear} style={styles.clearButton}>
+            <MaterialIcons name="close" size={20} color="#666" />
           </TouchableOpacity>
         )}
-      />
+      </View>
+      {suggestions.length > 0 && (
+        <FlatList
+          data={suggestions}
+          keyExtractor={(item) => item.place_id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.suggestionItem}
+              onPress={() => handleSuggestionPress(item)}
+            >
+              <Text>{item.description}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </View>
   );
 };
@@ -99,7 +132,6 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({ placeholder, onSelect, s
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    paddingHorizontal: 16,
     paddingBottom: 10,
   },
   inputContainer: {
@@ -123,6 +155,10 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
+    backgroundColor: "#f8f8f8",
+  },
+  clearButton: {
+    padding: 5,
   },
 });
 

@@ -10,39 +10,39 @@ interface ToggleButtonProps {
     initialCampus?: boolean;
 }
 
-const ToggleButton: React.FC<ToggleButtonProps> = ({ 
-    mapRef, 
-    sgwCoords, 
-    loyolaCoords, 
-    onCampusChange, 
+const ToggleButton: React.FC<ToggleButtonProps> = ({
+    mapRef,
+    sgwCoords,
+    loyolaCoords,
+    onCampusChange,
     initialCampus = true // false = Loyola, true = SGW
 }) => {
 
     const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-    
+
     const toggleWidth = Math.min(200, screenWidth * 0.50);
     const toggleHeight = Math.min(40, screenHeight * 0.05);
     const knobWidth = toggleWidth / 2;
-    
+
     const [isSGW, setIsSGW] = useState(initialCampus);
     const translateX = useRef(new Animated.Value(initialCampus ? knobWidth : 0)).current;
 
     const toggleSwitch = () => {
         const newIsSGW = !isSGW;
         setIsSGW(newIsSGW);
-        
+
         Animated.timing(translateX, {
             toValue: newIsSGW ? knobWidth : 0,
             duration: 250,
             useNativeDriver: true,
         }).start();
-        
+
         onCampusChange(newIsSGW);
     };
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={[
                     styles.slider,
                     {
@@ -54,9 +54,9 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
                 onPress={toggleSwitch}
                 activeOpacity={0.9}
             >
-                <Animated.View 
+                <Animated.View
                     style={[
-                        styles.knob, 
+                        styles.knob,
                         {
                             width: knobWidth,
                             height: toggleHeight,
@@ -65,21 +65,21 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
                         }
                     ]}
                 />
-                
+
                 <View style={styles.labelsContainer}>
                     <View style={styles.labelContainer}>
                         <Text style={[
-                            styles.labelText, 
+                            styles.labelText,
                             !isSGW ? styles.activeLabel : styles.inactiveLabel,
                             { fontSize: Math.max(14, toggleHeight * 0.38) }
                         ]}>
                             Loyola
                         </Text>
                     </View>
-                    
+
                     <View style={styles.labelContainer}>
                         <Text style={[
-                            styles.labelText, 
+                            styles.labelText,
                             isSGW ? styles.activeLabel : styles.inactiveLabel,
                             { fontSize: Math.max(14, toggleHeight * 0.38) }
                         ]}>
