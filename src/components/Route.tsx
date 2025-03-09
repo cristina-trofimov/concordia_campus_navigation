@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 interface Coords {
+    legs: any;
     latitude: number;
     longitude: number;
 }

@@ -6,6 +6,9 @@ export interface Prediction {
 
 export interface SearchBarProps {
     placeholder: string;
-    onSelect: (selectedPlace: string, coords: any) => void;
-    setCoords: any;
+    onSelect: (place: string, coords: { latitude: number; longitude: number }) => void;
+    setCoords: (coords: { latitude: number; longitude: number }) => void;
+    defaultValue?: string | null;
+    showClearButton?: boolean;
+    onClear?: () => void;
 }

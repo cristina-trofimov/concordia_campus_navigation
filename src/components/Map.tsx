@@ -12,13 +12,16 @@ import { Coords } from '../interfaces/Map.ts';
 
 
 import { HighlightBuilding } from './BuildingCoordinates';
+import BuildingInformation from './BuildingInformation.tsx';
+import { BuildingProperties } from '../interfaces/BuildingProperties.ts';
+import BuildingLocation from '../interfaces/buildingLocation.ts';
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) {
-  const { routeData: routeCoordinates } = useCoords();
+  const { routeData: routeCoordinates, setmyLocationString, myLocationString } = useCoords();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -37,8 +40,30 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
 
+  const [isOverlayVisible, setIsOverlayVisible] = useState(false);
+
+  const [selectedBuilding, setSelectedBuilding] = useState<BuildingLocation | null>(null);
+
+  console.log({ selectedBuilding });
+
+  const openOverlay = (building: BuildingLocation) => {
+    setSelectedBuilding(building);
+    setIsOverlayVisible(true);
+  };
+
+  const closeOverlay = () => {
+    setIsOverlayVisible(false);
+  };
   const [decodedPolyline, setDecodedPolyline] = useState<Coords[]>([]);
 
+
+  useEffect(() => {
+    if (myLocation) {
+      const { latitude, longitude } = myLocation;
+      const locationString = `${latitude},${longitude}`;
+      setmyLocationString(locationString);
+    }
+  }, [myLocation, setmyLocationString]);
 
   useEffect(() => {
 
@@ -49,7 +74,6 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
         const decoded = points.map(([lat, lng]) => ({ latitude: lat, longitude: lng }));
         const finaldecoded = decoded.map(coord => ({ latitude: coord.latitude, longitude: coord.longitude }))
         setDecodedPolyline(finaldecoded);
-
 
       } catch (error) {
         console.error("Error processing route coordinates:", error);
@@ -84,7 +108,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
         distanceInterval: 1,
       },
       (location) => {
-
+        console.log("User location updated:", location.coords);
         setMyLocation(location.coords);
       }
     );
@@ -114,7 +138,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
       }
 
       let location = await Location.getCurrentPositionAsync({});
-
+      console.log("User location received:", location.coords);
       setMyLocation(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
@@ -154,6 +178,11 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
 
   return (
     <View style={styles.container}>
+      <BuildingInformation
+        isVisible={isOverlayVisible}
+        onClose={closeOverlay}
+        buildingLocation={selectedBuilding}
+      />
       <MapView
         style={styles.map}
         ref={mapRef}
@@ -172,16 +201,12 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
             id={`point-${location.id}`}
             coordinate={location.coordinates}
             style={{ zIndex: 1 }}
+            onSelected={() => { openOverlay(location); }}
           >
-            <View style={styles.marker}>
-              <Text style={styles.markerText}>📍</Text>
+            <View style={styles.marker} >
+
+              <Text style={styles.markerText} >📍</Text>
             </View>
-            <Mapbox.Callout title={location.title}>
-              <View style={styles.callout}>
-                <Text style={styles.calloutTitle}>{location.title}</Text>
-                <Text style={styles.calloutDescription}>{location.description}</Text>
-              </View>
-            </Mapbox.Callout>
           </Mapbox.PointAnnotation>
         ))}
 
@@ -198,27 +223,35 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
           </PointAnnotation>
         )}
 
-        {decodedPolyline.length > 0 && (
-          <Mapbox.ShapeSource
-            id="routeSource"
-            shape={{
-              type: 'FeatureCollection',
-              features: [
-                {
-                  type: 'Feature',
-                  geometry: {
-                    type: 'LineString',
-                    coordinates: decodedPolyline.map(point => [point.longitude, point.latitude]),
-                  },
-                  properties: {},
+{decodedPolyline.length > 0 && (
+        <Mapbox.ShapeSource
+          id="routeSource"
+          shape={{
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                geometry: {
+                  type: 'LineString',
+                  coordinates:decodedPolyline.map(point => [point.longitude, point.latitude]),
                 },
-              ],
+                properties: {},
+              },
+            ],
+          }}
+        >
+          <Mapbox.LineLayer
+            id="routeLayer"
+            style={{
+              lineColor: '#ff0000',
+              lineWidth: 4,
+              lineOpacity: 0.8,
             }}
-          >
+          />
             <Mapbox.LineLayer
               id="routeLayer"
               style={{
-                lineColor: '#ff0000',
+                lineColor: '#3399FF',
                 lineWidth: 4,
                 lineOpacity: 0.8,
               }}
@@ -229,9 +262,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
 
 
       </MapView>
-
-
-
+      
       <Animated.View
         style={[
           styles.buttonContainer,

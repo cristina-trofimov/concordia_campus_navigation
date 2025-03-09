@@ -1,17 +1,35 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { Prediction, SearchBarProps } from "../interfaces/SearchBar";
+import { Prediction,SearchBarProps } from "../interfaces/SearchBar";
+import { SearchBarStyle } from "../styles/SearchBarStyle";
+
+
 
 const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU";
 
 
-
-const SearchBarComponent: React.FC<SearchBarProps> = ({ placeholder, onSelect, setCoords }) => {
+const SearchBarComponent: React.FC<SearchBarProps> = ({
+  placeholder,
+  onSelect,
+  setCoords,
+  defaultValue = null,
+  showClearButton = false,
+  onClear
+}) => {
+  //QUERY IS TEXT BEING WRITTEN
+  //DISPLAYED TEXT IS LOCATION SELECTD
   const [query, setQuery] = useState("");
-  const [displayedPlace, setDisplayedPlace] = useState("");
+  const [displayedPlace, setDisplayedPlace] = useState(defaultValue || "");
   const [suggestions, setSuggestions] = useState<Prediction[]>([]);
+
+  //WHEN YOU ADD A DEFAULT VALUE, IT WILL SET IT AS THE LOCATION SELECTED
+  useEffect(() => {
+    if (defaultValue) {
+      setDisplayedPlace(defaultValue);
+    }
+  }, [defaultValue]);
 
   const fetchSuggestions = async (text: string) => {
     if (text.length < 3) {
@@ -63,14 +81,22 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({ placeholder, onSelect, s
     } catch (error) {
       console.error("Error in geocoding:", error);
     }
-  }, [onSelect]);
+  }, [onSelect, setCoords]);
+
+  const handleClear = () => {
+    setDisplayedPlace("");
+    setQuery("");
+    if (onClear) {
+      onClear();
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.inputContainer}>
-        <MaterialIcons name="search" size={24} color="#666" style={styles.searchIcon} />
+    <View style={SearchBarStyle.container}>
+      <View style={SearchBarStyle.inputContainer}>
+        <MaterialIcons name="search" size={24} color="#666" style={SearchBarStyle.searchIcon} />
         <TextInput
-          style={styles.searchInput}
+          style={SearchBarStyle.searchInput}
           placeholder={placeholder}
           value={displayedPlace ? displayedPlace : query}
           onChangeText={(text) => {
@@ -79,51 +105,30 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({ placeholder, onSelect, s
             fetchSuggestions(text);
           }}
         />
-      </View>
-      <FlatList
-        data={suggestions}
-        keyExtractor={(item) => item.place_id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.suggestionItem}
-            onPress={() => handleSuggestionPress(item)}
-          >
-            <Text>{item.description}</Text>
+        {/* CLEAR BUTTON */}
+        {(showClearButton && displayedPlace) && (
+          <TouchableOpacity onPress={handleClear} style={SearchBarStyle.clearButton}>
+            <MaterialIcons name="close" size={20} color="#666" />
           </TouchableOpacity>
         )}
-      />
+      </View>
+      {suggestions.length > 0 && (
+        <FlatList
+          data={suggestions}
+          keyExtractor={(item) => item.place_id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={SearchBarStyle.suggestionItem}
+              onPress={() => handleSuggestionPress(item)}
+            >
+              <Text>{item.description}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    paddingHorizontal: 16,
-    paddingBottom: 10,
-  },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f0f0f0",
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    height: 40,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    height: "100%",
-  },
-  suggestionItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
-  },
-});
 
 export default SearchBarComponent;
