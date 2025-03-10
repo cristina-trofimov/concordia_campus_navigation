@@ -1,19 +1,13 @@
-import React, { useRef } from "react";
-import { Animated, Dimensions, StyleSheet } from "react-native";
-import { createTheme } from "@rneui/themed";
-import HomeScreen from './src/components/screens/HomeScreen';
-import CalendarScreen from "./src/components/screens/CalendarScreen";
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Dimensions, StyleSheet, Text, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Button, ThemeProvider, createTheme } from "@rneui/themed";
+import Map from "./src/components/Map";
+import BottomDrawer from "./src/components/BottomDrawer";
+import { CoordsProvider } from "./src/data/CoordsContext";
+import ShuttleBusTracker from "./src/data/ShuttleBusTracker";
 
 const { height } = Dimensions.get("window");
-const Stack = createNativeStackNavigator();
-
-export type RootStackParamList = {
-  Home: undefined;
-  Calendar: undefined;
-};
-
 
 const theme = createTheme({
   lightColors: {
@@ -26,16 +20,16 @@ const theme = createTheme({
 
 export default function App() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
+  const [busData, setBusData] = useState(null);
 
   return (
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen}
-            options={{ headerShown: false }} // Hide the header for this screen only
-          />
-          <Stack.Screen name="Calendar" component={CalendarScreen} options={{ headerShown: false }} />
-        </Stack.Navigator>
-      </NavigationContainer>
+    <CoordsProvider>
+      <View style={styles.container}>
+        <Map drawerHeight={drawerHeight} busData={busData}  />
+        <ShuttleBusTracker setBusData={setBusData} />
+        <BottomDrawer drawerHeight={drawerHeight} children={undefined} />
+      </View>
+    </CoordsProvider>
   );
 }
 

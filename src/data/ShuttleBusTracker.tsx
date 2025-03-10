@@ -1,11 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, StyleSheet, Image, Text } from 'react-native';
-import { PointAnnotation } from '@rnmapbox/maps';
+import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import axios from 'axios';
-import { GoogleObject, BusDataResponse } from '../interfaces/ShuttleBusLocation'; // Import the types
 
-const ShuttleBusTracker: React.FC = () => {
-    const [busData, setBusData] = useState<GoogleObject | null>(null);
+// Define types inline
+type Point = {
+    PointStatus: string;
+    Address: string;
+    ID: string;
+    IconImage: string;
+    IconShadowImage: string;
+    IconImageWidth: number;
+    IconShadowWidth: number;
+    IconShadowHeight: number;
+    IconAnchor_posX: number;
+    IconAnchor_posY: number;
+    InfoWindowAnchor_posX: number;
+    InfoWindowAnchor_posY: number;
+    Draggable: boolean;
+    IconImageHeight: number;
+    Latitude: number;
+    Longitude: number;
+    InfoHTML: string;
+    ToolTip: string;
+};
+
+type GoogleObject = {
+    __type: string;
+    Directions: {
+        Addresses: any[];
+        Locale: string;
+        ShowDirectionInstructions: boolean;
+        HideMarkers: boolean;
+        PolylineOpacity: number;
+        PolylineWeight: number;
+        PolylineColor: string;
+    };
+    Points: Point[];
+    Polylines: any[];
+    Polygons: any[];
+    CenterPoint: Point;
+    ZoomLevel: number;
+    ShowZoomControl: boolean;
+    RecenterMap: boolean;
+    AutomaticBoundaryAndZoom: boolean;
+    ShowTraffic: boolean;
+    ShowMapTypesControl: boolean;
+    Width: string;
+    Height: string;
+    MapType: string;
+    APIKey: string;
+    APIVersion: string;
+};
+
+type BusDataResponse = {
+    d: GoogleObject;
+};
+
+type ShuttleBusTrackerProps = {
+    setBusData: (data: GoogleObject | null) => void; // Callback to pass bus data to the parent
+};
+
+const ShuttleBusTracker: React.FC<ShuttleBusTrackerProps> = ({ setBusData }) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -24,12 +79,18 @@ const ShuttleBusTracker: React.FC = () => {
                 }
             );
 
-            // Set the bus data to state
+            // Log the raw response data
+            console.log('Raw Response:', postResponse.data);
+
+            // Log the bus data
+            console.log('Bus Data:', postResponse.data.d);
+
+            // Pass the bus data to the parent component
             setBusData(postResponse.data.d);
             setLoading(false);
         } catch (err) {
             console.error('Error fetching bus data:', err);
-            setError('Error fetching bus data');
+            setError(err.message);
             setLoading(false);
         }
     };
@@ -60,29 +121,7 @@ const ShuttleBusTracker: React.FC = () => {
         );
     }
 
-    if (!busData || !busData.Points) {
-        return null;
-    }
-
-    // Filter the Points array to include only buses (IDs starting with "BUS")
-    const busPoints = busData.Points.filter((point) => point.ID.startsWith('BUS'));
-
-    return (
-        <>
-            {busPoints.map((point) => (
-                <PointAnnotation
-                    key={point.ID}
-                    id={point.ID}
-                    coordinate={[point.Longitude, point.Latitude]}
-                >
-                    <Image
-                        source={require('../resources/images/ShuttleBus-Icon.png')}
-                        style={{ width: 100, height: 40 }}
-                    />
-                </PointAnnotation>
-            ))}
-        </>
-    );
+    return null; // No UI needed, data is passed to the parent
 };
 
 // Styles
