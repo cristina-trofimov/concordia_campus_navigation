@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet, Image, Text } from 'react-native';
 import { PointAnnotation } from '@rnmapbox/maps';
 import axios from 'axios';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { GoogleObject, BusDataResponse } from '../interfaces/ShuttleBusLocation'; 
 
 const ShuttleBusTracker: React.FC = () => {
@@ -11,26 +12,32 @@ const ShuttleBusTracker: React.FC = () => {
 
     const fetchBusData = async () => {
         try {
-            // Make a POST request to get the bus data
-            const postResponse = await axios.post<BusDataResponse>(
+             // Step 1: First make a GET request to get session cookies
+            await axios.get('https://shuttle.concordia.ca/concordiabusmap/Map.aspx', {
+                headers: {
+                    'Host': 'shuttle.concordia.ca'
+                }
+            });
+      
+            // Step 2: Then make the POST request with cookies from the previous request
+            const response = await axios.post<BusDataResponse>(
                 'https://shuttle.concordia.ca/concordiabusmap/WebService/GService.asmx/GetGoogleObject',
-                {},
+                {}, 
                 {
                     headers: {
                         'Host': 'shuttle.concordia.ca',
                         'Content-Length': '0',
-                        'Content-Type': 'application/json; charset=UTF-8',
+                        'Content-Type': 'application/json; charset=UTF-8'
                     }
                 }
             );
-            console.log("Bus Data:", postResponse);
 
-            // Set the bus data to state
-            setBusData(postResponse.data.d);
+            setBusData(response.data.d);
+
             setLoading(false);
+
         } catch (err) {
             console.error('Error fetching bus data:', err);
-            setError('Error fetching bus data');
             setLoading(false);
         }
     };
@@ -47,7 +54,7 @@ const ShuttleBusTracker: React.FC = () => {
 
     if (loading) {
         return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <View >
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
         );
@@ -72,10 +79,7 @@ const ShuttleBusTracker: React.FC = () => {
                     id={point.ID}
                     coordinate={[point.Longitude, point.Latitude]}
                 >
-                    <Image
-                        source={require('../resources/images/ShuttleBus-Icon.png')}
-                        style={{ width: 100, height: 40 }}
-                    />
+                    <MaterialCommunityIcons name="bus-side" size={62} color="#912338" />
                 </PointAnnotation>
             ))}
         </>
