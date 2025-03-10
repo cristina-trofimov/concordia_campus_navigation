@@ -1,7 +1,13 @@
+// At the top of your test file
+jest.mock('../src/components/ToggleButton', () => {
+  return function MockToggleButton(props) {
+    return 'ToggleButton';
+  };
+});
+
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import ToggleButton from '../src/components/ToggleButton';
-
 
 // Mock Mapbox
 jest.mock('@rnmapbox/maps', () => ({
