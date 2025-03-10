@@ -1,105 +1,123 @@
-// At the top of your test file
-jest.mock('../src/components/ToggleButton', () => {
-  return function MockToggleButton(props) {
-    return 'ToggleButton';
-  };
-});
-
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import ToggleButton from '../src/components/ToggleButton';
 
-// Mock Mapbox
+// Mock the required dependencies
 jest.mock('@rnmapbox/maps', () => ({
   MapView: 'MapView',
 }));
 
-// Mock React Native
-jest.mock('react-native', () => {
-  const RN = {
-    View: 'View',
-    Text: 'Text',
-    TouchableOpacity: 'TouchableOpacity',
-    StyleSheet: {
-      create: jest.fn(styles => styles),
-      flatten: jest.fn(style => style),
-    },
-    Animated: {
-      View: 'Animated.View',
-      Value: jest.fn((initialValue) => ({
-        _value: initialValue,
-        setValue: jest.fn(),
-        interpolate: jest.fn(),
-      })),
-      timing: jest.fn(() => ({
-        start: jest.fn(callback => callback && callback()),
-      })),
-    },
-    Dimensions: {
-      get: jest.fn(() => ({ width: 400, height: 800 })),
-    },
-  };
-  
-  return RN;
-});
-
-const renderToggleButton = (initialCampus = true) => {
-  const mockOnCampusChange = jest.fn();
-  const sgwCoords = { latitude: 45.4949968855897, longitude: -73.57794614197633 };
-  const loyolaCoords = { latitude: 45.459839, longitude: -73.640329 };
-  
-  const utils = render(
-    <ToggleButton
-      mapRef={React.createRef()}
-      sgwCoords={sgwCoords}
-      loyolaCoords={loyolaCoords}
-      onCampusChange={mockOnCampusChange}
-      initialCampus={initialCampus}
-    />
-  );
-  
-  return {
-    ...utils,
-    mockOnCampusChange,
-  };
-};
-
 describe('ToggleButton', () => {
-  it('renders correctly with SGW as initial campus', () => {
-    const { queryByText } = renderToggleButton(true);
-    
-    // Check if both campus options are rendered
-    expect(queryByText('SGW')).not.toBeNull();
-    expect(queryByText('Loyola')).not.toBeNull();
-  });
-  
-  it('renders correctly with Loyola as initial campus', () => {
-    const { queryByText } = renderToggleButton(false);
-    
-    // Check if both campus options are rendered
-    expect(queryByText('SGW')).not.toBeNull();
-    expect(queryByText('Loyola')).not.toBeNull();
+  const mockMapRef = { current: null };
+  const mockSgwCoords = { latitude: 45.497, longitude: -73.578 };
+  const mockLoyolaCoords = { latitude: 45.458, longitude: -73.638 };
+  const mockOnCampusChange = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('calls onCampusChange with correct value when toggle is pressed (SGW to Loyola)', () => {
-    const { UNSAFE_getAllByType, mockOnCampusChange } = renderToggleButton(true);
+  it('renders correctly with default props', () => {
+    const { getByText } = render(
+      <ToggleButton
+        mapRef={mockMapRef}
+        sgwCoords={mockSgwCoords}
+        loyolaCoords={mockLoyolaCoords}
+        onCampusChange={mockOnCampusChange}
+      />
+    );
+
+    // Check if both campus labels are rendered
+    expect(getByText('SGW')).toBeTruthy();
+    expect(getByText('Loyola')).toBeTruthy();
+  });
+
+  it('initializes with SGW campus selected by default', () => {
+    const { getByText } = render(
+      <ToggleButton
+        mapRef={mockMapRef}
+        sgwCoords={mockSgwCoords}
+        loyolaCoords={mockLoyolaCoords}
+        onCampusChange={mockOnCampusChange}
+      />
+    );
+
+    // Get the SGW text element and check its style
+    const sgwText = getByText('SGW');
+    const loyolaText = getByText('Loyola');
     
-    // Find TouchableOpacity directly
-    const touchable = UNSAFE_getAllByType('TouchableOpacity')[0];
-    fireEvent.press(touchable);
+    // The implementation assumes SGW is the active label when isSGW is true
+    // Note: This is a bit of a fragile test as it assumes knowledge of the component styling
+    expect(sgwText.props.style.some(style => style.fontWeight === 'bold')).toBeTruthy();
+    expect(loyolaText.props.style.some(style => style.fontWeight !== 'bold')).toBeTruthy();
+  });
+
+  it('initializes with Loyola campus when initialCampus is false', () => {
+    const { getByText } = render(
+      <ToggleButton
+        mapRef={mockMapRef}
+        sgwCoords={mockSgwCoords}
+        loyolaCoords={mockLoyolaCoords}
+        onCampusChange={mockOnCampusChange}
+        initialCampus={false}
+      />
+    );
+
+    const sgwText = getByText('SGW');
+    const loyolaText = getByText('Loyola');
     
-    // Verify the callback is called with the correct value (false = Loyola)
+    // The implementation assumes Loyola is the active label when isSGW is false
+    expect(loyolaText.props.style.some(style => style.fontWeight === 'bold')).toBeTruthy();
+    expect(sgwText.props.style.some(style => style.fontWeight !== 'bold')).toBeTruthy();
+  });
+
+  it('calls onCampusChange when the toggle is pressed', () => {
+    const { getByText } = render(
+      <ToggleButton
+        mapRef={mockMapRef}
+        sgwCoords={mockSgwCoords}
+        loyolaCoords={mockLoyolaCoords}
+        onCampusChange={mockOnCampusChange}
+      />
+    );
+
+    // Instead of using testID, we'll use the text content to find the touchable area
+    // For this test, let's press on the "Loyola" text to toggle from SGW to Loyola
+    const loyolaText = getByText('Loyola');
+    fireEvent.press(loyolaText);
+    
+    // onCampusChange should be called with false since we're toggling from SGW (true) to Loyola (false)
     expect(mockOnCampusChange).toHaveBeenCalledWith(false);
   });
-  
-  it('calls onCampusChange with correct value when toggle is pressed (Loyola to SGW)', () => {
-    const { UNSAFE_getAllByType, mockOnCampusChange } = renderToggleButton(false);
+
+  it('toggles between SGW and Loyola when pressed multiple times', () => {
+    const { getByText } = render(
+      <ToggleButton
+        mapRef={mockMapRef}
+        sgwCoords={mockSgwCoords}
+        loyolaCoords={mockLoyolaCoords}
+        onCampusChange={mockOnCampusChange}
+        initialCampus={true} // Start with SGW
+      />
+    );
+
+    // Use the text elements to trigger presses
+    const sgwText = getByText('SGW');
+    const loyolaText = getByText('Loyola');
     
-    // Find TouchableOpacity directly
-    const touchable = UNSAFE_getAllByType('TouchableOpacity')[0];
-    fireEvent.press(touchable);
+    // First press: SGW -> Loyola (press Loyola text)
+    fireEvent.press(loyolaText);
+    expect(mockOnCampusChange).toHaveBeenLastCalledWith(false);
     
-    // Verify the callback is called with the correct value (true = SGW)
-    expect(mockOnCampusChange).toHaveBeenCalledWith(true);
+    // Second press: Loyola -> SGW (press SGW text)
+    fireEvent.press(sgwText);
+    expect(mockOnCampusChange).toHaveBeenLastCalledWith(true);
+    
+    // Third press: SGW -> Loyola (press Loyola text again)
+    fireEvent.press(loyolaText);
+    expect(mockOnCampusChange).toHaveBeenLastCalledWith(false);
+    
+    // Check total number of calls
+    expect(mockOnCampusChange).toHaveBeenCalledTimes(3);
   });
 });
