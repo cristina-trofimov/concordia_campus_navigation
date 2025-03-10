@@ -45,6 +45,12 @@ npm install
 ```
 npx expo start
 ```
+IF: ERROR run
+```
+npx react-native run-android
+```
+IF: CMake and ninja error, project name too long, create new project with a shorter one
+
 9. Then in a new terminal navigate to `/backend` and run
 ```
 node server.js
