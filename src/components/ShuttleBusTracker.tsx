@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet, Image, Text } from 'react-native';
 import { PointAnnotation } from '@rnmapbox/maps';
 import axios from 'axios';
-import { GoogleObject, BusDataResponse } from '../interfaces/ShuttleBusLocation'; // Import the types
+import { GoogleObject, BusDataResponse } from '../interfaces/ShuttleBusLocation'; 
 
 const ShuttleBusTracker: React.FC = () => {
     const [busData, setBusData] = useState<GoogleObject | null>(null);
@@ -23,6 +23,7 @@ const ShuttleBusTracker: React.FC = () => {
                     }
                 }
             );
+            console.log("Bus Data:", postResponse);
 
             // Set the bus data to state
             setBusData(postResponse.data.d);
@@ -46,18 +47,14 @@ const ShuttleBusTracker: React.FC = () => {
 
     if (loading) {
         return (
-            <View style={styles.container}>
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
         );
     }
 
     if (error) {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.errorText}>Error: {error}</Text>
-            </View>
-        );
+        return null;
     }
 
     if (!busData || !busData.Points) {
@@ -84,18 +81,5 @@ const ShuttleBusTracker: React.FC = () => {
         </>
     );
 };
-
-// Styles
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    errorText: {
-        fontSize: 18,
-        color: 'red',
-    },
-});
 
 export default ShuttleBusTracker;

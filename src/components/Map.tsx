@@ -15,25 +15,14 @@ import { HighlightBuilding } from './BuildingCoordinates';
 import BuildingInformation from './BuildingInformation.tsx';
 import { BuildingProperties } from '../interfaces/BuildingProperties.ts';
 import BuildingLocation from '../interfaces/buildingLocation.ts';
-import ShuttleBusMarkers from './ShuttleBusMarkers';
+import ShuttleBusTracker from './ShuttleBusTracker.tsx';
+
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
-type MapProps = {
-  drawerHeight: Animated.Value;
-  busData: {
-      Points: {
-          ID: string;
-          Latitude: number;
-          Longitude: number;
-          IconImage: string;
-      }[];
-  } | null;
-};
-
-export default function Map({ drawerHeight, busData }: MapProps) {
+export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) {
   const { routeData: routeCoordinates, setmyLocationString, myLocationString } = useCoords();
 
   const sgwCoords = {
@@ -273,7 +262,7 @@ export default function Map({ drawerHeight, busData }: MapProps) {
         )}
 
         {/* Add ShuttleBusMarkers component */}
-        {busData && <ShuttleBusMarkers busData={busData} />}
+        <ShuttleBusTracker />
 
       </MapView>
       
@@ -363,5 +352,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
-
