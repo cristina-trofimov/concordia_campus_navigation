@@ -4,7 +4,7 @@
 
 // Explicitly import from the correct path
 // You may need to adjust this path to match your project structure
-import { HighlightBuilding } from '../src/components/HighlightBuilding';
+import { HighlightBuilding } from '../src/components/highlighBuildingData.ts';
 import * as turf from '@turf/turf';
 import React from 'react';
 import { render } from '@testing-library/react';
