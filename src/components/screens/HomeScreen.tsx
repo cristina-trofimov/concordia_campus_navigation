@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Animated, Dimensions, StyleSheet, View } from "react-native";
+import { Animated, Dimensions, View } from "react-native";
 import { createTheme } from "@rneui/themed";
 import Map from "../Map";
 import BottomDrawer from "../BottomDrawer";

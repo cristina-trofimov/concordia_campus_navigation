@@ -1,13 +1,11 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, FlatList, TouchableOpacity } from "react-native";
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { Prediction,SearchBarProps } from "../interfaces/SearchBar";
 import { SearchBarStyle } from "../styles/SearchBarStyle";
+import { GOOGLE_PLACES_API_KEY } from "@env";
 
-
-
-const GOOGLE_PLACES_API_KEY = "AIzaSyDVeg6jawwGFbwdBH7y_qlpXfXuZkkLtUU";
 
 
 const SearchBarComponent: React.FC<SearchBarProps> = ({
@@ -21,7 +19,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
   //QUERY IS TEXT BEING WRITTEN
   //DISPLAYED TEXT IS LOCATION SELECTD
   const [query, setQuery] = useState("");
-  const [displayedPlace, setDisplayedPlace] = useState(defaultValue || "");
+  const [displayedPlace, setDisplayedPlace] = useState(defaultValue ?? "");
   const [suggestions, setSuggestions] = useState<Prediction[]>([]);
 
   //WHEN YOU ADD A DEFAULT VALUE, IT WILL SET IT AS THE LOCATION SELECTED

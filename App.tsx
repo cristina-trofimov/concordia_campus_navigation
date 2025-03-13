@@ -1,12 +1,10 @@
-import React, { useRef } from "react";
-import { Animated, Dimensions, StyleSheet } from "react-native";
+import React from "react";
 import { createTheme } from "@rneui/themed";
 import HomeScreen from './src/components/screens/HomeScreen';
 import CalendarScreen from "./src/components/screens/CalendarScreen";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-const { height } = Dimensions.get("window");
 const Stack = createNativeStackNavigator();
 
 export type RootStackParamList = {
@@ -25,7 +23,6 @@ const theme = createTheme({
 });
 
 export default function App() {
-  const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
 
   return (
       <NavigationContainer>
@@ -39,16 +36,3 @@ export default function App() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-});

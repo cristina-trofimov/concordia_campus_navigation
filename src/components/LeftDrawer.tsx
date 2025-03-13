@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { TouchableOpacity, Image, StyleSheet, Modal, View, Animated, Dimensions, GestureResponderEvent, Text, } from "react-native";
+import { TouchableOpacity, Modal, View, Animated, Dimensions, GestureResponderEvent, Text, } from "react-native";
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LeftDrawerStyle } from "../styles/LeftDrawerStyle";
