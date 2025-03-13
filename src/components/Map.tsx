@@ -15,6 +15,8 @@ import { HighlightBuilding } from './BuildingCoordinates';
 import BuildingInformation from './BuildingInformation.tsx';
 import { BuildingProperties } from '../interfaces/BuildingProperties.ts';
 import BuildingLocation from '../interfaces/buildingLocation.ts';
+import ShuttleBusTracker from './ShuttleBusTracker.tsx';
+
 
 const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
@@ -259,7 +261,8 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
           </Mapbox.ShapeSource>
         )}
 
-
+        {/* Add ShuttleBusMarkers component */}
+        <ShuttleBusTracker />
 
       </MapView>
       
@@ -349,5 +352,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
-
