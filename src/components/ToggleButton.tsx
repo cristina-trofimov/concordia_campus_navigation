@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import { ToggleButtonStyle } from '../styles/ToggleButtonStyle';
 

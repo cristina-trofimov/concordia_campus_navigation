@@ -1,8 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
 import { Icon } from 'react-native-elements'; 
-import BuildingInfo from '../interfaces/buildingLocationInfo';
 import BuildingLocation from '../interfaces/buildingLocation';
 import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
 

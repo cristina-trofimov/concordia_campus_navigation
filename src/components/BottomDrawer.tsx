@@ -1,14 +1,11 @@
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
-  StyleSheet,
   View,
   PanResponder,
   Animated,
   PanResponderGestureState,
-  Text,
-  TouchableOpacity
-} from "react-native";
+  Text} from "react-native";
 import SearchBars from "./SearchBars";
 import { useCoords } from "../data/CoordsContext";
 import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";

@@ -1,6 +1,6 @@
 // SearchBars.tsx
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import SearchBar from './SearchBar';
 import getDirections from './Route';
 import { useCoords } from '../data/CoordsContext';
