@@ -96,7 +96,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
         <TextInput
           style={SearchBarStyle.searchInput}
           placeholder={placeholder}
-          value={displayedPlace ? displayedPlace : query}
+          value={displayedPlace || query}
           onChangeText={(text) => {
             setQuery(text);
             setDisplayedPlace("");
@@ -104,7 +104,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
           }}
         />
         {/* CLEAR BUTTON */}
-        {(showClearButton && displayedPlace) && (
+        {Boolean(showClearButton && displayedPlace) && (
           <TouchableOpacity onPress={handleClear} style={SearchBarStyle.clearButton}>
             <MaterialIcons name="close" size={20} color="#666" />
           </TouchableOpacity>

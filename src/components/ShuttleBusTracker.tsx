@@ -64,7 +64,9 @@ const ShuttleBusTracker: React.FC = () => {
         return null;
     }
 
-    if (!busData || !busData.Points) {
+    //TODO Need to make sure with Boudour that this change doesn't negatively impact the code
+    // if (!busData || !busData.Points) {
+    if (busData?.Points == null) {
         return null;
     }
 
