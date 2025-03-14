@@ -19,8 +19,8 @@ function BottomDrawer({
   children,
   drawerHeight,
 }: {
-  children: ReactNode;
-  drawerHeight: Animated.Value;
+  children: Readonly<ReactNode>;
+  drawerHeight: Readonly<Animated.Value>;
 }) {
 
   const { routeData: routeCoordinates } = useCoords();

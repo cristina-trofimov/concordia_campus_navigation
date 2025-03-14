@@ -20,7 +20,7 @@ import ShuttleBusTracker from './ShuttleBusTracker.tsx';
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.Value> }) {
-  const { routeData: routeCoordinates, setmyLocationString, myLocationString } = useCoords();
+  const { routeData: routeCoordinates, setmyLocationString } = useCoords();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -35,7 +35,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
   const cameraRef = useRef<Camera | null>(null);
   const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const mapRef = useRef<Mapbox.MapView | null>(null);
-  const [currentCoords, setCurrentCoords] = useState(sgwCoords);
+  const [, setCurrentCoords] = useState(sgwCoords);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
 
@@ -211,7 +211,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
 
         {myLocation && (
           <PointAnnotation
-            key={`<span class="math-inline">\{myLocation\.latitude\}\-</span>{myLocation.longitude}-${forceUpdate}`}
+            key={`<span class="math-inline">{myLocation.latitude}-</span>{myLocation.longitude}-${forceUpdate}`}
             id="my-location"
             coordinate={[myLocation.longitude, myLocation.latitude]}
           >

@@ -80,14 +80,11 @@ const testEvents: EventItem[] = [
 
 const CalendarScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [events, setEvents] = useState<EventItem[]>([]);
+  const [events, setEvents] = useState<EventItem[]>(testEvents);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
   const [currentDay, setCurrentDate] = useState<Date>(new Date());
-
-  const [eventTitle, setEventTitle] = useState(editingEvent?.title ?? '');
-
 
   const handleSaveEvent = () => {
     console.log('Save button pressed');
@@ -175,8 +172,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         allowDragToCreate={true}
         // onDragCreateEventStart={handleDragCreateStart}
         // onDragCreateEventEnd={handleDragCreateEvent}
-        events={testEvents}
-        // events={events}
+        events={events}
         dragStep={15}
         // onPressEvent={handleEventPress}
       >
