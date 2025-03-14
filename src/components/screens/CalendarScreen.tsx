@@ -29,7 +29,6 @@ const currentWeek = (currentDate?: Date): string => {
   const lastDay = new Date(firstDay);
   lastDay.setDate(firstDay.getDate() + 6);
 
-  let month;
   if (firstDay.getDate() > lastDay.getDate()) {
     return `${months[today.getMonth()]} ${firstDay.getDate()} - ${months[lastDay.getMonth()]} ${lastDay.getDate()}, ${today.getFullYear()}`;
   } else {
@@ -87,15 +86,12 @@ const CalendarScreen = () => {
   const [currentDay, setCurrentDate] = useState<Date>(new Date());
 
   const handleSaveEvent = () => {
-    console.log('Save button pressed');
     if (editingEvent) {
       setEvents((prevEvents) =>
         prevEvents.map((e) => (e.id === editingEvent.id ? editingEvent : e))
       );
     }
-    console.log('Attempting to close modal');
     setModalVisible(false);
-    console.log('Modal visibility set to false');
   };
 
 
@@ -167,14 +163,10 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
 
       {/* Renders the calendar view */}
       <CalendarContainer
-        // theme={theme}
         ref={calendarRef}
         allowDragToCreate={true}
-        // onDragCreateEventStart={handleDragCreateStart}
-        // onDragCreateEventEnd={handleDragCreateEvent}
         events={events}
         dragStep={15}
-        // onPressEvent={handleEventPress}
       >
         <CalendarHeader />
         <CalendarBody renderDraggingEvent={renderDraggingEvent} />
@@ -185,7 +177,6 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          console.log('Modal onRequestClose triggered');
           setModalVisible(false);
         }}
         animationType="fade"
@@ -206,7 +197,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             />
 
             <View onTouchEnd={() => { setModalVisible(false); } } >
-              <Button title="Cancel 2" onPress={ () => console.log('Modal content touched')} />
+              <Button title="Cancel 2" onPress={ () => { setModalVisible(false); console.log('Modal content touched') } } />
             </View>
             <Button title="Save" onPress={() => { handleSaveEvent(); }} />
             <Button title="Cancel 3" onPress={() => { setModalVisible(false); }} />

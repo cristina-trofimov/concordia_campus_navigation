@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useMemo } from 'react';
 import { CoordsContextType } from '../interfaces/CoordsContextType';
 
 export const CoordsContext = createContext<CoordsContextType>({
@@ -16,16 +16,18 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [myLocationString, setmyLocationString] = useState<string>("");
 
 
-    return (
-        <CoordsContext.Provider value={{
-            routeData,
-            setRouteData,
-            isInsideBuilding,
-            setIsInsideBuilding,
-            myLocationString,
-            setmyLocationString
-        }}>
-            {children}
+    const contextValue = useMemo(() => ({
+        routeData,
+        setRouteData,
+        isInsideBuilding,
+        setIsInsideBuilding,
+        myLocationString,
+        setmyLocationString
+      }), [routeData, isInsideBuilding, myLocationString]);
+    
+      return (
+        <CoordsContext.Provider value={contextValue}>
+          {children}
         </CoordsContext.Provider>
     );
 };
