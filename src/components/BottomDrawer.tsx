@@ -1,16 +1,14 @@
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
-  StyleSheet,
   View,
   PanResponder,
   Animated,
   PanResponderGestureState,
-  Text,
-} from "react-native";
+  Text} from "react-native";
 import SearchBars from "./SearchBars";
 import { useCoords } from "../data/CoordsContext";
-
+import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
 
 const { height, width } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;
@@ -24,19 +22,19 @@ function BottomDrawer({
   children: ReactNode;
   drawerHeight: Animated.Value;
 }) {
-  const { routeData: routeCoordinates } = useCoords();
 
+  const { routeData: routeCoordinates } = useCoords();
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log("routeCoordinates changed:", routeCoordinates);
+
 
     if (routeCoordinates && routeCoordinates.length > 0) {
-      const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => {return step.html_instructions.replace(/<.*?>/g, '');});
-      const HtmlContent = ({ instructions }: { instructions: string }) => {return (<div dangerouslySetInnerHTML={{ __html: instructions }} />);};
-      //console.log("instructions:",instructions)
+      const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => { return step.html_instructions.replace(/<.*?>/g, ''); });
+
+
       setHtmlInstructions(instructions);
-      //console.log("HTML changed:", htmlInstructions);
+
     } else {
       setHtmlInstructions([]);
     }
@@ -83,9 +81,9 @@ function BottomDrawer({
   ).current;
 
   return (
-    <Animated.View style={[styles.container, { height: drawerHeight }]}>
-      <View {...panResponder.panHandlers} style={styles.dragHandle}>
-        <View style={styles.dragIndicator} />
+    <Animated.View style={[BottomDrawerStyle.container, { height: drawerHeight }]}>
+      <View {...panResponder.panHandlers} style={BottomDrawerStyle.dragHandle}>
+        <View style={BottomDrawerStyle.dragIndicator} />
         <SearchBars />
         {htmlInstructions.length > 0 &&
           htmlInstructions.map((instruction, index) => (
@@ -94,36 +92,11 @@ function BottomDrawer({
             </Text>
           ))}
       </View>
-      <View style={styles.contentContainer}>{children}</View>
+      <View style={BottomDrawerStyle.contentContainer}>{children}</View>
     </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: "white",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    width: width,
-    position: "absolute",
-    bottom: 0,
-  },
-  dragHandle: {
-    width: width,
-    alignItems: "center",
-    paddingVertical: 10,
-  },
-  dragIndicator: {
-    width: 60,
-    height: 5,
-    backgroundColor: "#8F8F8F",
-    borderRadius: 3,
-    marginBottom: 10,
-  },
-  contentContainer: {
-    flex: 1,
-    padding: 16,
-  },
-});
+
 
 export default BottomDrawer;
