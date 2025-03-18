@@ -13,11 +13,11 @@ import {
 } from '@react-native-google-signin/google-signin';
 import { signIn } from "../signin";
 import { signOut } from "../signout";
-
+import { WEBCLIENTID } from '@env'
 
 
 GoogleSignin.configure({
-  webClientId: '38724570048-54lor6uhetguagq3lp164ccfui1hq5h5.apps.googleusercontent.com', // You need to fill this in with your actual web client ID
+  webClientId: WEBCLIENTID, // You need to fill this in with your actual web client ID
   scopes: ['email', 'profile','https://www.googleapis.com/auth/calendar'],
   offlineAccess: true,
   forceCodeForRefreshToken: false,
