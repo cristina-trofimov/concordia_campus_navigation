@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, Button, Modal, TextInput, TouchableOpacity, } from "react-native";
-import { CalendarBody, CalendarContainer, CalendarHeader, DraggingEvent, DraggingEventProps, OnCreateEventResponse, EventItem, CalendarKitHandle, } from "@howljs/calendar-kit";
+import { CalendarBody, CalendarContainer, CalendarHeader, DraggingEvent, DraggingEventProps, EventItem, CalendarKitHandle, } from "@howljs/calendar-kit";
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
@@ -86,7 +86,7 @@ const CalendarScreen = () => {
   const calendarRef = useRef<CalendarKitHandle>(null);
   const [currentDay, setCurrentDate] = useState<Date>(new Date());
 
-  const [eventTitle, setEventTitle] = useState(editingEvent?.title || '');
+  const [eventTitle, setEventTitle] = useState(editingEvent?.title ?? '');
 
 
   const handleSaveEvent = () => {
@@ -200,7 +200,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             <TextInput style={CalendarStyle.input} />
             <TextInput
               style={CalendarStyle.input}
-              value={editingEvent?.title || ''}
+              value={editingEvent?.title ?? ''}
               onChangeText={(text) => {
                 if (editingEvent) {
                   setEditingEvent({ ...editingEvent, title: text });

@@ -1,7 +1,6 @@
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
-  StyleSheet,
   View,
   PanResponder,
   Animated,
