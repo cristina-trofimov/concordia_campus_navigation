@@ -21,6 +21,7 @@ const theme = createTheme({
 
 export default function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
+  
 
   return (
     <CoordsProvider>
