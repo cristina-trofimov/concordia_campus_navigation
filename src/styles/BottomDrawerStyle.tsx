@@ -39,7 +39,6 @@ export const BottomDrawerStyle = StyleSheet.create({
       backgroundColor: "#f0f0f0",
       borderRadius: 10,
       textAlign:'left',
-      //borderTopWidth:2,
       borderColor:"#f0f0f0",
       fontSize: 14,
       lineHeight: 24,
