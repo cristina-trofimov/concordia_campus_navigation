@@ -9,7 +9,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 
 const SearchBars: React.FC = () => {
-    const { setRouteData, myLocationString,routeData } = useCoords();
+    const { setRouteData, myLocationString,routeData,isTransit,setIsTransit } = useCoords();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
@@ -74,6 +74,8 @@ const SearchBars: React.FC = () => {
                     durationText = durationText.replace(/hours?/g, 'h').replace(/mins?/g,'');
                     setTime(durationText)
                     console.log("Destination",time);
+                    //set isTransit to true
+                    if(selectedMode=="transit"){setIsTransit(true);}else {setIsTransit(false);};
                     //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
