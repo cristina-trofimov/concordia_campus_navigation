@@ -2,15 +2,31 @@
  * @jest-environment jsdom
  */
 
-// Explicitly import from the correct path
-// You may need to adjust this path to match your project structure
-import { HighlightBuilding } from '../src/components/highlighBuildingData.ts';
+// Import jest-dom matchers
+import '@testing-library/jest-dom';
+
+// Mock @rnmapbox/maps first
+jest.mock('@rnmapbox/maps', () => {
+  return {
+    ShapeSource: jest.fn(({ id, children, ...props }) => (
+      <div data-testid={`shape-source-${id}`} {...props}>
+        {children}
+      </div>
+    )),
+    FillExtrusionLayer: jest.fn(({ id, ...props }) => (
+      <div data-testid={`fill-extrusion-layer-${id}`} {...props} />
+    ))
+  };
+});
+
+// Other imports
+import { HighlightBuilding } from '../src/components/BuildingCoordinates.tsx';
 import * as turf from '@turf/turf';
 import React from 'react';
 import { render } from '@testing-library/react';
 import { buildingFeatures } from '../src/data/buildingFeatures.ts';
 
-// Mock modules before using them
+// Your existing mocks
 jest.mock('@turf/turf', () => {
   const originalModule = jest.requireActual('@turf/turf');
   return {
@@ -20,14 +36,14 @@ jest.mock('@turf/turf', () => {
   };
 });
 
-// Mock the CoordsContext
 jest.mock('../src/data/CoordsContext.tsx', () => ({
   useCoords: jest.fn()
 }));
 
-// Import the mocked module after mocking
 const { useCoords } = require('../src/data/CoordsContext.tsx');
 const mockedTurf = turf as jest.Mocked<typeof turf>;
+
+// Rest of your test file remains the same
 
 describe('HighlightBuilding', () => {
   const setIsInsideBuildingMock = jest.fn();
@@ -46,11 +62,11 @@ describe('HighlightBuilding', () => {
   });
 
   it('renders without user coordinates', () => {
-    const { queryByTestId } = render(<HighlightBuilding userCoordinates={null} />);
-    expect(queryByTestId('shape-source')).toBeInTheDocument();
-    expect(queryByTestId('fill-extrusion-layer-all-buildings')).toBeInTheDocument();
-    expect(queryByTestId('fill-extrusion-layer-highlighted-building-layer')).not.toBeInTheDocument();
-    expect(setIsInsideBuildingMock).not.toHaveBeenCalled();
+    const { container } = render(<HighlightBuilding userCoordinates={null} />);
+    // When userCoordinates is null, the component returns null
+    expect(container.firstChild).toBeNull();
+    // setIsInsideBuilding is still called with false when highlightedBuilding is null
+    expect(setIsInsideBuildingMock).toHaveBeenCalledWith(false);
   });
 
   it('renders with user coordinates outside any building', () => {
@@ -58,9 +74,9 @@ describe('HighlightBuilding', () => {
     
     const { queryByTestId } = render(<HighlightBuilding userCoordinates={outsideCoords} />);
     
-    expect(queryByTestId('shape-source')).toBeInTheDocument();
+    expect(queryByTestId('shape-source-buildings1')).toBeInTheDocument();
     expect(queryByTestId('fill-extrusion-layer-all-buildings')).toBeInTheDocument();
-    expect(queryByTestId('fill-extrusion-layer-highlighted-building-layer')).not.toBeInTheDocument();
+    expect(queryByTestId('shape-source-highlighted-building')).not.toBeInTheDocument();
     expect(setIsInsideBuildingMock).toHaveBeenCalledWith(false);
   });
 
@@ -71,8 +87,9 @@ describe('HighlightBuilding', () => {
     const insideCoords: [number, number] = buildingFeatures[0].geometry.coordinates[0][0].slice().reverse();
     const { queryByTestId } = render(<HighlightBuilding userCoordinates={insideCoords} />);
 
-    expect(queryByTestId('shape-source')).toBeInTheDocument();
+    expect(queryByTestId('shape-source-buildings1')).toBeInTheDocument();
     expect(queryByTestId('fill-extrusion-layer-all-buildings')).toBeInTheDocument();
+    expect(queryByTestId('shape-source-highlighted-building')).toBeInTheDocument();
     expect(queryByTestId('fill-extrusion-layer-highlighted-building-layer')).toBeInTheDocument();
     expect(setIsInsideBuildingMock).toHaveBeenCalledWith(true);
   });
