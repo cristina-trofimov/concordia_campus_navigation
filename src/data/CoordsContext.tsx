@@ -8,12 +8,15 @@ export const CoordsContext = createContext<CoordsContextType>({
     setIsInsideBuilding: () => { },
     myLocationString: "",
     setmyLocationString: () => { },
+    isTransit: false,
+    setIsTransit: () => { },
 });
 
 export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [routeData, setRouteData] = useState<any>(null);
     const [isInsideBuilding, setIsInsideBuilding] = useState<boolean>(false);
     const [myLocationString, setmyLocationString] = useState<string>("");
+    const [isTransit, setIsTransit] = useState<boolean>(false);
 
 
     return (
@@ -23,7 +26,9 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             isInsideBuilding,
             setIsInsideBuilding,
             myLocationString,
-            setmyLocationString
+            setmyLocationString,
+            isTransit,
+            setIsTransit
         }}>
             {children}
         </CoordsContext.Provider>

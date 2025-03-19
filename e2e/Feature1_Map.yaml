@@ -1,0 +1,34 @@
+appId: com.cristina.trofimov143.frontend
+---
+- launchApp
+
+- waitForAnimationToEnd:
+      timeout: 300
+- tapOn: "SGW"
+- swipe:
+      start: 50%, 50% # From (90% of width, 50% of height)
+      end: 50%, 90% # To (10% of width, 50% of height)
+- tapOn:
+      point: 46%, 45%
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn:
+    point: 93%, 94%
+- tapOn:
+    point: 50%, 92%
+- tapOn: "Loyola"
+- tapOn:
+    point: 34%, 38%
+- waitForAnimationToEnd:
+    timeout: 500
+- swipe:
+    start: 50%, 70% # From (90% of width, 50% of height)
+    end: 50%, 40% # To (10% of width, 50% of height)
+- tapOn:
+    point: 50%, 92%
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn:
+    point: 86%, 82%
+
+- killApp

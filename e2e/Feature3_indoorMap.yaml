@@ -1,0 +1,21 @@
+appId: com.cristina.trofimov143.frontend
+---
+- launchApp
+- waitForAnimationToEnd:
+    timeout: 500
+- swipe:
+    start: 50%, 50% # From (90% of width, 50% of height)
+    end: 50%, 90% # To (10% of width, 50% of height)
+- tapOn:
+    point: 8%, 6%
+- waitForAnimationToEnd:
+    timeout: 500
+- tapOn:
+    point: 50%, 80%
+- tapOn:
+    point: 93%, 6%
+- waitForAnimationToEnd:
+    timeout: 500
+- swipe:
+    start: 80%, 50% # From (90% of width, 50% of height)
+    end: 40%, 50% # To (10% of width, 50% of height)

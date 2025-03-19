@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Animated, Dimensions, StyleSheet, View } from "react-native";
+import { Animated, Dimensions, View } from "react-native";
 import { createTheme } from "@rneui/themed";
 import Map from "../Map";
 import BottomDrawer from "../BottomDrawer";
@@ -21,6 +21,7 @@ const theme = createTheme({
 
 export default function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
+  
 
   return (
     <CoordsProvider>
