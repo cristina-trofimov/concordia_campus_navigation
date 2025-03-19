@@ -76,17 +76,14 @@ const testEvents: EventItem[] = [
 
 
 const CalendarScreen = () => {
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  
-    const handleSignIn = () => {
-      signIn().then(() => setIsSignedIn(true));
-    };
-  
-    const handleSignOut = () => {
-      signOut().then(() => setIsSignedIn(false));
-    };
+  const handleSignOut = () => {
+    signOut();
+    handleGoingBack();
+  };
 
-    
+  const handleGoingBack = () => {
+    navigation.navigate("Home");
+  }
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [events, setEvents] = useState<EventItem[]>(testEvents);
@@ -167,7 +164,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
       {/* Header */}
       <View style={CalendarStyle.headerContainer}>
         <View style={{ flexDirection: "row" }} >
-          <TouchableOpacity onPress={ () => { navigation.navigate("Home") } } >
+          <TouchableOpacity onPress={handleGoingBack} >
             <Feather name="arrow-left-circle" size={40} color="black" style={{ marginTop: 5 }} />
           </TouchableOpacity>
           <View style={CalendarStyle.headerButtonsContainer} >
@@ -245,16 +242,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         </View>
       </Modal>
       <View style={CalendarStyle.signInButtonView}>
-      {!isSignedIn ? (
-        <GoogleSigninButton
-          size={GoogleSigninButton.Size.Wide}
-          color={GoogleSigninButton.Color.Dark}
-          onPress={handleSignIn}
-
-        />
-      ) : (
         <Button title="Sign Out" onPress={handleSignOut} />
-      )}
       </View>
     </View>
   );
