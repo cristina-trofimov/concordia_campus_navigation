@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --config=tests/jest.config.js",
+    "test": "jest",
     "detox-build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
     "detox-test": "detox test --configuration android.emu.debug",
     "start": "expo start --dev-client",
@@ -38,7 +38,7 @@
     "expo-status-bar": "~2.0.1",
     "geojson": "^0.5.0",
     "geojson-utils": "^1.1.0",
-    "react": "18.3.1",
+    "react": "^18.3.1",
     "react-native": "0.76.7",
     "react-native-config": "^1.5.3",
     "react-native-elements": "^3.4.3",
@@ -59,13 +59,19 @@
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@react-native-community/cli": "latest",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/react-native": "^12.9.0",
     "@types/mapbox__polyline": "^1.0.5",
     "@types/react": "^18.3.18",
     "@types/react-native-dotenv": "^0.2.2",
     "detox": "^20.32.0",
     "jes": "^0.6.1",
     "jest": "^29.7.0",
+    "jest-expo": "^52.0.5",
+    "react-dom": "^18.3.1",
     "react-native-dotenv": "^3.4.11",
+    "react-test-renderer": "^18.3.1",
     "typescript": "^5.7.3"
   },
   "detox": {
@@ -83,6 +89,15 @@
   },
   "private": true,
   "jest": {
-    "preset": "react-native"
+    "preset": "jest-expo",
+    "moduleNameMapper": {
+      "^expo-modules-core$": "/Users/constance/Downloads/concordia_campus_navigation-jest-fix/tests/_mocks_/@rnmapbox/maps.js"
+    },
+    "setupFiles": [
+      "./tests/jestSetup.ts"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@rneui|@rnmapbox|react-native|expo|@react-native|@expo|react-navigation|@react-navigation/.*|@mapbox|@unimodules|unimodules|sentry-expo|native-base|react-native-svg))"
+    ]
   }
 }
