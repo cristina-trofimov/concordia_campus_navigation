@@ -1,37 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1741578192217" clover="3.2.0">
-  <project timestamp="1741578192217" name="All files">
-    <metrics statements="47" coveredstatements="25" conditionals="22" coveredconditionals="9" methods="13" coveredmethods="5" elements="82" coveredelements="39" complexity="0" loc="47" ncloc="47" packages="3" files="7" classes="7"/>
+<coverage generated="1742413103560" clover="3.2.0">
+  <project timestamp="1742413103560" name="All files">
+    <metrics statements="86" coveredstatements="51" conditionals="38" coveredconditionals="21" methods="23" coveredmethods="13" elements="147" coveredelements="85" complexity="0" loc="86" ncloc="86" packages="4" files="9" classes="9"/>
     <package name="src.components">
-      <metrics statements="39" coveredstatements="17" conditionals="22" coveredconditionals="9" methods="10" coveredmethods="2"/>
+      <metrics statements="77" coveredstatements="42" conditionals="38" coveredconditionals="21" methods="20" coveredmethods="10"/>
       <file name="BottomDrawer.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/BottomDrawer.tsx">
-        <metrics statements="26" coveredstatements="4" conditionals="13" coveredconditionals="0" methods="8" coveredmethods="0"/>
-        <line num="16" count="1" type="stmt"/>
+        <metrics statements="40" coveredstatements="5" conditionals="17" coveredconditionals="0" methods="10" coveredmethods="0"/>
         <line num="17" count="1" type="stmt"/>
         <line num="18" count="1" type="stmt"/>
         <line num="19" count="1" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="31" count="0" type="stmt"/>
         <line num="32" count="0" type="stmt"/>
-        <line num="35" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="36" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="37" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="38" count="0" type="stmt"/>
+        <line num="41" count="0" type="stmt"/>
         <line num="42" count="0" type="stmt"/>
-        <line num="47" count="0" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
+        <line num="43" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="45" count="0" type="stmt"/>
+        <line num="46" count="0" type="stmt"/>
+        <line num="47" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="48" count="0" type="stmt"/>
         <line num="50" count="0" type="stmt"/>
-        <line num="51" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="52" count="0" type="stmt"/>
-        <line num="60" count="0" type="stmt"/>
+        <line num="51" count="0" type="stmt"/>
+        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="55" count="0" type="stmt"/>
+        <line num="57" count="0" type="stmt"/>
+        <line num="59" count="0" type="stmt"/>
         <line num="61" count="0" type="stmt"/>
+        <line num="65" count="0" type="stmt"/>
+        <line num="69" count="0" type="stmt"/>
         <line num="70" count="0" type="stmt"/>
-        <line num="73" count="0" type="stmt"/>
-        <line num="74" count="0" type="cond" truecount="0" falsecount="3"/>
-        <line num="75" count="0" type="stmt"/>
-        <line num="78" count="0" type="stmt"/>
+        <line num="71" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="72" count="0" type="stmt"/>
         <line num="80" count="0" type="stmt"/>
-        <line num="86" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="90" count="0" type="stmt"/>
         <line num="93" count="0" type="stmt"/>
+        <line num="94" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="95" count="0" type="stmt"/>
+        <line num="98" count="0" type="stmt"/>
+        <line num="100" count="0" type="stmt"/>
+        <line num="106" count="0" type="stmt"/>
+        <line num="115" count="0" type="stmt"/>
+      </file>
+      <file name="BuildingCoordinates.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/BuildingCoordinates.tsx">
+        <metrics statements="24" coveredstatements="24" conditionals="12" coveredconditionals="12" methods="8" coveredmethods="8"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="12" count="60" type="stmt"/>
+        <line num="13" count="61" type="stmt"/>
+        <line num="14" count="61" type="stmt"/>
+        <line num="16" count="61" type="cond" truecount="4" falsecount="0"/>
+        <line num="17" count="2" type="stmt"/>
+        <line num="20" count="59" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="25" count="60" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="35" count="6" type="stmt"/>
+        <line num="37" count="6" type="stmt"/>
+        <line num="38" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="39" count="5" type="stmt"/>
+        <line num="40" count="5" type="stmt"/>
+        <line num="43" count="6" type="stmt"/>
+        <line num="44" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="45" count="5" type="stmt"/>
+        <line num="46" count="182" type="stmt"/>
+        <line num="54" count="6" type="stmt"/>
+        <line num="55" count="6" type="stmt"/>
+        <line num="58" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="59" count="1" type="stmt"/>
+        <line num="62" count="5" type="stmt"/>
       </file>
       <file name="ToggleButton.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/ToggleButton.tsx">
         <metrics statements="13" coveredstatements="13" conditionals="9" coveredconditionals="9" methods="2" coveredmethods="2"/>
@@ -48,6 +89,13 @@
         <line num="35" count="4" type="stmt"/>
         <line num="41" count="4" type="stmt"/>
         <line num="44" count="9" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.data">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="buildingFeatures.ts" path="/Users/constance/Downloads/concordia_campus_navigation/src/data/buildingFeatures.ts">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="8" count="1" type="stmt"/>
       </file>
     </package>
     <package name="src.styles">

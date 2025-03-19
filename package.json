@@ -95,6 +95,9 @@
     },
     "setupFiles": [
       "./tests/jestSetup.ts"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@rneui|@rnmapbox|react-native|expo|@react-native|@expo|react-navigation|@react-navigation/.*|@mapbox|@unimodules|unimodules|sentry-expo|native-base|react-native-svg))"
     ]
   }
 }
