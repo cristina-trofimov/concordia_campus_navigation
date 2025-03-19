@@ -7,7 +7,21 @@ import { RootStackParamList } from "../../../App";
 import { StackNavigationProp } from '@react-navigation/stack';
 import Feather from '@expo/vector-icons/Feather';
 import { CalendarStyle } from "../../styles/CalendarStyle";
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+} from '@react-native-google-signin/google-signin';
+import { signIn } from "../signin";
+import { signOut } from "../signout";
+import { WEBCLIENTID } from '@env'
 
+
+GoogleSignin.configure({
+  webClientId: WEBCLIENTID, // You need to fill this in with your actual web client ID
+  scopes: ['email', 'profile','https://www.googleapis.com/auth/calendar'],
+  offlineAccess: true,
+  forceCodeForRefreshToken: false,
+});
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
   strict: false, // Disables strict mode
@@ -63,6 +77,18 @@ const testEvents: EventItem[] = [
 
 
 const CalendarScreen = () => {
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  
+    const handleSignIn = () => {
+      signIn().then(() => setIsSignedIn(true));
+    };
+  
+    const handleSignOut = () => {
+      signOut().then(() => setIsSignedIn(false));
+    };
+
+    
+
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [events, setEvents] = useState<EventItem[]>(testEvents);
   const [modalVisible, setModalVisible] = useState(false);
@@ -103,30 +129,33 @@ const CalendarScreen = () => {
 
 const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
   return (
-    <DraggingEvent
-        {...props}
-        TopEdgeComponent={
-          <View
-            style={{
-              height: 10,
-              width: '100%',
-              backgroundColor: 'red',
-              position: 'absolute',
-            }}
-          />
-        }
-        BottomEdgeComponent={
-          <View
-            style={{
-              height: 10,
-              width: '100%',
-              backgroundColor: 'red',
-              bottom: 0,
-              position: 'absolute',
-            }}
-          />
-        }
-      />
+    <React.Fragment>
+      
+      <DraggingEvent
+          {...props}
+          TopEdgeComponent={
+            <View
+              style={{
+                height: 10,
+                width: '100%',
+                backgroundColor: 'red',
+                position: 'absolute',
+              }}
+            />
+          }
+          BottomEdgeComponent={
+            <View
+              style={{
+                height: 10,
+                width: '100%',
+                backgroundColor: 'red',
+                bottom: 0,
+                position: 'absolute',
+              }}
+            />
+          }
+        />
+    </React.Fragment>
   );
 }, []);
 
@@ -216,6 +245,18 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
           </View>
         </View>
       </Modal>
+      <View style={CalendarStyle.signInButtonView}>
+      {!isSignedIn ? (
+        <GoogleSigninButton
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Dark}
+          onPress={handleSignIn}
+
+        />
+      ) : (
+        <Button title="Sign Out" onPress={handleSignOut} />
+      )}
+      </View>
     </View>
   );
 };

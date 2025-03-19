@@ -19,6 +19,7 @@
     "@fortawesome/react-native-fontawesome": "^0.3.2",
     "@howljs/calendar-kit": "^2.2.1",
     "@mapbox/polyline": "^1.2.1",
+    "@react-native-google-signin/google-signin": "^13.2.0",
     "@react-native/gradle-plugin": "^0.77.0",
     "@react-navigation/drawer": "^7.1.2",
     "@react-navigation/native": "^7.0.15",
