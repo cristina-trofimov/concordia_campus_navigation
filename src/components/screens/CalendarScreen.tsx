@@ -20,22 +20,6 @@ const theme = {
   selectedDayBackground: '#007bff',
 };
 
-const currentWeek = (currentDate?: Date): string => {
-  const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
-  const today = currentDate || new Date();
-  const dayOfWeek = today.getDay(); // 0 = Sun, 1 = Mon, etc
-  const firstDay = new Date(today);
-  firstDay.setDate(today.getDate() - dayOfWeek + ( dayOfWeek === 0 ? -6 : 1 )) // First day is monday
-  const lastDay = new Date(firstDay);
-  lastDay.setDate(firstDay.getDate() + 6);
-
-  let month;
-  if (firstDay.getDate() > lastDay.getDate()) {
-    return `${months[today.getMonth()]} ${firstDay.getDate()} - ${months[lastDay.getMonth()]} ${lastDay.getDate()}, ${today.getFullYear()}`;
-  } else {
-    return `${months[today.getMonth()]} ${firstDay.getDate()} - ${lastDay.getDate()}, ${today.getFullYear()}`;
-  }
-}
 
 const testEvents: EventItem[] = [
   {
@@ -80,14 +64,29 @@ const testEvents: EventItem[] = [
 
 const CalendarScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [events, setEvents] = useState<EventItem[]>([]);
+  const [events, setEvents] = useState<EventItem[]>(testEvents);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
-  const [currentDay, setCurrentDate] = useState<Date>(new Date());
+  const [currentDate, setCurrentDate] = useState<string>(`${new Date()}`);
 
   const [eventTitle, setEventTitle] = useState(editingEvent?.title ?? '');
 
+  const currentWeek = (currentDate: string) => {
+    const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
+    const today = new Date(currentDate);
+    const dayOfWeek = today.getDay(); // 0 = Sun, 1 = Mon, etc
+    const firstDay = new Date(today);
+    firstDay.setDate(today.getDate() - dayOfWeek + ( dayOfWeek === 0 ? -6 : 1 )) // First day is monday
+    const lastDay = new Date(firstDay);
+    lastDay.setDate(firstDay.getDate() + 6);
+  
+    if (firstDay.getDate() > lastDay.getDate()) {
+      return `${months[today.getMonth()]} ${firstDay.getDate()} - ${months[lastDay.getMonth()]} ${lastDay.getDate()}, ${today.getFullYear()}`;
+    } else {
+      return `${months[today.getMonth()]} ${firstDay.getDate()} - ${lastDay.getDate()}, ${today.getFullYear()}`;
+    }
+  }
 
   const handleSaveEvent = () => {
     console.log('Save button pressed');
@@ -146,8 +145,9 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
           <View style={CalendarStyle.headerButtonsContainer} >
             <TouchableOpacity
               onPress={ () => {
-                calendarRef.current?.goToPrevPage(true);
-                setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() - 7)));
+                setCurrentDate( `${new Date(currentDate).getDate() - 7}`);
+                calendarRef.current?.goToDate({date: new Date(currentDate)});
+                // calendarRef.current?.goToPrevPage(true);
               }}
             >
               <Feather name="chevron-left" size={28} color="black" />
@@ -155,12 +155,11 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             <TouchableOpacity
               onPress={ () => {
                 calendarRef.current?.goToNextPage(true);
-                setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() + 7)));
               }}
             >
               <Feather name="chevron-right" size={28} color="black" />
             </TouchableOpacity>
-            <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDay)}</Text>
+            <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDate)}</Text>
           </View>
         </View>
         <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
@@ -172,11 +171,11 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
       <CalendarContainer
         // theme={theme}
         ref={calendarRef}
+        onDateChanged={ setCurrentDate }
         allowDragToCreate={true}
         // onDragCreateEventStart={handleDragCreateStart}
         // onDragCreateEventEnd={handleDragCreateEvent}
-        events={testEvents}
-        // events={events}
+        events={events}
         dragStep={15}
         // onPressEvent={handleEventPress}
       >
