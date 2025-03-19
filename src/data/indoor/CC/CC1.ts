@@ -846,7 +846,8 @@ export const cc1Features: CC1Features[] = [
     {
         "type": "Feature",
         "properties": {
-            "indoor": "corridor"
+            "indoor": "corridor",
+            "level": "1"
         },
         "geometry": {
             "type": "Polygon",
