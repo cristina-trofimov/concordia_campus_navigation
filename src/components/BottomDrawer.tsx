@@ -36,7 +36,7 @@ function BottomDrawer({
       const instructions = routeCoordinates[0].legs[0].steps.map(
         (step: any) => {
           return step.html_instructions
-            .replace(/<.*?>/g, "")
+            .replace(/<[^>]*>/g, "")
             .replace(/(?=Destination)/gi, ". ");
         }
       );
@@ -45,7 +45,7 @@ function BottomDrawer({
       const number = routeCoordinates[0].legs[0].steps.length;
       const instructionsGeneral = routeCoordinates[0].legs[0].steps.map(
         (step: any) => {
-          return step.html_instructions.replace(/<.*?>/g, "");
+          return step.html_instructions.replace(/<[^>]*>/g, "");
         }
       );
       for (let i = 0; i < number; i++) {
@@ -53,7 +53,7 @@ function BottomDrawer({
           i
         ]?.steps?.map((step: any) => {
           return step.html_instructions
-            .replace(/<.*?>/g, "")
+            .replace(/<[^>]*>/g, "")
             .replace(/(?=Destination)/gi, ". ");
         });
         if (detailedHtmlInstructions == undefined) {
@@ -80,9 +80,7 @@ function BottomDrawer({
     }
   }, [routeCoordinates]);
 
-
   const drawerState = useRef<number>(1);
-
 
   useEffect(() => {
     const id = drawerHeight.addListener(({ value }) => {
@@ -100,10 +98,10 @@ function BottomDrawer({
       case 0:
         targetHeight = COLLAPSED_HEIGHT;
         break;
-      case 1: 
+      case 1:
         targetHeight = EXPANDED_HEIGHT;
         break;
-      case 2: 
+      case 2:
         targetHeight = FULL_EXPANDED_HEIGHT;
         break;
       default:
@@ -154,19 +152,15 @@ function BottomDrawer({
     const midPoint1 = (COLLAPSED_HEIGHT + EXPANDED_HEIGHT) / 2;
     const midPoint2 = (EXPANDED_HEIGHT + FULL_EXPANDED_HEIGHT) / 2;
 
-    
     if (gesture.vy < -VELOCITY_THRESHOLD) {
-      
       if (drawerState.current === 0) animateToPosition(1);
       else if (drawerState.current === 1) animateToPosition(2);
-      else animateToPosition(2); 
+      else animateToPosition(2);
     } else if (gesture.vy > VELOCITY_THRESHOLD) {
-      
       if (drawerState.current === 2) animateToPosition(1);
       else if (drawerState.current === 1) animateToPosition(0);
       else animateToPosition(0);
     } else {
-      
       if (currentHeight < midPoint1) {
         animateToPosition(0);
       } else if (currentHeight < midPoint2) {
