@@ -1,6 +1,6 @@
 import { Dimensions, StyleSheet, View, Image, TouchableOpacity, Animated } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import Mapbox, { Camera, MapView, PointAnnotation, ShapeSource, LineLayer } from '@rnmapbox/maps';
+import Mapbox, { Camera, MapView, PointAnnotation } from '@rnmapbox/maps';
 import { Text } from '@rneui/themed';
 import { locations } from '../data/buildingLocation.ts';
 import * as Location from 'expo-location';
@@ -8,19 +8,18 @@ import { useCoords } from '../data/CoordsContext.tsx';
 import ToggleButton from './ToggleButton';
 import Polyline from "@mapbox/polyline"
 import { Coords } from '../interfaces/Map.ts';
-
+import { MAPBOX_TOKEN } from '@env'
 
 
 import { HighlightBuilding } from './BuildingCoordinates';
 import BuildingInformation from './BuildingInformation.tsx';
-import { BuildingProperties } from '../interfaces/BuildingProperties.ts';
 import BuildingLocation from '../interfaces/buildingLocation.ts';
+import ShuttleBusTracker from './ShuttleBusTracker.tsx';
 
-const MAPBOX_TOKEN = 'sk.eyJ1IjoibWlkZHkiLCJhIjoiY202c2ZqdW03MDhjMzJxcTUybTZ6d3k3cyJ9.xPp9kFl0VC1SDnlp_ln2qA';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
-export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) {
+export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.Value> }) {
   const { routeData: routeCoordinates, setmyLocationString, myLocationString } = useCoords();
 
   const sgwCoords = {
@@ -259,7 +258,8 @@ export default function Map({ drawerHeight }: { drawerHeight: Animated.Value }) 
           </Mapbox.ShapeSource>
         )}
 
-
+        {/* Add ShuttleBusMarkers component */}
+        <ShuttleBusTracker />
 
       </MapView>
       
@@ -349,5 +349,3 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
 });
-
-
