@@ -36,7 +36,7 @@ function BottomDrawer({
       const instructions = routeCoordinates[0].legs[0].steps.map(
         (step: any) => {
           return step.html_instructions
-            .replace(/<[^>]*>/g, "")
+            .replace(/<[^<>]*>/g, "")
             .replace(/(?=Destination)/gi, ". ");
         }
       );
@@ -45,7 +45,7 @@ function BottomDrawer({
       const number = routeCoordinates[0].legs[0].steps.length;
       const instructionsGeneral = routeCoordinates[0].legs[0].steps.map(
         (step: any) => {
-          return step.html_instructions.replace(/<[^>]*>/g, "");
+          return step.html_instructions.replace(/<[^<>]*>/g, "");
         }
       );
       for (let i = 0; i < number; i++) {
@@ -53,7 +53,7 @@ function BottomDrawer({
           i
         ]?.steps?.map((step: any) => {
           return step.html_instructions
-            .replace(/<[^>]*>/g, "")
+            .replace(/<[^<>]*>/g, "")
             .replace(/(?=Destination)/gi, ". ");
         });
         if (detailedHtmlInstructions == undefined) {
