@@ -114,7 +114,6 @@ jest.mock('../src/data/CoordsContext', () => ({
 
 // Import after all mocks
 import React from 'react';
-// import { render } from '@testing-library/react-native';
 import { View, Text } from 'react-native';
 
 describe('App Test', () => {
