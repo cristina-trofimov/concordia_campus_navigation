@@ -1,9 +1,3 @@
-// export default {
-//   Camera: {},
-//   MarkerView: {},
-//   MapView: () => null, // Return null for now, or add basic functionality
-// };
-
 // tests/_mocks_/expo-modules-core.js
 module.exports = {
   requireNativeModule: function (moduleName) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 import { Animated } from 'react-native';
 import Map from '../src/components/Map.tsx';
 import * as Location from 'expo-location';
@@ -30,11 +30,6 @@ jest.mock('../src/data/CoordsContext.tsx', () => ({
     myLocationString: ''
   })
 }));
-
-// // Mock child components
-// jest.mock('../src/components/HighlightBuilding', () => ({
-//   HighlightBuilding: () => null
-// }));
 
 jest.mock('../src/components/BuildingInformation.tsx', () => 'BuildingInformation');
 jest.mock('../src/components/ToggleButton', () => 'ToggleButton');
