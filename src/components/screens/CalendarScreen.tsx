@@ -11,8 +11,7 @@ import {
   GoogleSignin,
   GoogleSigninButton,
 } from '@react-native-google-signin/google-signin';
-import { signIn } from "../signin";
-import { signOut } from "../signout";
+import { signIn, signOut } from "../HandleGoogle";
 import { WEBCLIENTID } from '@env'
 
 
@@ -260,7 +259,5 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
     </View>
   );
 };
-
-
 
 export default CalendarScreen;

@@ -3,10 +3,11 @@ import {
     isErrorWithCode,
     statusCodes,
 } from '@react-native-google-signin/google-signin';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export const signIn = async () => {
     try {
-        
         const currentUser = await GoogleSignin.getCurrentUser();
         if (currentUser) {
             
@@ -15,11 +16,10 @@ export const signIn = async () => {
             return currentUser;
         }
 
-        
         await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
 
-        
         const userInfo = await GoogleSignin.signIn();
+        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
         console.log("Sign-in successful. User Info:", JSON.stringify(userInfo, null, 2));
 
         return userInfo;
@@ -46,3 +46,23 @@ export const signIn = async () => {
         return null;
     }
 };
+
+export const signOut = async () => {
+    try {
+        await GoogleSignin.signOut();
+        await AsyncStorage.removeItem('userInfo');
+        console.log('User signed out successfully');
+        
+    } catch (error) {
+        console.error('Error signing out:', error);
+    }
+};
+
+export const getUserInfo = async () => {
+    try {
+    return await AsyncStorage.getItem('userInfo');
+    } catch (error) {
+      console.error('Error getting user token:', error);
+      return null;
+    }
+  };
