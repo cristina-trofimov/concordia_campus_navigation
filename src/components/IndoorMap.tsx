@@ -20,7 +20,7 @@ export const HighlightIndoorMap = () => {
         h8Features,
         h9Features,
         cc1Features,
-      };
+    };
 
     // Check if the building has indoor maps
     useEffect(() => {
@@ -34,7 +34,7 @@ export const HighlightIndoorMap = () => {
                 setBuildingHasFloors(true);
 
                 // Get the first floor's feature component from the map
-                const featureComponent = featureMap[floorAssociations[0].component];
+                const featureComponent = featureMap[floorAssociations[2].component];
                 if (featureComponent) {
                     setIndoorFeatures(featureComponent);
                 } else {
@@ -60,8 +60,31 @@ export const HighlightIndoorMap = () => {
                     <Mapbox.FillLayer
                         id="indoor-polygons"
                         style={{
-                            fillColor: '#FF5733',
-                            fillOpacity: 0.6,
+                            fillColor: '#912338',
+                            fillOutlineColor: 'black',
+                            fillOpacity: ['case',
+                                ['==', ['get', 'indoor'], 'corridor'], 0.1,
+                                0.4,
+                            ],
+                        }}
+                    />
+                    <Mapbox.SymbolLayer
+                        id="room-numbers"
+                        style={{
+                            textField: ['get', 'ref'],
+                            textSize: [
+                                'interpolate',
+                                ['linear'],
+                                ['zoom'],
+                                10, 0,
+                                12, 0,
+                                15, 0,
+                                20, 20
+                            ],
+                            textColor: '#FFFFFF',
+                            textAnchor: 'center',
+                            textJustify: 'center',
+                            textAllowOverlap: true,
                         }}
                     />
                 </Mapbox.ShapeSource>

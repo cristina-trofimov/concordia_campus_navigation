@@ -92,7 +92,7 @@ export const HighlightBuilding = () => {
             style={{
               fillExtrusionColor: '#F37413',
               fillExtrusionHeight: ['get', 'height'],
-              fillExtrusionOpacity: 0.45,
+              fillExtrusionOpacity: 0.3,
             }}
           />
         </Mapbox.ShapeSource>
