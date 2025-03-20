@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect  } from "react";
+import { AppRegistry } from 'react-native';
 import { createTheme } from "@rneui/themed";
 import HomeScreen from './src/components/screens/HomeScreen';
 import CalendarScreen from "./src/components/screens/CalendarScreen";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import firebase from './src/components/firebase';
+import analytics from '@react-native-firebase/analytics';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 const Stack = createNativeStackNavigator();
 
@@ -21,8 +24,12 @@ const theme = createTheme({
   mode: "light",
 });
 
-export default function App() {
-
+export default function App(): React.ReactElement {
+useEffect(() => {
+    analytics().setAnalyticsCollectionEnabled(true);
+    crashlytics().setCrashlyticsCollectionEnabled(true);
+    analytics().logAppOpen();
+  }, []);
 
   return (
     <NavigationContainer>

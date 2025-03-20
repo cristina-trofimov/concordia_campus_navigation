@@ -38,7 +38,8 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps._some_id_here_"
         }
-      ]
+      ],
+      "expo-build-properties"
     ],
     "extra": {
       "eas": {
