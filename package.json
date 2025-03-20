@@ -91,8 +91,7 @@
   "jest": {
     "preset": "jest-expo",
     "moduleNameMapper": {
-      "^expo-modules-core$": "/Users/constance/Downloads/concordia_campus_navigation-jest-fix/node_modules/expo-modules-core/build/index.js",
-      "^@rnmapbox/maps$": "/Users/constance/Downloads/concordia_campus_navigation-jest-fix/tests/_mocks_/@rnmapbox/maps.js"
+      "^expo-modules-core$": "./tests/_mocks_/@rnmapbox/maps.js"
     },
     "setupFiles": [
       "./tests/jestSetup.ts"
