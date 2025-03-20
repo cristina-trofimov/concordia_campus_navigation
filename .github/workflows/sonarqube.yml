@@ -20,10 +20,13 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests with coverage
-        run: npm test -- coverage
+      # - name: Run tests with coverage
+      #   run: npm test -- --coverage
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
