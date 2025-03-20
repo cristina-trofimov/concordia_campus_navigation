@@ -1,5 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
 import { CoordsContextType } from '../interfaces/CoordsContextType';
+import { BuildingFloorAssociation } from '../interfaces/buildingFloorAssociation';
+import { FeatureCollection } from '../interfaces/Feature.ts';
 
 export const CoordsContext = createContext<CoordsContextType>({
     routeData: null,
@@ -20,6 +22,12 @@ export const CoordsContext = createContext<CoordsContextType>({
     setInFloorView: () => { },
     currentFloor: null,
     setCurrentFloor: () => { },
+    floorList: [],
+    setFloorList: () => { },
+    currentFloorAssociations: [],
+    setCurrentFloorAssociations: () => { },
+    indoorFeatures: [],
+    setIndoorFeatures: () => { },
 });
 
 export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -32,6 +40,9 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [myLocationCoords, setMyLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
     const [inFloorView, setInFloorView] = useState<boolean>(false);
     const [currentFloor, setCurrentFloor] = useState<string | null>(null);
+    const [floorList, setFloorList] = useState<string[]>([]);
+    const [currentFloorAssociations, setCurrentFloorAssociations] = useState<BuildingFloorAssociation[]>([]);
+    const [indoorFeatures, setIndoorFeatures] = useState<FeatureCollection[]>([]);
 
     return (
         <CoordsContext.Provider value={{
@@ -53,6 +64,12 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             setInFloorView,
             currentFloor,
             setCurrentFloor,
+            floorList,
+            setFloorList,
+            currentFloorAssociations,
+            setCurrentFloorAssociations,
+            indoorFeatures,
+            setIndoorFeatures,
         }}>
             {children}
         </CoordsContext.Provider>

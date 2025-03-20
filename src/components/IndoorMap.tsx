@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Mapbox from '@rnmapbox/maps';
 import { useCoords } from "../data/CoordsContext";
 import { buildingFloorAssociations } from '../data/buildingFloorAssociations.ts';
-import { BuildingFloorAssociation } from '../interfaces/buildingFloorAssociation.ts';
+import { FeatureCollection } from '../interfaces/Feature.ts';
 import { h1Features } from '../data/indoor/Hall/H1.ts';
 import { h2Features } from '../data/indoor/Hall/H2.ts';
 import { h8Features } from '../data/indoor/Hall/H8.ts';
@@ -17,43 +17,63 @@ const featureMap: { [key: string]: any } = {
     cc1Features,
 };
 
-export const HighlightIndoorMap = () => {
-    const { setBuildingHasFloors, highlightedBuilding, setInFloorView, inFloorView, setCurrentFloor } = useCoords();
-    const [indoorFeatures, setIndoorFeatures] = useState([]);
-    const [floorAssociations, setFloorAssociations] = useState<BuildingFloorAssociation[]>([]);
+export const useIndoorFeatures = () => {
+    const { setCurrentFloor, currentFloorAssociations, setIndoorFeatures } = useCoords();
 
     const selectIndoorFeatures = (index: number) => {
-        const featureComponent = featureMap[floorAssociations[index].component];
-        if (featureComponent) {
-            setIndoorFeatures(featureComponent);
-            setCurrentFloor(floorAssociations[index].floor);
+        if (currentFloorAssociations && currentFloorAssociations[index]) {
+            const featureComponent = featureMap[currentFloorAssociations[index].component] as FeatureCollection[];
+            if (featureComponent) {
+                setIndoorFeatures(featureComponent);
+                setCurrentFloor(
+                    currentFloorAssociations[index].floor +
+                    (currentFloorAssociations[index].floor === "1"
+                        ? "st Floor"
+                        : currentFloorAssociations[index].floor === "2"
+                        ? "nd Floor"
+                        : "th Floor")
+                );
+            } else {
+                setIndoorFeatures([]);
+                setCurrentFloor(null);
+            }
         } else {
+            console.warn("Invalid index or currentFloorAssociations is undefined");
             setIndoorFeatures([]);
             setCurrentFloor(null);
         }
-    }
+    };
+
+    return { selectIndoorFeatures };
+};
+
+export const HighlightIndoorMap = () => {
+    const { setBuildingHasFloors, highlightedBuilding, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations,
+        setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures } = useCoords();
+    const { selectIndoorFeatures } = useIndoorFeatures();
 
     useEffect(() => {
+        setInFloorView(false);
         if (highlightedBuilding) {
-            setInFloorView(false);
             const buildingId = highlightedBuilding.properties.id;
             const associations = buildingFloorAssociations.filter(
                 (association) => association.buildingID === buildingId
             );
-            setFloorAssociations(associations);
+            setCurrentFloorAssociations(associations);
         }
     }, [highlightedBuilding]);
-    
+
     useEffect(() => {
-        if (floorAssociations.length > 0) {
+        if (currentFloorAssociations.length > 0) {
             setBuildingHasFloors(true);
+            setFloorList(currentFloorAssociations.map((association) => association.floor + (association.floor == "1" ? "st Floor" : (association.floor == "2" ? "nd Floor" : "th Floor"))));
             selectIndoorFeatures(0);
         } else {
             setBuildingHasFloors(false);
             setIndoorFeatures([]);
             setCurrentFloor(null);
         }
-    }, [floorAssociations]);
+    }, [currentFloorAssociations]);
 
     return (
         <>
@@ -71,8 +91,8 @@ export const HighlightIndoorMap = () => {
                             fillColor: '#912338',
                             fillOutlineColor: 'black',
                             fillOpacity: ['case',
-                                ['==', ['get', 'indoor'], 'corridor'], 0.1,
-                                0.4,
+                                ['==', ['get', 'indoor'], 'corridor'], 0.2,
+                                0.5,
                             ],
                         }}
                     />

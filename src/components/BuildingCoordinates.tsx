@@ -61,7 +61,6 @@ export const HighlightBuilding = () => {
           turf.polygon(fixedCoordinates)
         );
       });
-
       setHighlightedBuilding(building);
       setIsInsideBuilding(!!building);
     }

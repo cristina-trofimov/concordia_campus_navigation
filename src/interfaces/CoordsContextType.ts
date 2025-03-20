@@ -1,3 +1,5 @@
+import { BuildingFloorAssociation } from "./buildingFloorAssociation";
+
 export interface CoordsContextType {
     routeData: any;
     setRouteData: (data: any) => void;
@@ -17,4 +19,10 @@ export interface CoordsContextType {
     setInFloorView: (inFloorView: boolean) => void;
     currentFloor: string | null;
     setCurrentFloor: (floor: string | null) => void;
+    floorList: string[];
+    setFloorList: (floors: string[]) => void;
+    currentFloorAssociations: BuildingFloorAssociation[];
+    setCurrentFloorAssociations: (associations: BuildingFloorAssociation[]) => void;
+    indoorFeatures: any[];
+    setIndoorFeatures: (features: any[]) => void;
 }
