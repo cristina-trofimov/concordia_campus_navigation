@@ -7,6 +7,7 @@ import { CoordsProvider } from "../../data/CoordsContext";
 import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
 import { HomeStyle } from "../../styles/HomeStyle";
+import { FloorSelector } from "../FloorSelector";
 
 const { height } = Dimensions.get("window");
 
@@ -29,6 +30,7 @@ export default function HomeScreen() {
         <CalendarButton />
         <LeftDrawer />
         <Map drawerHeight={drawerHeight} />
+        <FloorSelector />
         <BottomDrawer drawerHeight={drawerHeight} children={undefined} />
       </View>
     </CoordsProvider>

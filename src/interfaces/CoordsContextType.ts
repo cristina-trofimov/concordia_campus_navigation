@@ -15,4 +15,6 @@ export interface CoordsContextType {
     setMyLocationCoords: (location: { latitude: number; longitude: number }) => void;
     inFloorView: boolean;
     setInFloorView: (inFloorView: boolean) => void;
+    currentFloor: string | null;
+    setCurrentFloor: (floor: string | null) => void;
 }

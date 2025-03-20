@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Mapbox from '@rnmapbox/maps';
-import { fixPolygonCoordinates, fixedBuildingFeatures, HighlightBuilding } from './BuildingCoordinates.tsx';
-import { buildingFeatures } from '../data/buildingFeatures.ts'
 import { useCoords } from "../data/CoordsContext";
 import { buildingFloorAssociations } from '../data/buildingFloorAssociations.ts';
+import { BuildingFloorAssociation } from '../interfaces/buildingFloorAssociation.ts';
 import { h1Features } from '../data/indoor/Hall/H1.ts';
 import { h2Features } from '../data/indoor/Hall/H2.ts';
 import { h8Features } from '../data/indoor/Hall/H8.ts';
@@ -19,31 +18,38 @@ const featureMap: { [key: string]: any } = {
 };
 
 export const HighlightIndoorMap = () => {
-    const { setBuildingHasFloors, highlightedBuilding, setInFloorView, inFloorView } = useCoords();
+    const { setBuildingHasFloors, highlightedBuilding, setInFloorView, inFloorView, setCurrentFloor } = useCoords();
     const [indoorFeatures, setIndoorFeatures] = useState([]);
+    const [floorAssociations, setFloorAssociations] = useState<BuildingFloorAssociation[]>([]);
+
+    const selectIndoorFeatures = (index: number) => {
+        const featureComponent = featureMap[floorAssociations[index].component];
+        if (featureComponent) {
+            setIndoorFeatures(featureComponent);
+            setCurrentFloor(floorAssociations[index].floor);
+        } else {
+            setIndoorFeatures([]);
+            setCurrentFloor(null);
+        }
+    }
 
     // Check if the building has indoor maps
     useEffect(() => {
         if (highlightedBuilding) {
             setInFloorView(false);
             const buildingId = highlightedBuilding.properties.id;
-            const floorAssociations = buildingFloorAssociations.filter(
+            const associations = buildingFloorAssociations.filter(
                 (association) => association.buildingID === buildingId
             );
+            setFloorAssociations(associations);
 
             if (floorAssociations.length > 0) {
                 setBuildingHasFloors(true);
-
-                // Get the first floor's feature component from the map
-                const featureComponent = featureMap[floorAssociations[2].component];
-                if (featureComponent) {
-                    setIndoorFeatures(featureComponent);
-                } else {
-                    setIndoorFeatures([]);
-                }
+                selectIndoorFeatures(0); // Select the first floor by default
             } else {
                 setBuildingHasFloors(false);
                 setIndoorFeatures([]);
+                setCurrentFloor(null);
             }
         }
     }, [highlightedBuilding]);
