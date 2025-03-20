@@ -10,6 +10,12 @@ export const CoordsContext = createContext<CoordsContextType>({
     setmyLocationString: () => { },
     isTransit: false,
     setIsTransit: () => { },
+    buildingHasFloors: false,
+    setBuildingHasFloors: () => { },
+    highlightedBuilding: null,
+    setHighlightedBuilding: () => { },
+    myLocationCoords: null,
+    setMyLocationCoords: () => { }
 });
 
 export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -17,7 +23,9 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [isInsideBuilding, setIsInsideBuilding] = useState<boolean>(false);
     const [myLocationString, setmyLocationString] = useState<string>("");
     const [isTransit, setIsTransit] = useState<boolean>(false);
-
+    const [buildingHasFloors, setBuildingHasFloors] = useState<boolean>(false);
+    const [highlightedBuilding, setHighlightedBuilding] = useState<any>(null);
+    const [myLocationCoords, setMyLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
 
     return (
         <CoordsContext.Provider value={{
@@ -28,7 +36,13 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             myLocationString,
             setmyLocationString,
             isTransit,
-            setIsTransit
+            setIsTransit,
+            buildingHasFloors,
+            setBuildingHasFloors,
+            highlightedBuilding,
+            setHighlightedBuilding,
+            myLocationCoords,
+            setMyLocationCoords
         }}>
             {children}
         </CoordsContext.Provider>

@@ -10,17 +10,16 @@ import Polyline from "@mapbox/polyline"
 import { Coords } from '../interfaces/Map.ts';
 import { MAPBOX_TOKEN } from '@env'
 
-
 import { HighlightBuilding } from './BuildingCoordinates';
 import BuildingInformation from './BuildingInformation.tsx';
 import BuildingLocation from '../interfaces/buildingLocation.ts';
 import ShuttleBusTracker from './ShuttleBusTracker.tsx';
-
+import { HighlightIndoorMap } from './IndoorMap.tsx'; 
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.Value> }) {
-  const { routeData: routeCoordinates, setmyLocationString, myLocationString } = useCoords();
+  const { routeData: routeCoordinates, setmyLocationString, myLocationCoords, setMyLocationCoords } = useCoords();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -33,14 +32,11 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
   };
 
   const cameraRef = useRef<Camera | null>(null);
-  const [myLocation, setMyLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const mapRef = useRef<Mapbox.MapView | null>(null);
   const [currentCoords, setCurrentCoords] = useState(sgwCoords);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
-
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
-
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingLocation | null>(null);
 
   console.log({ selectedBuilding });
@@ -57,12 +53,12 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
 
 
   useEffect(() => {
-    if (myLocation) {
-      const { latitude, longitude } = myLocation;
+    if (myLocationCoords) {
+      const { latitude, longitude } = myLocationCoords;
       const locationString = `${latitude},${longitude}`;
       setmyLocationString(locationString);
     }
-  }, [myLocation, setmyLocationString]);
+  }, [myLocationCoords, setmyLocationString]);
 
   useEffect(() => {
 
@@ -108,7 +104,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
       },
       (location) => {
         console.log("User location updated:", location.coords);
-        setMyLocation(location.coords);
+        setMyLocationCoords(location.coords);
       }
     );
 
@@ -125,7 +121,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
   // Trigger a re-render when the user location changes
   useEffect(() => {
     setForceUpdate((prev) => prev + 1);
-  }, [myLocation]);
+  }, [myLocationCoords]);
 
   const _getLocation = async () => {
     try {
@@ -138,20 +134,20 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
 
       let location = await Location.getCurrentPositionAsync({});
       console.log("User location received:", location.coords);
-      setMyLocation(location.coords);
+      setMyLocationCoords(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
     }
   };
 
   const focusOnLocation = () => {
-    if (!myLocation || !cameraRef.current || !mapLoaded) {
+    if (!myLocationCoords || !cameraRef.current || !mapLoaded) {
       console.warn("User location, camera, or map not available.");
       return;
     }
 
     cameraRef.current.setCamera({
-      centerCoordinate: [myLocation.longitude, myLocation.latitude],
+      centerCoordinate: [myLocationCoords.longitude, myLocationCoords.latitude],
       zoomLevel: 17,
       animationMode: 'flyTo',
       animationDuration: 1000,
@@ -187,7 +183,8 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding userCoordinates={myLocation ? [myLocation.latitude, myLocation.longitude] : null} />
+        <HighlightBuilding/>
+        <HighlightIndoorMap/>
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17}
@@ -209,11 +206,11 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
           </Mapbox.PointAnnotation>
         ))}
 
-        {myLocation && (
+        {myLocationCoords && (
           <PointAnnotation
             key={`<span class="math-inline">\{myLocation\.latitude\}\-</span>{myLocation.longitude}-${forceUpdate}`}
             id="my-location"
-            coordinate={[myLocation.longitude, myLocation.latitude]}
+            coordinate={[myLocationCoords.longitude, myLocationCoords.latitude]}
           >
             <Image
               source={require('../resources/images/currentLocation-Icon.png')}

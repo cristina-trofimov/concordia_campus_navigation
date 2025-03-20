@@ -4,11 +4,7 @@ import * as turf from '@turf/turf';
 import { buildingFeatures } from '../data/buildingFeatures.ts'
 import { useCoords } from "../data/CoordsContext";
 
-interface HighlightBuildingProps {
-  userCoordinates: [number, number] | null;
-}
-
-const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
+export const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
   return coordinates.map((ring) => {
     const firstCoord = ring[0];
     const lastCoord = ring[ring.length - 1];
@@ -21,7 +17,7 @@ const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
   });
 };
 
-const fixedBuildingFeatures = buildingFeatures.map((feature) => {
+export const fixedBuildingFeatures = buildingFeatures.map((feature) => {
   return {
     ...feature,
     geometry: {
@@ -31,31 +27,30 @@ const fixedBuildingFeatures = buildingFeatures.map((feature) => {
   };
 });
 
-export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) => {
-  const { setIsInsideBuilding } = useCoords();
+export const HighlightBuilding = () => {
+  const { setIsInsideBuilding, highlightedBuilding, setHighlightedBuilding, myLocationCoords } = useCoords();
 
   const swappedUserCoordinates = useMemo(() => {
-    if (!userCoordinates) return null;
-    const [latitude, longitude] = userCoordinates;
+    if (!myLocationCoords) return null;
+    const { latitude, longitude } = myLocationCoords;
     return [longitude, latitude];
-  }, [userCoordinates]);
-
-  const highlightedBuilding = useMemo(() => {
-    if (!swappedUserCoordinates) return null;
-    return fixedBuildingFeatures.find((feature) =>
-      turf.booleanPointInPolygon(
-        turf.point(swappedUserCoordinates),
-        turf.polygon(feature.geometry.coordinates)
-      )
-    );
-  }, [swappedUserCoordinates]);
+  }, [myLocationCoords]);
 
   // Update the context state whenever user location changes
   useEffect(() => {
-    setIsInsideBuilding(!!highlightedBuilding);
-  }, [highlightedBuilding, setIsInsideBuilding]);
+    if (swappedUserCoordinates) {
+      const building = buildingFeatures.find((feature) =>
+        turf.booleanPointInPolygon(
+          turf.point(swappedUserCoordinates),
+          turf.polygon(feature.geometry.coordinates)
+        )
+      );
+      setHighlightedBuilding(building);
+      setIsInsideBuilding(!!building);
+    }
+  }, [swappedUserCoordinates, setHighlightedBuilding, setIsInsideBuilding]);
 
-  if (!userCoordinates) {
+  if (!myLocationCoords) {
     return null;
   }
 

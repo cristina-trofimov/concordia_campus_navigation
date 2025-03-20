@@ -7,5 +7,10 @@ export interface CoordsContextType {
     setmyLocationString: (location: string) => void;
     isTransit: boolean;
     setIsTransit: (isTransit: boolean) => void;
-
+    buildingHasFloors: boolean;
+    setBuildingHasFloors: (hasFloors: boolean) => void;
+    highlightedBuilding: any;
+    setHighlightedBuilding: (building: any) => void;
+    myLocationCoords: { latitude: number; longitude: number } | null;
+    setMyLocationCoords: (location: { latitude: number; longitude: number }) => void;
 }
