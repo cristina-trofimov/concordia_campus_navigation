@@ -15,31 +15,11 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath('com.android.tools.build:gradle:8.0.2')
+        classpath('com.android.tools.build:gradle')
         classpath('com.facebook.react:react-native-gradle-plugin')
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
         classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
-        classpath 'com.google.gms:google-services:4.3.15'
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.5'
-    }
-}
-
-plugins {
-  id "org.sonarqube" version "6.0.1.5171"
-}
-
-sonar {
-    properties {
-        property "sonar.projectKey", "cristina-trofimov_concordia_campus_navigation"
-        property "sonar.organization", "the-niners"
-        property "sonar.host.url", "https://sonarcloud.io"
-
-        // Read PR variables if they exist
-        if (System.getenv("GITHUB_ACTIONS") == "true") {
-            property "sonar.pullrequest.key", System.getenv("GITHUB_PR_NUMBER")
-            property "sonar.pullrequest.branch", System.getenv("GITHUB_PR_BRANCH")
-            property "sonar.pullrequest.base", System.getenv("GITHUB_PR_BASE")
-        }
+        classpath('com.google.gms:google-services:4.3.15')
+        classpath('com.google.firebase:firebase-crashlytics-gradle:2.9.5')
     }
 }
 
@@ -65,14 +45,15 @@ allprojects {
 
 allprojects {
   repositories {
-    maven {
-      url 'https://api.mapbox.com/downloads/v2/releases/maven'
-      authentication { basic(BasicAuthentication) }
-      credentials {
-        username = 'mapbox'
-        password = project.properties['MAPBOX_TOKEN'] ?: ""
+      google()
+      maven {
+          url 'https://api.mapbox.com/downloads/v2/releases/maven'
+          authentication { basic(BasicAuthentication) }
+          credentials {
+            username = 'mapbox'
+            password = project.properties['MAPBOX_DOWNLOADS_TOKEN'] ?: ""
+          }
       }
-    }
   }
 }
 
