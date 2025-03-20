@@ -5,16 +5,26 @@ import { buildingFeatures } from '../data/buildingFeatures.ts'
 import { useCoords } from "../data/CoordsContext";
 
 export const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
-  return coordinates.map((ring) => {
-    const firstCoord = ring[0];
-    const lastCoord = ring[ring.length - 1];
-
-    if (firstCoord[0] !== lastCoord[0] || firstCoord[1] !== lastCoord[1]) {
-      return [...ring, firstCoord];
+    if (!coordinates || !Array.isArray(coordinates)) {
+        console.warn("Invalid coordinates input:", coordinates);
+        return [];
     }
 
-    return ring;
-  });
+    return coordinates.map((ring) => {
+        if (!ring || !Array.isArray(ring) || ring.length === 0) {
+            console.warn("Invalid ring in coordinates:", ring);
+            return [];
+        }
+
+        const firstCoord = ring[0];
+        const lastCoord = ring[ring.length - 1];
+
+        if (firstCoord[0] !== lastCoord[0] || firstCoord[1] !== lastCoord[1]) {
+            return [...ring, firstCoord];
+        }
+
+        return ring;
+    });
 };
 
 export const fixedBuildingFeatures = buildingFeatures.map((feature) => {
@@ -38,17 +48,24 @@ export const HighlightBuilding = () => {
 
   // Update the context state whenever user location changes
   useEffect(() => {
-    if (swappedUserCoordinates) {
-      const building = buildingFeatures.find((feature) =>
-        turf.booleanPointInPolygon(
-          turf.point(swappedUserCoordinates),
-          turf.polygon(feature.geometry.coordinates)
-        )
-      );
-      setHighlightedBuilding(building);
-      setIsInsideBuilding(!!building);
-    }
-  }, [swappedUserCoordinates, setHighlightedBuilding, setIsInsideBuilding]);
+          if (swappedUserCoordinates) {
+              const building = buildingFeatures.find((feature) => {
+                  if (!feature.geometry || !feature.geometry.coordinates) {
+                      console.warn("Invalid feature geometry:", feature);
+                      return false;
+                  }
+
+                  const fixedCoordinates = fixPolygonCoordinates(feature.geometry.coordinates);
+                  return turf.booleanPointInPolygon(
+                      turf.point(swappedUserCoordinates),
+                      turf.polygon(fixedCoordinates)
+                  );
+              });
+
+              setHighlightedBuilding(building);
+              setIsInsideBuilding(!!building);
+          }
+      }, [swappedUserCoordinates, setHighlightedBuilding, setIsInsideBuilding]);
 
   if (!myLocationCoords) {
     return null;

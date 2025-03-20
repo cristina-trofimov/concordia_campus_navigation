@@ -9,11 +9,11 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 
 const SearchBars: React.FC = () => {
-    const { setRouteData, myLocationString,routeData,isTransit,setIsTransit } = useCoords();
+    const { setRouteData, myLocationString, setIsTransit, inFloorView, setInFloorView } = useCoords();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
-    const [time, setTime]=useState('');
+    const [time, setTime] = useState('');
 
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {
@@ -45,8 +45,8 @@ const SearchBars: React.FC = () => {
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
                     setTime(fetchedCoords[0].legs[0].duration.text);
-                    console.log("Origin",time);
-                //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
+                    console.log("Origin", time);
+                    //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
                     setRouteData(null);
@@ -71,11 +71,11 @@ const SearchBars: React.FC = () => {
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
                     let durationText = fetchedCoords[0].legs[0].duration.text;
-                    durationText = durationText.replace(/hours?/g, 'h').replace(/mins?/g,'');
+                    durationText = durationText.replace(/hours?/g, 'h').replace(/mins?/g, '');
                     setTime(durationText)
-                    console.log("Destination",time);
+                    console.log("Destination", time);
                     //set isTransit to true
-                    if(selectedMode=="transit"){setIsTransit(true);}else {setIsTransit(false);};
+                    if (selectedMode == "transit") { setIsTransit(true); } else { setIsTransit(false); };
                     //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
@@ -133,7 +133,7 @@ const SearchBars: React.FC = () => {
                     </View>
                     {/* Transport Buttons with Time Estimates */}
                     <View style={SearchBarsStyle.transportButtonContainer}>
-                        {transportModes.map(({ mode, icon}) => (
+                        {transportModes.map(({ mode, icon }) => (
                             <TouchableOpacity
                                 key={mode}
                                 style={SearchBarsStyle.transportButton}
@@ -158,7 +158,7 @@ const SearchBars: React.FC = () => {
                             <Text style={SearchBarsStyle.timeValue}>
                                 {time}min
                             </Text>
-                            
+
                         </View>
                         {/* Buttons Container */}
                         <View style={SearchBarsStyle.buttonsContainer}>
@@ -169,29 +169,44 @@ const SearchBars: React.FC = () => {
                                 </View>
                             </TouchableOpacity>
 
-                            <TouchableOpacity
-                                style={[
-                                    SearchBarsStyle.button,
-                                    {
-                                        backgroundColor: isInsideBuilding ? "white" : "#ddd",
-                                        borderColor: isInsideBuilding ? "#912338" : "grey",
-                                        opacity: isInsideBuilding ? 1 : 0.5
-                                    }
-                                ]}
-                                disabled={!isInsideBuilding} // Disable button when user is outside
-                            >
-                                <View style={SearchBarsStyle.buttonContent}>
-                                    <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
-                                    <Text style={[SearchBarsStyle.buttonText, { color: isInsideBuilding ? "#912338" : "grey" }]}>Floor View</Text>
-                                </View>
-                            </TouchableOpacity>
-                        {/* When implementing floor plans, switch between floor and outside view !!! WILL BE USED IN THE FUTURE
-                            <TouchableOpacity style={styles.button}>
-                                <View style={styles.buttonContent}>
-                                    <Entypo name="tree" size={20} color="black" />
-                                    <Text style={styles.buttonText}>Outside View</Text>
-                                </View>
-                            </TouchableOpacity> */}
+                            {!inFloorView && (
+                                <TouchableOpacity
+                                    style={[
+                                        SearchBarsStyle.button,
+                                        {
+                                            backgroundColor: isInsideBuilding ? "white" : "#ddd",
+                                            borderColor: isInsideBuilding ? "#912338" : "grey",
+                                            opacity: isInsideBuilding ? 1 : 0.5
+                                        }
+                                    ]}
+                                    disabled={!isInsideBuilding} // Disable button when user is outside
+                                    onPress={() => setInFloorView(true)}
+                                >
+                                    <View style={SearchBarsStyle.buttonContent}>
+                                        <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
+                                        <Text style={[SearchBarsStyle.buttonText, { color: isInsideBuilding ? "#912338" : "grey" }]}>Floor View</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )}
+
+                            {inFloorView && (
+                                <TouchableOpacity
+                                    style={[
+                                        SearchBarsStyle.button,
+                                        {
+                                            backgroundColor: "white",
+                                            borderColor: "#912338",
+                                            opacity: 1
+                                        }
+                                    ]}
+                                    onPress={() => setInFloorView(false)}
+                                >
+                                    <View style={SearchBarsStyle.buttonContent}>
+                                        <Entypo name="tree" size={20} color="#912338" />
+                                        <Text style={[SearchBarsStyle.buttonText, { color: "#912338" }]}>Outside View</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            )}
                         </View>
                     </View>
                 </>

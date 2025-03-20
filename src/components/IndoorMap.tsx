@@ -19,7 +19,7 @@ const featureMap: { [key: string]: any } = {
 };
 
 export const HighlightIndoorMap = () => {
-    const { setBuildingHasFloors, highlightedBuilding } = useCoords();
+    const { setBuildingHasFloors, highlightedBuilding, setInFloorView } = useCoords();
     const [indoorFeatures, setIndoorFeatures] = useState([]);
 
     // Check if the building has indoor maps
@@ -44,6 +44,9 @@ export const HighlightIndoorMap = () => {
                 setBuildingHasFloors(false);
                 setIndoorFeatures([]);
             }
+        } else {
+            setInFloorView(false);
+            setIndoorFeatures([]);
         }
     }, [highlightedBuilding]);
 
