@@ -123,33 +123,30 @@ const CalendarScreen = () => {
 
 const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
   return (
-    <React.Fragment>
-      
-      <DraggingEvent
-          {...props}
-          TopEdgeComponent={
-            <View
-              style={{
-                height: 10,
-                width: '100%',
-                backgroundColor: 'red',
-                position: 'absolute',
-              }}
-            />
-          }
-          BottomEdgeComponent={
-            <View
-              style={{
-                height: 10,
-                width: '100%',
-                backgroundColor: 'red',
-                bottom: 0,
-                position: 'absolute',
-              }}
-            />
-          }
-        />
-    </React.Fragment>
+    <DraggingEvent
+        {...props}
+        TopEdgeComponent={
+          <View
+            style={{
+              height: 10,
+              width: '100%',
+              backgroundColor: 'red',
+              position: 'absolute',
+            }}
+          />
+        }
+        BottomEdgeComponent={
+          <View
+            style={{
+              height: 10,
+              width: '100%',
+              backgroundColor: 'red',
+              bottom: 0,
+              position: 'absolute',
+            }}
+          />
+        }
+      />
   );
 }, []);
 

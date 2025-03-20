@@ -19,30 +19,20 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [isTransit, setIsTransit] = useState<boolean>(false);
 
 
-    // const contextValue = useMemo(() => ({
-    //     routeData,
-    //     setRouteData,
-    //     isInsideBuilding,
-    //     setIsInsideBuilding,
-    //     myLocationString,
-    //     setmyLocationString
-    //   }), [routeData, isInsideBuilding, myLocationString]);
+    const contextValue = useMemo(() => ({
+        routeData,
+        setRouteData,
+        isInsideBuilding,
+        setIsInsideBuilding,
+        myLocationString,
+        setmyLocationString,
+        isTransit,
+        setIsTransit
+      }), [routeData, isInsideBuilding, myLocationString, isTransit]);
     
-    //   return (
-    //     <CoordsContext.Provider value={contextValue}>
-    //       {children}
-    return (
-        <CoordsContext.Provider value={{
-            routeData,
-            setRouteData,
-            isInsideBuilding,
-            setIsInsideBuilding,
-            myLocationString,
-            setmyLocationString,
-            isTransit,
-            setIsTransit
-        }}>
-            {children}
+      return (
+        <CoordsContext.Provider value={contextValue}>
+          {children}
         </CoordsContext.Provider>
     );
 };

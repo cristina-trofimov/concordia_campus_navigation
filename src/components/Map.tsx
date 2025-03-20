@@ -20,7 +20,7 @@ import ShuttleBusTracker from './ShuttleBusTracker.tsx';
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.Value> }) {
-  const { routeData: routeCoordinates, setmyLocationString } = useCoords();
+  const { routeData: routeCoordinates, setmyLocationString, myLocationString } = useCoords();
 
   const sgwCoords = {
     latitude: 45.4949968855897,

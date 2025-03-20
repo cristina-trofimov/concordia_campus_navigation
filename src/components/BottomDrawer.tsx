@@ -6,13 +6,11 @@ import {
   Animated,
   PanResponderGestureState,
   Text,
-  TouchableOpacity,
   ScrollView
 } from "react-native";
 import SearchBars from "./SearchBars";
 import { useCoords } from "../data/CoordsContext";
 import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
-import { SearchBar } from "react-native-elements";
 
 const { height, width } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;
@@ -51,7 +49,7 @@ function BottomDrawer({
           detailedInstructions=detailedInstructions.concat(detailedHtmlInstructions);}
       }
     //Set htmlInstruction to the transit one if chosen mode is transit
-    if (isTransit==true){
+    if (isTransit){
       setHtmlInstructions(detailedInstructions);
     } else {
       setHtmlInstructions(instructions);
