@@ -10,17 +10,17 @@ import { h8Features } from '../data/indoor/Hall/H8.ts';
 import { h9Features } from '../data/indoor/Hall/H9.ts';
 import { cc1Features } from '../data/indoor/CC/CC1.ts';
 
+const featureMap: { [key: string]: any } = {
+    h1Features,
+    h2Features,
+    h8Features,
+    h9Features,
+    cc1Features,
+};
+
 export const HighlightIndoorMap = () => {
     const { setBuildingHasFloors, highlightedBuilding } = useCoords();
     const [indoorFeatures, setIndoorFeatures] = useState([]);
-
-    const featureMap: { [key: string]: any } = {
-        h1Features,
-        h2Features,
-        h8Features,
-        h9Features,
-        cc1Features,
-    };
 
     // Check if the building has indoor maps
     useEffect(() => {

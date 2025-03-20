@@ -15,7 +15,9 @@ export const CoordsContext = createContext<CoordsContextType>({
     highlightedBuilding: null,
     setHighlightedBuilding: () => { },
     myLocationCoords: null,
-    setMyLocationCoords: () => { }
+    setMyLocationCoords: () => { },
+    inFloorView: false,
+    setInFloorView: () => { },
 });
 
 export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -26,6 +28,7 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [buildingHasFloors, setBuildingHasFloors] = useState<boolean>(false);
     const [highlightedBuilding, setHighlightedBuilding] = useState<any>(null);
     const [myLocationCoords, setMyLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [inFloorView, setInFloorView] = useState<boolean>(false);
 
     return (
         <CoordsContext.Provider value={{
@@ -42,7 +45,9 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             highlightedBuilding,
             setHighlightedBuilding,
             myLocationCoords,
-            setMyLocationCoords
+            setMyLocationCoords,
+            inFloorView,
+            setInFloorView,
         }}>
             {children}
         </CoordsContext.Provider>

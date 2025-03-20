@@ -13,4 +13,6 @@ export interface CoordsContextType {
     setHighlightedBuilding: (building: any) => void;
     myLocationCoords: { latitude: number; longitude: number } | null;
     setMyLocationCoords: (location: { latitude: number; longitude: number }) => void;
+    inFloorView: boolean;
+    setInFloorView: (inFloorView: boolean) => void;
 }

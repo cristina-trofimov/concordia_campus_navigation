@@ -19,7 +19,7 @@ import { HighlightIndoorMap } from './IndoorMap.tsx';
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.Value> }) {
-  const { routeData: routeCoordinates, setmyLocationString, myLocationCoords, setMyLocationCoords } = useCoords();
+  const { routeData: routeCoordinates, setmyLocationString, myLocationCoords, setMyLocationCoords, inFloorView } = useCoords();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -183,8 +183,8 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding/>
-        <HighlightIndoorMap/>
+        {!inFloorView && <HighlightBuilding/>}
+        {inFloorView && <HighlightIndoorMap/>}
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17}
