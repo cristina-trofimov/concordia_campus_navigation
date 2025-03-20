@@ -54,6 +54,7 @@ export const HighlightIndoorMap = () => {
 
     useEffect(() => {
         setInFloorView(false);
+        setFloorList([]);
         if (highlightedBuilding) {
             const buildingId = highlightedBuilding.properties.id;
             const associations = buildingFloorAssociations.filter(
