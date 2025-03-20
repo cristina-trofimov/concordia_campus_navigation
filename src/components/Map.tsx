@@ -1,25 +1,41 @@
-import { Dimensions, StyleSheet, View, Image, TouchableOpacity, Animated } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
-import Mapbox, { Camera, MapView, PointAnnotation } from '@rnmapbox/maps';
-import { Text } from '@rneui/themed';
-import { locations } from '../data/buildingLocation.ts';
-import * as Location from 'expo-location';
-import { useCoords } from '../data/CoordsContext.tsx';
-import ToggleButton from './ToggleButton';
-import Polyline from "@mapbox/polyline"
-import { Coords } from '../interfaces/Map.ts';
-import { MAPBOX_TOKEN } from '@env'
+import {
+  Dimensions,
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import Mapbox, { Camera, MapView, PointAnnotation } from "@rnmapbox/maps";
+import { Text } from "@rneui/themed";
+import { locations } from "../data/buildingLocation.ts";
+import * as Location from "expo-location";
+import { useCoords } from "../data/CoordsContext.tsx";
+import ToggleButton from "./ToggleButton";
+import Polyline from "@mapbox/polyline";
+import { Coords } from "../interfaces/Map.ts";
+import { MAPBOX_TOKEN } from "@env";
 
-import { HighlightBuilding } from './BuildingCoordinates';
-import BuildingInformation from './BuildingInformation.tsx';
-import BuildingLocation from '../interfaces/buildingLocation.ts';
-import ShuttleBusTracker from './ShuttleBusTracker.tsx';
+import { HighlightBuilding } from "./BuildingCoordinates";
+import BuildingInformation from "./BuildingInformation.tsx";
+import BuildingLocation from "../interfaces/buildingLocation.ts";
+import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
 import { HighlightIndoorMap } from './IndoorMap.tsx'; 
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
-export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.Value> }) {
-  const { routeData: routeCoordinates, setmyLocationString, myLocationCoords, setMyLocationCoords, inFloorView } = useCoords();
+export default function Map({
+  drawerHeight,
+}: {
+  drawerHeight: Readonly<Animated.Value>;
+}) {
+  const {
+    routeData: routeCoordinates,
+    setmyLocationString,
+    myLocationCoords,
+    setMyLocationCoords,
+  } = useCoords();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -51,7 +67,6 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
   };
   const [decodedPolyline, setDecodedPolyline] = useState<Coords[]>([]);
 
-
   useEffect(() => {
     if (myLocationCoords) {
       const { latitude, longitude } = myLocationCoords;
@@ -61,23 +76,26 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
   }, [myLocationCoords, setmyLocationString]);
 
   useEffect(() => {
-
-
     if (routeCoordinates && routeCoordinates.length > 0) {
       try {
-        const points = Polyline.decode(routeCoordinates[0].overview_polyline.points);
-        const decoded = points.map(([lat, lng]) => ({ latitude: lat, longitude: lng }));
-        const finaldecoded = decoded.map(coord => ({ latitude: coord.latitude, longitude: coord.longitude }))
+        const points = Polyline.decode(
+          routeCoordinates[0].overview_polyline.points
+        );
+        const decoded = points.map(([lat, lng]) => ({
+          latitude: lat,
+          longitude: lng,
+        }));
+        const finaldecoded = decoded.map((coord) => ({
+          latitude: coord.latitude,
+          longitude: coord.longitude,
+        }));
         setDecodedPolyline(finaldecoded);
-
       } catch (error) {
         console.error("Error processing route coordinates:", error);
         setDecodedPolyline([]);
-
       }
     } else {
       setDecodedPolyline([]);
-
     }
 
     // Focus on SGW when the app starts
@@ -86,13 +104,13 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
         cameraRef.current.setCamera({
           centerCoordinate: [sgwCoords.longitude, sgwCoords.latitude],
           zoomLevel: 17,
-          animationMode: 'flyTo',
+          animationMode: "flyTo",
           animationDuration: 1000,
         });
       } else {
         console.warn("Camera reference is not available yet");
       }
-    }, 1000);// Increased delay for stability (to make sure that MapView is loaded before setting the camera)
+    }, 1000); // Increased delay for stability (to make sure that MapView is loaded before setting the camera)
 
     _getLocation();
 
@@ -110,12 +128,14 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
 
     return () => {
       clearTimeout(timer);
-      locationSubscription.then((subscription) => {
-        subscription.remove();
-      }).catch((error) => {
-        console.warn("Error unsubscribing from location updates:", error);
-      });
-    }
+      locationSubscription
+        .then((subscription) => {
+          subscription.remove();
+        })
+        .catch((error) => {
+          console.warn("Error unsubscribing from location updates:", error);
+        });
+    };
   }, [routeCoordinates]);
 
   // Trigger a re-render when the user location changes
@@ -127,8 +147,8 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
 
-      if (status !== 'granted') {
-        console.warn('Permission to access location was denied');
+      if (status !== "granted") {
+        console.warn("Permission to access location was denied");
         return;
       }
 
@@ -149,7 +169,7 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
     cameraRef.current.setCamera({
       centerCoordinate: [myLocationCoords.longitude, myLocationCoords.latitude],
       zoomLevel: 17,
-      animationMode: 'flyTo',
+      animationMode: "flyTo",
       animationDuration: 1000,
     });
   };
@@ -162,14 +182,13 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
       cameraRef.current.setCamera({
         centerCoordinate: [coords.longitude, coords.latitude],
         zoomLevel: 17,
-        animationMode: 'flyTo',
+        animationMode: "flyTo",
         animationDuration: 1000,
       });
     } else {
       console.warn("Error loading campus");
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -186,7 +205,9 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
         <HighlightBuilding/>
         <HighlightIndoorMap/>
         <Camera
-          ref={(ref) => { cameraRef.current = ref; }}
+          ref={(ref) => {
+            cameraRef.current = ref;
+          }}
           zoomLevel={17}
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
@@ -197,11 +218,12 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
             id={`point-${location.id}`}
             coordinate={location.coordinates}
             style={{ zIndex: 1 }}
-            onSelected={() => { openOverlay(location); }}
+            onSelected={() => {
+              openOverlay(location);
+            }}
           >
-            <View style={styles.marker} >
-
-              <Text style={styles.markerText} >📍</Text>
+            <View style={styles.marker}>
+              <Text style={styles.markerText}>📍</Text>
             </View>
           </Mapbox.PointAnnotation>
         ))}
@@ -213,41 +235,44 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
             coordinate={[myLocationCoords.longitude, myLocationCoords.latitude]}
           >
             <Image
-              source={require('../resources/images/currentLocation-Icon.png')}
+              source={require("../resources/images/currentLocation-Icon.png")}
               style={{ width: 30, height: 30 }}
             />
           </PointAnnotation>
         )}
 
-{decodedPolyline.length > 0 && (
-        <Mapbox.ShapeSource
-          id="routeSource"
-          shape={{
-            type: 'FeatureCollection',
-            features: [
-              {
-                type: 'Feature',
-                geometry: {
-                  type: 'LineString',
-                  coordinates:decodedPolyline.map(point => [point.longitude, point.latitude]),
+        {decodedPolyline.length > 0 && (
+          <Mapbox.ShapeSource
+            id="routeSource"
+            shape={{
+              type: "FeatureCollection",
+              features: [
+                {
+                  type: "Feature",
+                  geometry: {
+                    type: "LineString",
+                    coordinates: decodedPolyline.map((point) => [
+                      point.longitude,
+                      point.latitude,
+                    ]),
+                  },
+                  properties: {},
                 },
-                properties: {},
-              },
-            ],
-          }}
-        >
-          <Mapbox.LineLayer
-            id="routeLayer"
-            style={{
-              lineColor: '#ff0000',
-              lineWidth: 4,
-              lineOpacity: 0.8,
+              ],
             }}
-          />
+          >
             <Mapbox.LineLayer
               id="routeLayer"
               style={{
-                lineColor: '#3399FF',
+                lineColor: "#ff0000",
+                lineWidth: 4,
+                lineOpacity: 0.8,
+              }}
+            />
+            <Mapbox.LineLayer
+              id="routeLayer"
+              style={{
+                lineColor: "#3399FF",
                 lineWidth: 4,
                 lineOpacity: 0.8,
               }}
@@ -257,20 +282,31 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
 
         {/* Add ShuttleBusMarkers component */}
         <ShuttleBusTracker />
-
       </MapView>
-      
+
       <Animated.View
         style={[
           styles.buttonContainer,
           {
-            bottom: Animated.add(drawerHeight, 20),
+            bottom: drawerHeight.interpolate({
+              inputRange: [
+                Dimensions.get("window").height * 0.1,
+                Dimensions.get("window").height * 0.5,
+                Dimensions.get("window").height * 0.85,
+              ],
+              outputRange: [
+                Dimensions.get("window").height * 0.1 + 10,
+                Dimensions.get("window").height * 0.5 + 10,
+                Dimensions.get("window").height * 0.5 + 10, // Keep position fixed when drawer is fully open
+              ],
+              extrapolate: "clamp",
+            }),
           },
         ]}
       >
         <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
           <Image
-            source={require('../resources/images/currentLocation-button.png')}
+            source={require("../resources/images/currentLocation-button.png")}
             style={styles.buttonImage}
           />
         </TouchableOpacity>
@@ -292,54 +328,54 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
   map: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
   },
   buttonContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     right: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonImage: {
     width: 50,
     height: 50,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   imageButton: {
     padding: 10,
-    backgroundColor: 'transparent',
-    borderRadius: 25,
+    backgroundColor: "transparent",
+    borderRadius: 40,
   },
   annotationImage: {
     width: 30,
     height: 30,
   },
   toggleButtonContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   marker: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   markerText: {
     fontSize: 24,
   },
   callout: {
     padding: 10,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 5,
     width: 150,
   },
   calloutTitle: {
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 16,
   },
   calloutDescription: {
