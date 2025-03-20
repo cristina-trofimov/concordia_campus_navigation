@@ -33,7 +33,6 @@ export const HighlightIndoorMap = () => {
         }
     }
 
-    // Check if the building has indoor maps
     useEffect(() => {
         if (highlightedBuilding) {
             setInFloorView(false);
@@ -42,17 +41,19 @@ export const HighlightIndoorMap = () => {
                 (association) => association.buildingID === buildingId
             );
             setFloorAssociations(associations);
-
-            if (floorAssociations.length > 0) {
-                setBuildingHasFloors(true);
-                selectIndoorFeatures(0); // Select the first floor by default
-            } else {
-                setBuildingHasFloors(false);
-                setIndoorFeatures([]);
-                setCurrentFloor(null);
-            }
         }
     }, [highlightedBuilding]);
+    
+    useEffect(() => {
+        if (floorAssociations.length > 0) {
+            setBuildingHasFloors(true);
+            selectIndoorFeatures(0);
+        } else {
+            setBuildingHasFloors(false);
+            setIndoorFeatures([]);
+            setCurrentFloor(null);
+        }
+    }, [floorAssociations]);
 
     return (
         <>
