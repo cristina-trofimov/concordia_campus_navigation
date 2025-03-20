@@ -183,8 +183,8 @@ export default function Map({ drawerHeight }: { drawerHeight: Readonly<Animated.
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        {!inFloorView && <HighlightBuilding/>}
-        {inFloorView && <HighlightIndoorMap/>}
+        <HighlightBuilding/>
+        <HighlightIndoorMap/>
         <Camera
           ref={(ref) => { cameraRef.current = ref; }}
           zoomLevel={17}

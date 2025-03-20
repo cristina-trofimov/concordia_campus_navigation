@@ -19,12 +19,13 @@ const featureMap: { [key: string]: any } = {
 };
 
 export const HighlightIndoorMap = () => {
-    const { setBuildingHasFloors, highlightedBuilding, setInFloorView } = useCoords();
+    const { setBuildingHasFloors, highlightedBuilding, setInFloorView, inFloorView } = useCoords();
     const [indoorFeatures, setIndoorFeatures] = useState([]);
 
     // Check if the building has indoor maps
     useEffect(() => {
         if (highlightedBuilding) {
+            setInFloorView(false);
             const buildingId = highlightedBuilding.properties.id;
             const floorAssociations = buildingFloorAssociations.filter(
                 (association) => association.buildingID === buildingId
@@ -44,15 +45,12 @@ export const HighlightIndoorMap = () => {
                 setBuildingHasFloors(false);
                 setIndoorFeatures([]);
             }
-        } else {
-            setInFloorView(false);
-            setIndoorFeatures([]);
         }
     }, [highlightedBuilding]);
 
     return (
         <>
-            {indoorFeatures.length > 0 && (
+            {indoorFeatures.length > 0 && inFloorView && (
                 <Mapbox.ShapeSource
                     id="indoor-features"
                     shape={{
