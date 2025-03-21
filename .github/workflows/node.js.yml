@@ -33,7 +33,7 @@ jobs:
 
       # Run Jest tests
       - name: Run Jest tests
-        run: npm test
+        run: npm test -- --json --outputFile=jest-results.json
 
       # Upload Jest results as artifacts
       - name: Upload Jest Test Results
