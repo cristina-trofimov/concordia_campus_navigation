@@ -43,5 +43,4 @@ jobs:
           echo "|------------|--------|--------|---------|---------|" >> $GITHUB_STEP_SUMMARY
           cat jest-results.json | jq -r '.testResults[] | 
             select(.name != null) | 
-            "| \(.name) | \(.numPassedTests // 0) | \(.numFailedTests // 0) | \(.numPendingTests // 0) | \((.perfStats.runtime // 0) / 1000) |"' >> $GITHUB_STEP_SUMMARY
-
+            "| \(.name | capture("(?<file>[^/]+$)").file) | \(.numPassedTests // 0) | \(.numFailedTests // 0) | \(.numPendingTests // 0) | \((.perfStats.runtime // 0) / 1000) |"' >> $GITHUB_STEP_SUMMARY
