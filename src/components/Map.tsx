@@ -36,6 +36,7 @@ export default function Map({
     setmyLocationString,
     myLocationCoords,
     setMyLocationCoords,
+    inFloorView,
   } = useCoords();
 
   const sgwCoords = {
@@ -311,7 +312,7 @@ export default function Map({
         </TouchableOpacity>
       </Animated.View>
 
-      <View style={MapStyles.toggleButtonContainer}>
+      { !inFloorView && (<View style={MapStyles.toggleButtonContainer}>
         <ToggleButton
           mapRef={mapRef}
           sgwCoords={sgwCoords}
@@ -320,6 +321,7 @@ export default function Map({
           initialCampus={true}
         />
       </View>
+      )}
     </View>
   );
 }

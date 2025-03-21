@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 export const FloorSelectorStyle = StyleSheet.create({
     container: {
         position: 'absolute',
-        top: '8%',
+        top: '3%',
         zIndex: 1000,
         width: 150,
     },
