@@ -9,7 +9,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 
 const SearchBars: React.FC = () => {
-    const { setRouteData, myLocationString,routeData,isTransit,setIsTransit } = useCoords();
+    const { setRouteData, myLocationString,setIsTransit } = useCoords();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
@@ -24,12 +24,12 @@ const SearchBars: React.FC = () => {
 
     const [originCoords, setOriginCoords] = useState<any>(null);
     const [destinationCoords, setDestinationCoords] = useState<any>(null);
-    const [transportModes, setTransportModes] = useState([
+    const transportModes = [
         { mode: "driving", icon: "car-outline", label: "Drive", time: "-" },
         { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "-" },
         { mode: "walking", icon: "walk-outline", label: "Walk", time: "-" },
         { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-" },
-    ]);
+    ];
     const [selectedMode, setSelectedMode] = useState("driving");
     const { isInsideBuilding } = useCoords();
 
