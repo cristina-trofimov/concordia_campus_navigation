@@ -1,60 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1742569705898" clover="3.2.0">
-  <project timestamp="1742569705898" name="All files">
-    <metrics statements="42" coveredstatements="37" conditionals="20" coveredconditionals="18" methods="9" coveredmethods="8" elements="71" coveredelements="63" complexity="0" loc="42" ncloc="42" packages="2" files="2" classes="2"/>
-    <package name="components">
-      <metrics statements="41" coveredstatements="36" conditionals="20" coveredconditionals="18" methods="9" coveredmethods="8"/>
-      <file name="SearchBar.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/SearchBar.tsx">
-        <metrics statements="41" coveredstatements="36" conditionals="20" coveredconditionals="18" methods="9" coveredmethods="8"/>
-        <line num="11" count="1" type="stmt"/>
-        <line num="21" count="24" type="stmt"/>
-        <line num="22" count="24" type="cond" truecount="2" falsecount="0"/>
-        <line num="23" count="24" type="stmt"/>
-        <line num="26" count="24" type="stmt"/>
-        <line num="27" count="9" type="cond" truecount="2" falsecount="0"/>
-        <line num="28" count="1" type="stmt"/>
-        <line num="32" count="24" type="stmt"/>
-        <line num="33" count="7" type="cond" truecount="2" falsecount="0"/>
-        <line num="34" count="1" type="stmt"/>
-        <line num="35" count="1" type="stmt"/>
-        <line num="38" count="6" type="stmt"/>
-        <line num="39" count="6" type="stmt"/>
-        <line num="48" count="5" type="stmt"/>
-        <line num="50" count="1" type="stmt"/>
-        <line num="54" count="24" type="stmt"/>
-        <line num="55" count="3" type="stmt"/>
-        <line num="56" count="3" type="stmt"/>
-        <line num="57" count="3" type="stmt"/>
-        <line num="58" count="3" type="stmt"/>
-        <line num="60" count="3" type="stmt"/>
-        <line num="61" count="3" type="stmt"/>
-        <line num="71" count="3" type="cond" truecount="2" falsecount="0"/>
-        <line num="72" count="2" type="stmt"/>
-        <line num="73" count="2" type="stmt"/>
-        <line num="74" count="2" type="stmt"/>
-        <line num="75" count="2" type="stmt"/>
-        <line num="77" count="1" type="stmt"/>
-        <line num="80" count="0" type="stmt"/>
-        <line num="84" count="24" type="stmt"/>
-        <line num="85" count="0" type="stmt"/>
-        <line num="86" count="0" type="stmt"/>
-        <line num="87" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="88" count="0" type="stmt"/>
-        <line num="92" count="24" type="stmt"/>
-        <line num="101" count="7" type="stmt"/>
-        <line num="102" count="7" type="stmt"/>
-        <line num="103" count="7" type="stmt"/>
-        <line num="116" count="15" type="stmt"/>
-        <line num="118" count="10" type="stmt"/>
-        <line num="120" count="3" type="stmt"/>
-      </file>
-    </package>
-    <package name="styles">
-      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="SearchBarStyle.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/styles/SearchBarStyle.tsx">
-        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="3" count="1" type="stmt"/>
-      </file>
-    </package>
+<coverage generated="1742573442140" clover="3.2.0">
+  <project timestamp="1742573442140" name="All files">
+    <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2" elements="7" coveredelements="7" complexity="0" loc="5" ncloc="5" packages="1" files="1" classes="1"/>
+    <file name="CalendarButton.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/CalendarButton.tsx">
+      <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+      <line num="9" count="1" type="stmt"/>
+      <line num="10" count="4" type="stmt"/>
+      <line num="12" count="4" type="stmt"/>
+      <line num="14" count="1" type="stmt"/>
+      <line num="17" count="4" type="stmt"/>
+    </file>
   </project>
 </coverage>
