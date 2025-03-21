@@ -30,20 +30,31 @@ export const BottomDrawerStyle = StyleSheet.create({
     listContent: {
       alignItems: 'flex-end',
       justifyContent: 'center',
-      margin: 16,
+      backgroundColor:'yellow'
       
     },
     instructionsList: {
       margin:6,
       padding: 16,
-      backgroundColor: "#f0f0f0",
+      backgroundColor: "red",
       borderRadius: 10,
       textAlign:'left',
       borderColor:"#f0f0f0",
+      borderTopWidth:2,
       fontSize: 14,
       lineHeight: 24,
       fontWeight:"500",
+      paddingVertical:8,
+      flexDirection:'row',
+      alignItems:'center'
 
     },
+    iconsBox: {
+      marginRight:20,
+      justifyContent:'center',
+      alignItems:'center',
+      borderRadius: 12,
+      backgroundColor:"purple"
+    }
 
   });

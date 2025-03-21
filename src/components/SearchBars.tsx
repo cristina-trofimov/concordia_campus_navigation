@@ -138,6 +138,7 @@ const SearchBars: React.FC = () => {
                                 key={mode}
                                 style={SearchBarsStyle.transportButton}
                                 onPress={() => setSelectedMode(mode)}
+                                
                             >
                                 <View style={SearchBarsStyle.transportButtonContent}>
                                     <Ionicons
@@ -145,9 +146,8 @@ const SearchBars: React.FC = () => {
                                         size={24}
                                         color={selectedMode === mode ? "#912338" : "black"}
                                     />
-                                    <Text style={[SearchBarsStyle.timeText, { color: selectedMode === mode ? "#912338" : "black" }]}>
-                                        {selectedMode === mode ? time : transportModes.find(t => t.mode === mode)?.time} min
-                                    </Text>
+                                    {selectedMode === mode}
+                    
                                 </View>
                             </TouchableOpacity>
                         ))}
