@@ -10,7 +10,7 @@ interface PolygonGeometry {
 
 type Geometry = PointGeometry | PolygonGeometry;
 
-interface Feature {
+interface IndoorFeature {
     type: "Feature";
     geometry: Geometry;
     properties: {
@@ -18,4 +18,4 @@ interface Feature {
     };
 }
 
-export type FeatureCollection = Feature[];
+export type IndoorFeatureCollection = IndoorFeature[];

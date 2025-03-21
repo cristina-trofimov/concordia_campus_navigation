@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Mapbox from '@rnmapbox/maps';
 import { useCoords } from "../data/CoordsContext";
 import { buildingFloorAssociations } from '../data/buildingFloorAssociations.ts';
-import { FeatureCollection } from '../interfaces/Feature.ts';
+import { IndoorFeatureCollection } from '../interfaces/IndoorFeature.ts';
 import { h1Features } from '../data/indoor/Hall/H1.ts';
 import { h2Features } from '../data/indoor/Hall/H2.ts';
 import { h8Features } from '../data/indoor/Hall/H8.ts';
@@ -22,7 +22,7 @@ export const useIndoorFeatures = () => {
 
     const selectIndoorFeatures = (index: number) => {
         if (currentFloorAssociations && currentFloorAssociations[index]) {
-            const featureComponent = featureMap[currentFloorAssociations[index].component] as FeatureCollection[];
+            const featureComponent = featureMap[currentFloorAssociations[index].component] as IndoorFeatureCollection[];
             if (featureComponent) {
                 setIndoorFeatures(featureComponent);
                 setCurrentFloor(
