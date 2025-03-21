@@ -1,4 +1,16 @@
-// At the very top of your Map.test.tsx file
+// At the top of your test file
+beforeAll(() => {
+  jest.spyOn(console, 'log').mockImplementation(() => {});
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+afterAll(() => {
+  console.log.mockRestore();
+  console.warn.mockRestore();
+  console.error.mockRestore();
+});
+
 jest.mock('@env', () => ({
   MAPBOX_TOKEN: 'mock-token'
 }));
@@ -32,20 +44,29 @@ jest.mock('@rnmapbox/maps', () => {
   
   return {
     setAccessToken: jest.fn(),
-    MapView: jest.fn(({ children, onDidFinishLoadingMap, testID }) => {
+    MapView: React.forwardRef((props, ref) => {
+      const { children, onDidFinishLoadingMap, testID } = props;
       React.useEffect(() => {
         if (onDidFinishLoadingMap) {
           onDidFinishLoadingMap();
         }
       }, []);
-      return <div data-testid="mapview" testID="mapview">{children}</div>;
+      return <div data-testid="mapview" testID="mapview" ref={ref}>{children}</div>;
     }),
-    Camera: jest.fn(({ children, ref }) => {
+    Camera: React.forwardRef((props, ref) => {
+      const { children } = props;
       React.useEffect(() => {
         if (ref) {
-          ref({
-            setCamera: jest.fn()
-          });
+          // Pass the mock camera methods to the ref
+          if (typeof ref === 'function') {
+            ref({
+              setCamera: jest.fn()
+            });
+          } else {
+            ref.current = {
+              setCamera: jest.fn()
+            };
+          }
         }
       }, []);
       return <div data-testid="camera">{children}</div>;
