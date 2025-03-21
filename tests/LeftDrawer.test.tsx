@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent, act } from '@testing-library/react-native';
 import { Animated, Dimensions } from 'react-native';
-import LeftDrawer from '../src/LeftDrawer';
+import LeftDrawer from '../src/components/LeftDrawer';
 
 // Mock the necessary components and modules
 jest.mock('@expo/vector-icons/Feather', () => 'Feather');
