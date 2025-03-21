@@ -1,81 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1742567306581" clover="3.2.0">
-  <project timestamp="1742567306581" name="All files">
-    <metrics statements="163" coveredstatements="101" conditionals="65" coveredconditionals="33" methods="43" coveredmethods="23" elements="271" coveredelements="157" complexity="0" loc="163" ncloc="163" packages="5" files="11" classes="11"/>
-    <package name="src.components">
-      <metrics statements="154" coveredstatements="92" conditionals="65" coveredconditionals="33" methods="42" coveredmethods="22"/>
-      <file name="BottomDrawer.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/BottomDrawer.tsx">
-        <metrics statements="40" coveredstatements="5" conditionals="17" coveredconditionals="0" methods="10" coveredmethods="0"/>
-        <line num="17" count="1" type="stmt"/>
-        <line num="18" count="1" type="stmt"/>
-        <line num="19" count="1" type="stmt"/>
-        <line num="20" count="1" type="stmt"/>
-        <line num="21" count="1" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="37" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="38" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="43" count="0" type="stmt"/>
-        <line num="44" count="0" type="stmt"/>
-        <line num="45" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="47" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="48" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
-        <line num="51" count="0" type="stmt"/>
-        <line num="54" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="55" count="0" type="stmt"/>
-        <line num="57" count="0" type="stmt"/>
-        <line num="59" count="0" type="stmt"/>
-        <line num="61" count="0" type="stmt"/>
-        <line num="65" count="0" type="stmt"/>
-        <line num="69" count="0" type="stmt"/>
-        <line num="70" count="0" type="stmt"/>
-        <line num="71" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="72" count="0" type="stmt"/>
-        <line num="80" count="0" type="stmt"/>
-        <line num="81" count="0" type="stmt"/>
-        <line num="90" count="0" type="stmt"/>
-        <line num="93" count="0" type="stmt"/>
-        <line num="94" count="0" type="cond" truecount="0" falsecount="3"/>
-        <line num="95" count="0" type="stmt"/>
-        <line num="98" count="0" type="stmt"/>
-        <line num="100" count="0" type="stmt"/>
-        <line num="106" count="0" type="stmt"/>
-        <line num="115" count="0" type="stmt"/>
-      </file>
-      <file name="BuildingCoordinates.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/BuildingCoordinates.tsx">
-        <metrics statements="24" coveredstatements="24" conditionals="12" coveredconditionals="12" methods="8" coveredmethods="8"/>
-        <line num="11" count="1" type="stmt"/>
-        <line num="12" count="60" type="stmt"/>
-        <line num="13" count="61" type="stmt"/>
-        <line num="14" count="61" type="stmt"/>
-        <line num="16" count="61" type="cond" truecount="4" falsecount="0"/>
-        <line num="17" count="2" type="stmt"/>
-        <line num="20" count="59" type="stmt"/>
-        <line num="24" count="1" type="stmt"/>
-        <line num="25" count="60" type="stmt"/>
-        <line num="34" count="1" type="stmt"/>
-        <line num="35" count="6" type="stmt"/>
-        <line num="37" count="6" type="stmt"/>
-        <line num="38" count="6" type="cond" truecount="2" falsecount="0"/>
-        <line num="39" count="5" type="stmt"/>
-        <line num="40" count="5" type="stmt"/>
-        <line num="43" count="6" type="stmt"/>
-        <line num="44" count="6" type="cond" truecount="2" falsecount="0"/>
-        <line num="45" count="5" type="stmt"/>
-        <line num="46" count="182" type="stmt"/>
-        <line num="54" count="6" type="stmt"/>
-        <line num="55" count="6" type="stmt"/>
-        <line num="58" count="6" type="cond" truecount="2" falsecount="0"/>
-        <line num="59" count="1" type="stmt"/>
-        <line num="62" count="5" type="stmt"/>
-      </file>
+<coverage generated="1742568106763" clover="3.2.0">
+  <project timestamp="1742568106763" name="All files">
+    <metrics statements="80" coveredstatements="54" conditionals="27" coveredconditionals="12" methods="22" coveredmethods="13" elements="129" coveredelements="79" complexity="0" loc="80" ncloc="80" packages="3" files="4" classes="4"/>
+    <package name="components">
+      <metrics statements="77" coveredstatements="51" conditionals="27" coveredconditionals="12" methods="22" coveredmethods="13"/>
       <file name="Map.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/Map.tsx">
-        <metrics statements="77" coveredstatements="50" conditionals="27" coveredconditionals="12" methods="22" coveredmethods="12"/>
+        <metrics statements="77" coveredstatements="51" conditionals="27" coveredconditionals="12" methods="22" coveredmethods="13"/>
         <line num="20" count="1" type="stmt"/>
         <line num="23" count="5" type="stmt"/>
         <line num="25" count="5" type="stmt"/>
@@ -112,8 +42,8 @@
         <line num="83" count="1" type="stmt"/>
         <line num="88" count="1" type="stmt"/>
         <line num="89" count="1" type="cond" truecount="1" falsecount="1"/>
-        <line num="90" count="0" type="stmt"/>
-        <line num="97" count="1" type="stmt"/>
+        <line num="90" count="1" type="stmt"/>
+        <line num="97" count="0" type="stmt"/>
         <line num="101" count="1" type="stmt"/>
         <line num="103" count="1" type="stmt"/>
         <line num="110" count="1" type="stmt"/>
@@ -148,41 +78,21 @@
         <line num="173" count="0" type="stmt"/>
         <line num="178" count="5" type="stmt"/>
         <line num="188" count="1" type="stmt"/>
-        <line num="192" count="0" type="stmt"/>
+        <line num="192" count="1" type="stmt"/>
         <line num="198" count="300" type="stmt"/>
         <line num="203" count="0" type="stmt"/>
         <line num="235" count="0" type="stmt"/>
         <line num="295" count="1" type="stmt"/>
       </file>
-      <file name="ToggleButton.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/ToggleButton.tsx">
-        <metrics statements="13" coveredstatements="13" conditionals="9" coveredconditionals="9" methods="2" coveredmethods="2"/>
-        <line num="14" count="1" type="stmt"/>
-        <line num="22" count="9" type="stmt"/>
-        <line num="24" count="9" type="stmt"/>
-        <line num="25" count="9" type="stmt"/>
-        <line num="26" count="9" type="stmt"/>
-        <line num="28" count="9" type="stmt"/>
-        <line num="29" count="9" type="cond" truecount="2" falsecount="0"/>
-        <line num="31" count="9" type="stmt"/>
-        <line num="32" count="4" type="stmt"/>
-        <line num="33" count="4" type="stmt"/>
-        <line num="35" count="4" type="stmt"/>
-        <line num="41" count="4" type="stmt"/>
-        <line num="44" count="9" type="stmt"/>
-      </file>
     </package>
-    <package name="src.data">
-      <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="buildingFeatures.ts" path="/Users/constance/Downloads/concordia_campus_navigation/src/data/buildingFeatures.ts">
-        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="8" count="1" type="stmt"/>
-      </file>
+    <package name="data">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="buildingLocation.ts" path="/Users/constance/Downloads/concordia_campus_navigation/src/data/buildingLocation.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="3" count="1" type="stmt"/>
       </file>
     </package>
-    <package name="src.resources.images">
+    <package name="resources.images">
       <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <file name="currentLocation-Icon.png" path="/Users/constance/Downloads/concordia_campus_navigation/src/resources/images/currentLocation-Icon.png">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -191,26 +101,6 @@
       <file name="currentLocation-button.png" path="/Users/constance/Downloads/concordia_campus_navigation/src/resources/images/currentLocation-button.png">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="1" type="stmt"/>
-      </file>
-    </package>
-    <package name="src.styles">
-      <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="BottomDrawerStyle.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/styles/BottomDrawerStyle.tsx">
-        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="3" count="1" type="stmt"/>
-        <line num="5" count="1" type="stmt"/>
-      </file>
-      <file name="ToggleButtonStyle.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/styles/ToggleButtonStyle.tsx">
-        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="3" count="1" type="stmt"/>
-      </file>
-    </package>
-    <package name="tests">
-      <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
-      <file name="SimpleComponent.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/tests/SimpleComponent.tsx">
-        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="5" count="1" type="stmt"/>
       </file>
     </package>
   </project>
