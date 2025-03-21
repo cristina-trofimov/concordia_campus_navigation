@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Mapbox from '@rnmapbox/maps';
-import { useCoords } from "../data/CoordsContext";
+import { useCoords } from "../data/CoordsContext.tsx";
+import { useIndoor } from "../data/IndoorContext.tsx";
 import { buildingFloorAssociations } from '../data/buildingFloorAssociations.ts';
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature.ts';
 import { h1Features } from '../data/indoor/Hall/H1.ts';
@@ -18,7 +19,7 @@ const featureMap: { [key: string]: any } = {
 };
 
 export const useIndoorFeatures = () => {
-    const { setCurrentFloor, currentFloorAssociations, setIndoorFeatures } = useCoords();
+    const { setCurrentFloor, currentFloorAssociations, setIndoorFeatures } = useIndoor();
 
     const selectIndoorFeatures = (index: number) => {
         if (currentFloorAssociations && currentFloorAssociations[index]) {
@@ -48,8 +49,8 @@ export const useIndoorFeatures = () => {
 };
 
 export const HighlightIndoorMap = () => {
-    const { setBuildingHasFloors, highlightedBuilding, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations,
-        setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures } = useCoords();
+    const { highlightedBuilding} = useCoords();
+    const { setBuildingHasFloors, inFloorView, setInFloorView, setCurrentFloor, setFloorList, currentFloorAssociations, setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures} = useIndoor();
     const { selectIndoorFeatures } = useIndoorFeatures();
 
     useEffect(() => {
