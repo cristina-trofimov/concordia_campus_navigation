@@ -34,3 +34,10 @@ jobs:
       # Run Jest tests
       - name: Run Jest tests
         run: npm test
+
+      # Upload Jest results as artifacts
+      - name: Upload Jest Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: jest-results-${{ matrix.node-version }}
+          path: jest-results.json
