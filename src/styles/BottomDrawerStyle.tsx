@@ -25,24 +25,6 @@ export const BottomDrawerStyle = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    padding: 16,
   },
-  listContent: {
-    flex: 1,
-    padding: 5,
-     alignItems: "flex-end",
-     justifyContent: "center",
-  },
-  instructionsList: {
-    margin: 6,
-    padding: 16,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 10,
-    textAlign: "left",
-    borderColor: "#f0f0f0",
-    fontSize: 14,
-    lineHeight: 24,
-    fontWeight: "500",
-    
-  },
+
 });
