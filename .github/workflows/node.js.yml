@@ -51,5 +51,10 @@ jobs:
             ) | \(
               (.assertionResults | map(select(.status=="pending")) | length) // 0
             ) | \(
-              (.perfStats.end - .perfStats.start) / 1000 | tonumber
+              if .perfStats.start and .perfStats.end then 
+                ((.perfStats.end - .perfStats.start) / 1000 | tonumber)
+              else 
+                "N/A"
+              end
             ) |"' >> $GITHUB_STEP_SUMMARY
+
