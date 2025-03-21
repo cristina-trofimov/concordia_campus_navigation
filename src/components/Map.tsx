@@ -51,7 +51,7 @@ export default function Map({
     longitude: number;
   } | null>(null);
   const mapRef = useRef<Mapbox.MapView | null>(null);
-  const [, setCurrentCoords] = useState(sgwCoords);
+  let currentCoords = sgwCoords;
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
 
@@ -181,7 +181,7 @@ export default function Map({
 
   const handleCampusChange = (isSGW: boolean) => {
     const coords = isSGW ? sgwCoords : loyolaCoords;
-    setCurrentCoords(coords);
+    currentCoords = coords;
 
     if (mapLoaded && cameraRef.current) {
       cameraRef.current.setCamera({
