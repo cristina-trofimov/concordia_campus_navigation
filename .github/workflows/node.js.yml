@@ -50,5 +50,6 @@ jobs:
               (.assertionResults | map(select(.status=="failed")) | length) // 0
             ) | \(
               (.assertionResults | map(select(.status=="pending")) | length) // 0
-            ) | \((.perfStats.runtime // 0) / 1000) |"' >> $GITHUB_STEP_SUMMARY
-
+            ) | \(
+              (.perfStats.end - .perfStats.start) / 1000 | tonumber
+            ) |"' >> $GITHUB_STEP_SUMMARY
