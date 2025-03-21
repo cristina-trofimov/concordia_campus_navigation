@@ -22,6 +22,7 @@ import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
 import { HighlightIndoorMap } from './IndoorMap.tsx'; 
+import { MapStyles } from "../styles/MapStyle.tsx";
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
@@ -189,14 +190,14 @@ export default function Map({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={MapStyles.container}>
       <BuildingInformation
         isVisible={isOverlayVisible}
         onClose={closeOverlay}
         buildingLocation={selectedBuilding}
       />
       <MapView
-        style={styles.map}
+        style={MapStyles.map}
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
@@ -220,8 +221,8 @@ export default function Map({
               openOverlay(location);
             }}
           >
-            <View style={styles.marker}>
-              <Text style={styles.markerText}>📍</Text>
+            <View style={MapStyles.marker}>
+              <Text style={MapStyles.markerText}>📍</Text>
             </View>
           </Mapbox.PointAnnotation>
         ))}
@@ -284,7 +285,7 @@ export default function Map({
 
       <Animated.View
         style={[
-          styles.buttonContainer,
+          MapStyles.buttonContainer,
           {
             bottom: drawerHeight.interpolate({
               inputRange: [
@@ -302,15 +303,15 @@ export default function Map({
           },
         ]}
       >
-        <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
+        <TouchableOpacity onPress={focusOnLocation} style={MapStyles.imageButton}>
           <Image
             source={require("../resources/images/currentLocation-button.png")}
-            style={styles.buttonImage}
+            style={MapStyles.buttonImage}
           />
         </TouchableOpacity>
       </Animated.View>
 
-      <View style={styles.toggleButtonContainer}>
+      <View style={MapStyles.toggleButtonContainer}>
         <ToggleButton
           mapRef={mapRef}
           sgwCoords={sgwCoords}
@@ -323,60 +324,3 @@ export default function Map({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
-  buttonContainer: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    alignItems: "center",
-  },
-  buttonImage: {
-    width: 50,
-    height: 50,
-    resizeMode: "contain",
-  },
-  imageButton: {
-    padding: 10,
-    backgroundColor: "transparent",
-    borderRadius: 40,
-  },
-  annotationImage: {
-    width: 30,
-    height: 30,
-  },
-  toggleButtonContainer: {
-    position: "absolute",
-    top: 20,
-    alignItems: "center",
-  },
-  marker: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  markerText: {
-    fontSize: 24,
-  },
-  callout: {
-    padding: 10,
-    backgroundColor: "white",
-    borderRadius: 5,
-    width: 150,
-  },
-  calloutTitle: {
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  calloutDescription: {
-    fontSize: 14,
-  },
-});
