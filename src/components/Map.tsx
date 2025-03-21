@@ -55,8 +55,6 @@ export default function Map({
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingLocation | null>(null);
 
-  console.log({ selectedBuilding });
-
   const openOverlay = (building: BuildingLocation) => {
     setSelectedBuilding(building);
     setIsOverlayVisible(true);
