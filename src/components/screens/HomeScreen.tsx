@@ -8,6 +8,7 @@ import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
 import { HomeStyle } from "../../styles/HomeStyle";
 import SearchBars from "../SearchBars";
+import DirectionsSteps from "../DirectionsSteps";
 import { Text } from "react-native-elements";
 
 const { height } = Dimensions.get("window");
@@ -87,20 +88,13 @@ export default function HomeScreen() {
         <Map drawerHeight={drawerHeight} />
         <BottomDrawer drawerHeight={drawerHeight} >
           <SearchBars />
+          <DirectionsSteps/>
           {/* oviya component  */}
-          <View style={HomeStyle.listContent}>
-            <ScrollView>
-              {htmlInstructions.length > 0 &&
-                htmlInstructions.map((instruction, index) => (
-                  <Text key={index} style={HomeStyle.instructionsList}>
-                    {instruction}
-                  </Text>
-                ))}
-            </ScrollView>
-          </View>
+          
 
         </BottomDrawer>
       </View>
     </CoordsProvider>
   );
 }
+ 

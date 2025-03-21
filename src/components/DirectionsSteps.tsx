@@ -6,6 +6,7 @@ import {
 } from "react-native";
 import { useCoords } from "../data/CoordsContext";
 import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
+import { DirectionStepsStyle } from "../styles/DirectionsStepsStyle";
 import { MaterialIcons} from "@expo/vector-icons";
 
 
@@ -46,7 +47,7 @@ import { MaterialIcons} from "@expo/vector-icons";
     }
   }, [routeCoordinates]);
     return(
-        <View style={BottomDrawerStyle.listContent}>
+        <View style={ DirectionStepsStyle.listContent}>
         <ScrollView>
         {htmlInstructions.length > 0 &&
           htmlInstructions.map((instruction, index) => {
@@ -54,10 +55,10 @@ import { MaterialIcons} from "@expo/vector-icons";
                                             instruction.toLowerCase().includes('right')?'turn-right':
                                                 null;
           return (
-            <View key={index} style={BottomDrawerStyle.instructionsList}>
+            <View key={index} style={ DirectionStepsStyle.instructionsList}>
              <View>
               {instructionsIconsDisplay && (
-                <View style={BottomDrawerStyle.iconsBox}>
+                <View style={ DirectionStepsStyle.iconsBox}>
                   <MaterialIcons
                     name={instructionsIconsDisplay as keyof typeof MaterialIcons.glyphMap}
                     size={30}
@@ -67,7 +68,7 @@ import { MaterialIcons} from "@expo/vector-icons";
               )}
               </View>
               <View>
-              <Text style={[BottomDrawerStyle.listContent]}>
+              <Text style={[ DirectionStepsStyle.listContent]}>
                 {instruction}
               </Text>
               </View>

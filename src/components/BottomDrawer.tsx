@@ -131,8 +131,6 @@ function BottomDrawer({
     >
       <View {...panResponder.panHandlers} style={BottomDrawerStyle.dragHandle}>
         <View style={BottomDrawerStyle.dragIndicator} />
-        <SearchBars />
-       <DirectionsSteps />
       </View>
       <View style={BottomDrawerStyle.contentContainer}>{children}</View>
     </Animated.View>
