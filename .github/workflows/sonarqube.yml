@@ -39,4 +39,4 @@ jobs:
             -Dsonar.projectBaseDir=.
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
             -Dsonar.sources=src
-            -Dsonar.tests=__tests__,src/**/*.test.js,src/**/*.spec.js
+            -Dsonar.tests=tests/*.test.tsx
