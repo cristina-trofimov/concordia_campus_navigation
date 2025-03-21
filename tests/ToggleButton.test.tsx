@@ -1,11 +1,14 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, act } from '@testing-library/react-native';
 import ToggleButton from '../src/components/ToggleButton';
 
 // Mock the required dependencies
 jest.mock('@rnmapbox/maps', () => ({
   MapView: 'MapView',
 }));
+
+// Mock timers to handle animation timing
+jest.useFakeTimers();
 
 describe('ToggleButton', () => {
   const mockMapRef = { current: null };
@@ -46,8 +49,6 @@ describe('ToggleButton', () => {
     const sgwText = getByText('SGW');
     const loyolaText = getByText('Loyola');
     
-    // The implementation assumes SGW is the active label when isSGW is true
-    // Note: This is a bit of a fragile test as it assumes knowledge of the component styling
     expect(sgwText.props.style.some(style => style.fontWeight === 'bold')).toBeTruthy();
     expect(loyolaText.props.style.some(style => style.fontWeight !== 'bold')).toBeTruthy();
   });
@@ -66,12 +67,11 @@ describe('ToggleButton', () => {
     const sgwText = getByText('SGW');
     const loyolaText = getByText('Loyola');
     
-    // The implementation assumes Loyola is the active label when isSGW is false
     expect(loyolaText.props.style.some(style => style.fontWeight === 'bold')).toBeTruthy();
     expect(sgwText.props.style.some(style => style.fontWeight !== 'bold')).toBeTruthy();
   });
 
-  it('calls onCampusChange when the toggle is pressed', () => {
+  it('calls onCampusChange when the toggle is pressed', async () => {
     const { getByText } = render(
       <ToggleButton
         mapRef={mockMapRef}
@@ -81,43 +81,53 @@ describe('ToggleButton', () => {
       />
     );
 
-    // Instead of using testID, we'll use the text content to find the touchable area
-    // For this test, let's press on the "Loyola" text to toggle from SGW to Loyola
     const loyolaText = getByText('Loyola');
-    fireEvent.press(loyolaText);
     
-    // onCampusChange should be called with false since we're toggling from SGW (true) to Loyola (false)
+    // Wrap the event in act()
+    await act(async () => {
+      fireEvent.press(loyolaText);
+      // Advance timers to complete any animations
+      jest.runAllTimers();
+    });
+    
     expect(mockOnCampusChange).toHaveBeenCalledWith(false);
   });
 
-  it('toggles between SGW and Loyola when pressed multiple times', () => {
+  it('toggles between SGW and Loyola when pressed multiple times', async () => {
     const { getByText } = render(
       <ToggleButton
         mapRef={mockMapRef}
         sgwCoords={mockSgwCoords}
         loyolaCoords={mockLoyolaCoords}
         onCampusChange={mockOnCampusChange}
-        initialCampus={true} // Start with SGW
+        initialCampus={true}
       />
     );
 
-    // Use the text elements to trigger presses
     const sgwText = getByText('SGW');
     const loyolaText = getByText('Loyola');
     
-    // First press: SGW -> Loyola (press Loyola text)
-    fireEvent.press(loyolaText);
+    // First press: SGW -> Loyola
+    await act(async () => {
+      fireEvent.press(loyolaText);
+      jest.runAllTimers();
+    });
     expect(mockOnCampusChange).toHaveBeenLastCalledWith(false);
     
-    // Second press: Loyola -> SGW (press SGW text)
-    fireEvent.press(sgwText);
+    // Second press: Loyola -> SGW
+    await act(async () => {
+      fireEvent.press(sgwText);
+      jest.runAllTimers();
+    });
     expect(mockOnCampusChange).toHaveBeenLastCalledWith(true);
     
-    // Third press: SGW -> Loyola (press Loyola text again)
-    fireEvent.press(loyolaText);
+    // Third press: SGW -> Loyola
+    await act(async () => {
+      fireEvent.press(loyolaText);
+      jest.runAllTimers();
+    });
     expect(mockOnCampusChange).toHaveBeenLastCalledWith(false);
     
-    // Check total number of calls
     expect(mockOnCampusChange).toHaveBeenCalledTimes(3);
   });
 });
