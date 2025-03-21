@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest",
     "detox-build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+    "coverage": "jest --coverage",
     "detox-test": "detox test --configuration android.emu.debug",
     "start": "expo start --dev-client",
     "android": "expo run:android",
