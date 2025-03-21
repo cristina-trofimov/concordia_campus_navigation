@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest",
     "detox-build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
     "detox-test": "detox test --configuration android.emu.debug",
     "start": "expo start --dev-client",
@@ -96,10 +96,9 @@
     "setupFiles": [
       "./tests/jestSetup.ts"
     ],
+    "testMatch": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[tj]s?(x)"],
     "transformIgnorePatterns": [
       "node_modules/(?!(@rneui|@rnmapbox|react-native|expo|@react-native|@expo|react-navigation|@react-navigation/.*|@mapbox|@unimodules|unimodules|sentry-expo|native-base|react-native-svg))"
-    ],
-    "collectCoverage": true,
-    "coverageReporters": ["lcov", "text"]
+    ]
   }
 }
