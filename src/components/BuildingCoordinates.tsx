@@ -3,6 +3,7 @@ import Mapbox from '@rnmapbox/maps';
 import * as turf from '@turf/turf';
 import { buildingFeatures } from '../data/buildingFeatures.ts'
 import { useCoords } from "../data/CoordsContext";
+import { useIndoor } from "../data/IndoorContext";
 
 export const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
   if (!coordinates || !Array.isArray(coordinates)) {
@@ -38,7 +39,8 @@ export const fixedBuildingFeatures = buildingFeatures.map((feature) => {
 });
 
 export const HighlightBuilding = () => {
-  const { setIsInsideBuilding, highlightedBuilding, setHighlightedBuilding, myLocationCoords, inFloorView } = useCoords();
+  const { setIsInsideBuilding, highlightedBuilding, setHighlightedBuilding, myLocationCoords } = useCoords();
+  const { inFloorView } = useIndoor();
 
   const swappedUserCoordinates = useMemo(() => {
     if (!myLocationCoords) return null;

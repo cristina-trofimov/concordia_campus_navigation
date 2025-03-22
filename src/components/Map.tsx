@@ -12,6 +12,7 @@ import { Text } from "@rneui/themed";
 import { locations } from "../data/buildingLocation.ts";
 import * as Location from "expo-location";
 import { useCoords } from "../data/CoordsContext.tsx";
+import { useIndoor } from "../data/IndoorContext";
 import ToggleButton from "./ToggleButton";
 import Polyline from "@mapbox/polyline";
 import { Coords } from "../interfaces/Map.ts";
@@ -36,8 +37,8 @@ export default function Map({
     setmyLocationString,
     myLocationCoords,
     setMyLocationCoords,
-    inFloorView,
   } = useCoords();
+  const { inFloorView } = useIndoor();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
