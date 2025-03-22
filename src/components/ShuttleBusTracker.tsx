@@ -8,7 +8,7 @@ import { GoogleObject, BusDataResponse } from '../interfaces/ShuttleBusLocation'
 const ShuttleBusTracker: React.FC = () => {
     const [busData, setBusData] = useState<GoogleObject | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [error] = useState<string | null>(null);
+    const error = null;
 
     const fetchBusData = async () => {
         try {
