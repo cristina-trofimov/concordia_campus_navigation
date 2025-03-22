@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, ScrollView, View } from "react-native";
-import Map from "../MapComponent";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider, useCoords } from "../../data/CoordsContext";
 import { IndoorsProvider } from "../../data/IndoorContext";
@@ -10,6 +9,7 @@ import { HomeStyle } from "../../styles/HomeStyle";
 import { FloorSelector } from "../FloorSelector";
 import SearchBars from "../SearchBars";
 import { Text } from "react-native-elements";
+import MapComponent from "../MapComponent";
 
 const { height } = Dimensions.get("window");
 
@@ -19,6 +19,7 @@ export default function HomeScreen() {
 
   const { routeData: routeCoordinates, isTransit } = useCoords();
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
+  const [inputDestination, setInputDestination] = useState<string>("");
 
 
   useEffect(() => {
@@ -78,11 +79,11 @@ export default function HomeScreen() {
         <View style={HomeStyle.container}>
           <CalendarButton />
           <LeftDrawer />
-          <Map drawerHeight={drawerHeight} />
+          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} />
           <FloorSelector />
 
           <BottomDrawer drawerHeight={drawerHeight} >
-            <SearchBars />
+            <SearchBars inputDestination={inputDestination} />
             {/* oviya component  */}
             <View style={HomeStyle.listContent}>
               <ScrollView>

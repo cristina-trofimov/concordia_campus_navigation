@@ -9,13 +9,23 @@ import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 
-const SearchBars: React.FC = () => {
+interface SearchBarProps {
+    inputDestination: string;
+}
+
+
+const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
+    
     const { setRouteData, myLocationString, setIsTransit } = useCoords();
-    const { inFloorView, setInFloorView } = useIndoor();
 
     const [origin, setOrigin] = useState('');
-    const [destination, setDestination] = useState('');
+    const [destination, setDestination] = useState(inputDestination);
     const [time, setTime] = useState('');
+    const { inFloorView, setInFloorView } = useIndoor();
+    
+    useEffect(() => {
+        setDestination(inputDestination);
+    }, [inputDestination]);
 
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {
