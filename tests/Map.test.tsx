@@ -112,7 +112,7 @@ jest.mock('../src/components/ToggleButton', () => {
 });
 
 // Import the component under test
-import Map from '../src/components/MapComponent.tsx';
+import MapComponent from '../src/components/MapComponent.tsx';
 
 // Setup tests
 describe('Map Component', () => {
