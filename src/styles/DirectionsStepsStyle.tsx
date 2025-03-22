@@ -2,29 +2,43 @@ import { StyleSheet } from "react-native";
 
 export const DirectionStepsStyle = StyleSheet.create({
 
-  listContent: {
-    flex: 1,
-    padding: 5,
-    alignItems: "flex-end",
-    justifyContent: "center",
+  container: {
+    flexDirection:'column',
+    flex:1,
   },
   instructionsList: {
-    margin: 6,
-    padding: 16,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 10,
-    textAlign: "left",
-    borderColor: "#f0f0f0",
-    fontSize: 14,
-    lineHeight: 24,
-    fontWeight: "500",
-
+     margin: 6,
+     borderRadius: 10,
+     textAlign: "left",
+     fontSize: 14,
+     lineHeight: 24,
+     fontWeight: "500",
+     flexDirection:'row',
+     paddingHorizontal:8, 
+     paddingVertical:3,
+     alignItems:'flex-end',
   },
   iconsBox: {
     marginRight:20,
     justifyContent:'center',
     alignItems:'center',
     borderRadius: 12,
-    backgroundColor:"purple"
+    width:50,
+    height:50,
+  },
+  instructionText:{
+    flex:1,
+    fontSize:14,
+    lineHeight:24,
+    fontWeight:500,
+    paddingVertical: 8,
+    paddingRight:10,
+    textAlignVertical:'center'
+  },
+  topBorder:{
+    flex:1,
+    borderTopColor:"#f0f0f0",
+    borderTopWidth:2,
+    justifyContent:'center'
   }
 });

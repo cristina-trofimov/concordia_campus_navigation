@@ -10,7 +10,6 @@ import { DirectionStepsStyle } from "../styles/DirectionsStepsStyle";
 import { MaterialIcons} from "@expo/vector-icons";
 
 
-
   const DirectionsSteps = () => {
 
     const { routeData: routeCoordinates,isTransit,setIsTransit} = useCoords();
@@ -47,33 +46,44 @@ import { MaterialIcons} from "@expo/vector-icons";
     }
   }, [routeCoordinates]);
     return(
-        <View style={ DirectionStepsStyle.listContent}>
+        <View style={ DirectionStepsStyle.container}>
         <ScrollView>
         {htmlInstructions.length > 0 &&
           htmlInstructions.map((instruction, index) => {
-            const instructionsIconsDisplay= instruction.toLowerCase().includes('left')?'turn-left':
+            const instructionsIconsDisplay=                                            
+                                            instruction.toLowerCase().includes('destination')?'location-on':
+                                            instruction.toLowerCase().includes('left')?'turn-left':
+                                            instruction.toLowerCase().includes('left')?'turn-left':
                                             instruction.toLowerCase().includes('right')?'turn-right':
+                                            instruction.toLowerCase().includes('walk')?'directions-walk':
+                                            instruction.toLowerCase().includes('bus')?'directions-bus':
+                                            instruction.toLowerCase().includes('metro')?'directions-subway':
+                                            instruction.toLowerCase().includes('merge')?'merge':
+                                            instruction.toLowerCase().includes('straight')?'straight':
+                                            instruction.toLowerCase().includes('continue')?'straight':
+                                            instruction.toLowerCase().includes('northeast')?'turn-slight-right':
+                                            instruction.toLowerCase().includes('northwest')?'turn-slight-left':
+                                            instruction.toLowerCase().includes('exit')?'arrow-outward':
                                                 null;
           return (
             <View key={index} style={ DirectionStepsStyle.instructionsList}>
-             <View>
-              {instructionsIconsDisplay && (
-                <View style={ DirectionStepsStyle.iconsBox}>
-                  <MaterialIcons
-                    name={instructionsIconsDisplay as keyof typeof MaterialIcons.glyphMap}
-                    size={30}
-                    color="black"
-                  />
-                </View>
-              )}
-              </View>
               <View>
-              <Text style={[ DirectionStepsStyle.listContent]}>
-                {instruction}
-              </Text>
+                <View style={ DirectionStepsStyle.iconsBox}>
+                  {instructionsIconsDisplay && (
+                    <MaterialIcons
+                      name={instructionsIconsDisplay as keyof typeof MaterialIcons.glyphMap}
+                      size={30}
+                      color="black"
+                    />
+                )}
+                </View>
+              </View>
+              <View style={DirectionStepsStyle.topBorder}>
+                <Text style={DirectionStepsStyle.instructionText}>
+                  {instruction}
+                </Text>
               </View>
             </View>
-
           );
             
             })}
