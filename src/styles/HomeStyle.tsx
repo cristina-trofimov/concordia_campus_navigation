@@ -30,4 +30,11 @@ export const HomeStyle = StyleSheet.create({
     fontWeight: "500",
 
   },
+  iconsBox: {
+    marginRight:20,
+    justifyContent:'center',
+    alignItems:'center',
+    borderRadius: 12,
+    backgroundColor:"purple"
+  }
 });
