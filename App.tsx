@@ -25,11 +25,23 @@ const theme = createTheme({
 });
 
 export default function App(): React.ReactElement {
+      const [isTesting, setIsTesting] = useState(false);
 useEffect(() => {
-    analytics().setAnalyticsCollectionEnabled(true);
-    crashlytics().setCrashlyticsCollectionEnabled(true);
-    analytics().logAppOpen();
-  }, []);
+  console.log('Initializing Firebase...');
+  analytics().setAnalyticsCollectionEnabled(true);
+  crashlytics().setCrashlyticsCollectionEnabled(true);
+  analytics().logAppOpen();
+
+ if (isTesting) {
+    analytics().logEvent('testing_mode_enabled', {
+      message: 'App is in testing mode.',
+    });
+    console.log('Custom Event Triggered: testing_mode_enabled');
+    console.log('Event Data:', {
+      message: 'App is in testing mode.',
+    });
+  }
+}, [isTesting]);
 
   return (
     <NavigationContainer>
