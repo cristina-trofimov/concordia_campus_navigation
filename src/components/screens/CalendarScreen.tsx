@@ -43,6 +43,7 @@ const currentWeek = (currentDate?: Date): string => {
   const lastDay = new Date(firstDay);
   lastDay.setDate(firstDay.getDate() + 6);
 
+  let month;
   if (firstDay.getDate() > lastDay.getDate()) {
     return `${months[today.getMonth()]} ${firstDay.getDate()} - ${months[lastDay.getMonth()]} ${lastDay.getDate()}, ${today.getFullYear()}`;
   } else {
@@ -105,48 +106,57 @@ const CalendarScreen = () => {
     
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [events, setEvents] = useState<EventItem[]>(testEvents);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
   const [currentDay, setCurrentDate] = useState<Date>(new Date());
 
+  const [eventTitle, setEventTitle] = useState(editingEvent?.title ?? '');
+
+
   const handleSaveEvent = () => {
+    console.log('Save button pressed');
     if (editingEvent) {
       setEvents((prevEvents) =>
         prevEvents.map((e) => (e.id === editingEvent.id ? editingEvent : e))
       );
     }
+    console.log('Attempting to close modal');
     setModalVisible(false);
+    console.log('Modal visibility set to false');
   };
 
 
 const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
   return (
-    <DraggingEvent
-        {...props}
-        TopEdgeComponent={
-          <View
-            style={{
-              height: 10,
-              width: '100%',
-              backgroundColor: 'red',
-              position: 'absolute',
-            }}
-          />
-        }
-        BottomEdgeComponent={
-          <View
-            style={{
-              height: 10,
-              width: '100%',
-              backgroundColor: 'red',
-              bottom: 0,
-              position: 'absolute',
-            }}
-          />
-        }
-      />
+    <React.Fragment>
+      
+      <DraggingEvent
+          {...props}
+          TopEdgeComponent={
+            <View
+              style={{
+                height: 10,
+                width: '100%',
+                backgroundColor: 'red',
+                position: 'absolute',
+              }}
+            />
+          }
+          BottomEdgeComponent={
+            <View
+              style={{
+                height: 10,
+                width: '100%',
+                backgroundColor: 'red',
+                bottom: 0,
+                position: 'absolute',
+              }}
+            />
+          }
+        />
+    </React.Fragment>
   );
 }, []);
 
@@ -189,10 +199,15 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
 
       {/* Renders the calendar view */}
       <CalendarContainer
+        // theme={theme}
         ref={calendarRef}
         allowDragToCreate={true}
-        events={events}
+        // onDragCreateEventStart={handleDragCreateStart}
+        // onDragCreateEventEnd={handleDragCreateEvent}
+        events={testEvents}
+        // events={events}
         dragStep={15}
+        // onPressEvent={handleEventPress}
       >
         <CalendarHeader />
         <CalendarBody renderDraggingEvent={renderDraggingEvent} />
@@ -203,6 +218,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
+          console.log('Modal onRequestClose triggered');
           setModalVisible(false);
         }}
         animationType="fade"
@@ -223,7 +239,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             />
 
             <View onTouchEnd={() => { setModalVisible(false); } } >
-              <Button title="Cancel 2" onPress={ () => { setModalVisible(false); console.log('Modal content touched') } } />
+              <Button title="Cancel 2" onPress={ () => console.log('Modal content touched')} />
             </View>
             <Button title="Save" onPress={() => { handleSaveEvent(); }} />
             <Button title="Cancel 3" onPress={() => { setModalVisible(false); }} />

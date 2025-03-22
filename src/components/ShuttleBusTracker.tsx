@@ -8,7 +8,7 @@ import { GoogleObject, BusDataResponse } from '../interfaces/ShuttleBusLocation'
 const ShuttleBusTracker: React.FC = () => {
     const [busData, setBusData] = useState<GoogleObject | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [error] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     const fetchBusData = async () => {
         try {
@@ -64,6 +64,8 @@ const ShuttleBusTracker: React.FC = () => {
         return null;
     }
 
+    //TODO Need to make sure with Boudour that this change doesn't negatively impact the code
+    // if (!busData || !busData.Points) {
     if (busData?.Points == null) {
         return null;
     }

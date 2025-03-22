@@ -51,7 +51,7 @@ export default function Map({
 
   const cameraRef = useRef<Camera | null>(null);
   const mapRef = useRef<Mapbox.MapView | null>(null);
-  let currentCoords = sgwCoords;
+  const [currentCoords, setCurrentCoords] = useState(sgwCoords);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
@@ -176,7 +176,7 @@ export default function Map({
 
   const handleCampusChange = (isSGW: boolean) => {
     const coords = isSGW ? sgwCoords : loyolaCoords;
-    currentCoords = coords;
+    setCurrentCoords(coords);
 
     if (mapLoaded && cameraRef.current) {
       cameraRef.current.setCamera({
@@ -230,7 +230,7 @@ export default function Map({
 
         {myLocationCoords && (
           <PointAnnotation
-            key={`<span class="math-inline">{myLocation.latitude}-</span>{myLocation.longitude}-${forceUpdate}`}
+            key={`<span class="math-inline">\{myLocation\.latitude\}\-</span>{myLocation.longitude}-${forceUpdate}`}
             id="my-location"
             coordinate={[myLocationCoords.longitude, myLocationCoords.latitude]}
           >

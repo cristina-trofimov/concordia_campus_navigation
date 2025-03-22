@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   View,
@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
 
-const { height } = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;
 const EXPANDED_HEIGHT = height * 0.5;
 const FULL_EXPANDED_HEIGHT = height * 0.85;
@@ -18,8 +18,8 @@ function BottomDrawer({
   children,
   drawerHeight,
 }: {
-  children: Readonly<ReactNode>;
-  drawerHeight: Readonly<Animated.Value>;
+  children: ReactNode;
+  drawerHeight: Animated.Value;
 }) {
   const currentHeightRef = useRef<number>(EXPANDED_HEIGHT);
 
