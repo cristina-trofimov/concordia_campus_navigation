@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest",
     "detox-build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+    "coverage": "jest --coverage",
     "detox-test": "detox test --configuration android.emu.debug",
     "start": "expo start --dev-client",
     "android": "expo run:android",
@@ -91,11 +92,13 @@
   "jest": {
     "preset": "jest-expo",
     "moduleNameMapper": {
-      "^expo-modules-core$": "/Users/constance/Downloads/concordia_campus_navigation-jest-fix/tests/_mocks_/@rnmapbox/maps.js"
+      "^expo-modules-core$": "<rootDir>/tests/_mocks_/@rnmapbox/maps.js", 
+      "@env": "<rootDir>/tests/mock-env.ts"
     },
     "setupFiles": [
       "./tests/jestSetup.ts"
     ],
+    "testMatch": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[tj]s?(x)"],
     "transformIgnorePatterns": [
       "node_modules/(?!(@rneui|@rnmapbox|react-native|expo|@react-native|@expo|react-navigation|@react-navigation/.*|@mapbox|@unimodules|unimodules|sentry-expo|native-base|react-native-svg))"
     ]
