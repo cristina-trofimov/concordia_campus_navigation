@@ -40,6 +40,8 @@ sonar {
             property "sonar.pullrequest.branch", System.getenv("GITHUB_PR_BRANCH")
             property "sonar.pullrequest.base", System.getenv("GITHUB_PR_BASE")
         }
+    }
+}
 
 apply plugin: "com.facebook.react.rootproject"
 

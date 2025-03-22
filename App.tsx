@@ -10,7 +10,7 @@ import analytics from '@react-native-firebase/analytics';
 import crashlytics from '@react-native-firebase/crashlytics';
 
 const Stack = createNativeStackNavigator();
-
+(globalThis as any).isTesting = false; // when doing usability testing
 export type RootStackParamList = {
   Home: undefined;
   Calendar: undefined;
@@ -25,23 +25,19 @@ const theme = createTheme({
 });
 
 export default function App(): React.ReactElement {
-      const [isTesting, setIsTesting] = useState(false);
 useEffect(() => {
   console.log('Initializing Firebase...');
   analytics().setAnalyticsCollectionEnabled(true);
   crashlytics().setCrashlyticsCollectionEnabled(true);
   analytics().logAppOpen();
 
- if (isTesting) {
+ if (globalThis.isTesting) {
     analytics().logEvent('testing_mode_enabled', {
       message: 'App is in testing mode.',
     });
     console.log('Custom Event Triggered: testing_mode_enabled');
-    console.log('Event Data:', {
-      message: 'App is in testing mode.',
-    });
   }
-}, [isTesting]);
+}, []);
 
   return (
     <NavigationContainer>
