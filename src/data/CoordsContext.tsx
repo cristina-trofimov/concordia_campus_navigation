@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useMemo } from 'react';
 import { CoordsContextType } from '../interfaces/CoordsContextType';
 
 export const CoordsContext = createContext<CoordsContextType>({
@@ -10,6 +10,10 @@ export const CoordsContext = createContext<CoordsContextType>({
     setmyLocationString: () => { },
     isTransit: false,
     setIsTransit: () => { },
+    highlightedBuilding: null,
+    setHighlightedBuilding: () => { },
+    myLocationCoords: null,
+    setMyLocationCoords: () => { },
 });
 
 export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -17,20 +21,27 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [isInsideBuilding, setIsInsideBuilding] = useState<boolean>(false);
     const [myLocationString, setmyLocationString] = useState<string>("");
     const [isTransit, setIsTransit] = useState<boolean>(false);
+    const [highlightedBuilding, setHighlightedBuilding] = useState<any>(null);
+    const [myLocationCoords, setMyLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
 
-
-    return (
-        <CoordsContext.Provider value={{
-            routeData,
-            setRouteData,
-            isInsideBuilding,
-            setIsInsideBuilding,
-            myLocationString,
-            setmyLocationString,
-            isTransit,
-            setIsTransit
-        }}>
-            {children}
+    const contextValue = useMemo(() => ({
+        routeData,
+        setRouteData,
+        isInsideBuilding,
+        setIsInsideBuilding,
+        myLocationString,
+        setmyLocationString,
+        isTransit,
+        setIsTransit,
+        highlightedBuilding,
+        setHighlightedBuilding,
+        myLocationCoords,
+        setMyLocationCoords,
+      }), [routeData, isInsideBuilding, myLocationString, isTransit, highlightedBuilding, myLocationCoords]);
+    
+      return (
+        <CoordsContext.Provider value={contextValue}>
+          {children}
         </CoordsContext.Provider>
     );
 };

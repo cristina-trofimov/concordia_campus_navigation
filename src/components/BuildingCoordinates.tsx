@@ -3,13 +3,20 @@ import Mapbox from '@rnmapbox/maps';
 import * as turf from '@turf/turf';
 import { buildingFeatures } from '../data/buildingFeatures.ts'
 import { useCoords } from "../data/CoordsContext";
+import { useIndoor } from "../data/IndoorContext";
 
-interface HighlightBuildingProps {
-  userCoordinates: [number, number] | null;
-}
+export const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
+  if (!coordinates || !Array.isArray(coordinates)) {
+    console.warn("Invalid coordinates input:", coordinates);
+    return [];
+  }
 
-const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
   return coordinates.map((ring) => {
+    if (!ring || !Array.isArray(ring) || ring.length === 0) {
+      console.warn("Invalid ring in coordinates:", ring);
+      return [];
+    }
+
     const firstCoord = ring[0];
     const lastCoord = ring[ring.length - 1];
 
@@ -21,7 +28,7 @@ const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
   });
 };
 
-const fixedBuildingFeatures = buildingFeatures.map((feature) => {
+export const fixedBuildingFeatures = buildingFeatures.map((feature) => {
   return {
     ...feature,
     geometry: {
@@ -31,76 +38,84 @@ const fixedBuildingFeatures = buildingFeatures.map((feature) => {
   };
 });
 
-export const HighlightBuilding = ({ userCoordinates }: HighlightBuildingProps) => {
-  const { setIsInsideBuilding } = useCoords();
+export const HighlightBuilding = () => {
+  const { setIsInsideBuilding, highlightedBuilding, setHighlightedBuilding, myLocationCoords } = useCoords();
+  const { inFloorView } = useIndoor();
 
   const swappedUserCoordinates = useMemo(() => {
-    if (!userCoordinates) return null;
-    const [latitude, longitude] = userCoordinates;
+    if (!myLocationCoords) return null;
+    const { latitude, longitude } = myLocationCoords;
     return [longitude, latitude];
-  }, [userCoordinates]);
-
-  const highlightedBuilding = useMemo(() => {
-    if (!swappedUserCoordinates) return null;
-    return fixedBuildingFeatures.find((feature) =>
-      turf.booleanPointInPolygon(
-        turf.point(swappedUserCoordinates),
-        turf.polygon(feature.geometry.coordinates)
-      )
-    );
-  }, [swappedUserCoordinates]);
+  }, [myLocationCoords]);
 
   // Update the context state whenever user location changes
   useEffect(() => {
-    setIsInsideBuilding(!!highlightedBuilding);
-  }, [highlightedBuilding, setIsInsideBuilding]);
+    if (swappedUserCoordinates) {
+      const building = buildingFeatures.find((feature) => {
+        if (!feature.geometry || !feature.geometry.coordinates) {
+          console.warn("Invalid feature geometry:", feature);
+          return false;
+        }
 
-  if (!userCoordinates) {
+        const fixedCoordinates = fixPolygonCoordinates(feature.geometry.coordinates);
+        return turf.booleanPointInPolygon(
+          turf.point(swappedUserCoordinates),
+          turf.polygon(fixedCoordinates)
+        );
+      });
+      setHighlightedBuilding(building);
+      setIsInsideBuilding(!!building);
+    }
+  }, [swappedUserCoordinates, setHighlightedBuilding, setIsInsideBuilding]);
+
+  if (!myLocationCoords) {
     return null;
   }
 
   return (
     <>
-
-      <Mapbox.ShapeSource
-        id="buildings1"
-        shape={{
-          type: 'FeatureCollection',
-          features: fixedBuildingFeatures,
-        }}
-      >
-        <Mapbox.FillExtrusionLayer
-          id="all-buildings"
-          minZoomLevel={0}
-          maxZoomLevel={22}
-          style={{
-            fillExtrusionColor: ['get', 'color'],
-            fillExtrusionHeight: ['get', 'height'],
-            fillExtrusionOpacity: 0.3,
-          }}
-        />
-      </Mapbox.ShapeSource>
-
-
-      {highlightedBuilding && (
-        <Mapbox.ShapeSource
-          id="highlighted-building"
-          shape={{
-            type: 'FeatureCollection',
-            features: [highlightedBuilding],
-          }}
-        >
-          <Mapbox.FillExtrusionLayer
-            id="highlighted-building-layer"
-            minZoomLevel={0}
-            maxZoomLevel={22}
-            style={{
-              fillExtrusionColor: '#F37413',
-              fillExtrusionHeight: ['get', 'height'],
-              fillExtrusionOpacity: 0.45,
+      {!inFloorView && (
+        <>
+          <Mapbox.ShapeSource
+            id="buildings1"
+            shape={{
+              type: 'FeatureCollection',
+              features: fixedBuildingFeatures,
             }}
-          />
-        </Mapbox.ShapeSource>
+          >
+            <Mapbox.FillExtrusionLayer
+              id="all-buildings"
+              minZoomLevel={0}
+              maxZoomLevel={22}
+              style={{
+                fillExtrusionColor: ['get', 'color'],
+                fillExtrusionHeight: ['get', 'height'],
+                fillExtrusionOpacity: 0.3,
+              }}
+            />
+          </Mapbox.ShapeSource>
+
+          {highlightedBuilding && (
+            <Mapbox.ShapeSource
+              id="highlighted-building"
+              shape={{
+                type: 'FeatureCollection',
+                features: [highlightedBuilding],
+              }}
+            >
+              <Mapbox.FillExtrusionLayer
+                id="highlighted-building-layer"
+                minZoomLevel={0}
+                maxZoomLevel={22}
+                style={{
+                  fillExtrusionColor: '#F37413',
+                  fillExtrusionHeight: ['get', 'height'],
+                  fillExtrusionOpacity: 0.3,
+                }}
+              />
+            </Mapbox.ShapeSource>
+          )}
+        </>
       )}
     </>
   );
