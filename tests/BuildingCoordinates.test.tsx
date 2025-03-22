@@ -6,15 +6,16 @@
 import '@testing-library/jest-dom';
 
 // Mock @rnmapbox/maps first
+// Mock @rnmapbox/maps first
 jest.mock('@rnmapbox/maps', () => {
   return {
-    ShapeSource: jest.fn(({ id, children, ...props }) => (
-      <div data-testid={`shape-source-${id}`} {...props}>
+    ShapeSource: jest.fn(({ id, children, minZoomLevel, maxZoomLevel, ...validDOMProps }) => (
+      <div data-testid={`shape-source-${id}`} {...validDOMProps}>
         {children}
       </div>
     )),
-    FillExtrusionLayer: jest.fn(({ id, ...props }) => (
-      <div data-testid={`fill-extrusion-layer-${id}`} {...props} />
+    FillExtrusionLayer: jest.fn(({ id, minZoomLevel, maxZoomLevel, ...otherProps }) => (
+      <div data-testid={`fill-extrusion-layer-${id}`} {...otherProps} />
     ))
   };
 });

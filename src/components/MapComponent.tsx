@@ -1,6 +1,5 @@
 import {
   Dimensions,
-  StyleSheet,
   View,
   Image,
   TouchableOpacity,
@@ -12,28 +11,35 @@ import { Text } from "@rneui/themed";
 import { locations } from "../data/buildingLocation.ts";
 import * as Location from "expo-location";
 import { useCoords } from "../data/CoordsContext.tsx";
+import { useIndoor } from "../data/IndoorContext";
 import ToggleButton from "./ToggleButton";
 import Polyline from "@mapbox/polyline";
 import { Coords } from "../interfaces/Map.ts";
 import { MAPBOX_TOKEN } from "@env";
 
-import { HighlightBuilding } from "./BuildingCoordinates";
+import { HighlightBuilding } from "./BuildingCoordinates.tsx";
 import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
+import { HighlightIndoorMap } from './IndoorMap.tsx'; 
+import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
-export default function Map({
+export default function MapComponent({
   drawerHeight,
+  setInputDestination,
 }: {
-  drawerHeight: Readonly<Animated.Value>;
+    readonly drawerHeight: Animated.Value;
+    setInputDestination: (inputDestination: string) => void;
 }) {
   const {
     routeData: routeCoordinates,
     setmyLocationString,
-    myLocationString,
+    myLocationCoords,
+    setMyLocationCoords,
   } = useCoords();
+  const { inFloorView } = useIndoor();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -46,21 +52,11 @@ export default function Map({
   };
 
   const cameraRef = useRef<Camera | null>(null);
-  const [myLocation, setMyLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
   const mapRef = useRef<Mapbox.MapView | null>(null);
-  const [currentCoords, setCurrentCoords] = useState(sgwCoords);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
-
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
-
-  const [selectedBuilding, setSelectedBuilding] =
-    useState<BuildingLocation | null>(null);
-
-  console.log({ selectedBuilding });
+  const [selectedBuilding, setSelectedBuilding] = useState<BuildingLocation | null>(null);
 
   const openOverlay = (building: BuildingLocation) => {
     setSelectedBuilding(building);
@@ -73,12 +69,12 @@ export default function Map({
   const [decodedPolyline, setDecodedPolyline] = useState<Coords[]>([]);
 
   useEffect(() => {
-    if (myLocation) {
-      const { latitude, longitude } = myLocation;
+    if (myLocationCoords) {
+      const { latitude, longitude } = myLocationCoords;
       const locationString = `${latitude},${longitude}`;
       setmyLocationString(locationString);
     }
-  }, [myLocation, setmyLocationString]);
+  }, [myLocationCoords, setmyLocationString]);
 
   useEffect(() => {
     if (routeCoordinates && routeCoordinates.length > 0) {
@@ -127,7 +123,7 @@ export default function Map({
       },
       (location) => {
         console.log("User location updated:", location.coords);
-        setMyLocation(location.coords);
+        setMyLocationCoords(location.coords);
       }
     );
 
@@ -146,7 +142,7 @@ export default function Map({
   // Trigger a re-render when the user location changes
   useEffect(() => {
     setForceUpdate((prev) => prev + 1);
-  }, [myLocation]);
+  }, [myLocationCoords]);
 
   const _getLocation = async () => {
     try {
@@ -159,20 +155,20 @@ export default function Map({
 
       let location = await Location.getCurrentPositionAsync({});
       console.log("User location received:", location.coords);
-      setMyLocation(location.coords);
+      setMyLocationCoords(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
     }
   };
 
   const focusOnLocation = () => {
-    if (!myLocation || !cameraRef.current || !mapLoaded) {
+    if (!myLocationCoords || !cameraRef.current || !mapLoaded) {
       console.warn("User location, camera, or map not available.");
       return;
     }
 
     cameraRef.current.setCamera({
-      centerCoordinate: [myLocation.longitude, myLocation.latitude],
+      centerCoordinate: [myLocationCoords.longitude, myLocationCoords.latitude],
       zoomLevel: 17,
       animationMode: "flyTo",
       animationDuration: 1000,
@@ -181,7 +177,6 @@ export default function Map({
 
   const handleCampusChange = (isSGW: boolean) => {
     const coords = isSGW ? sgwCoords : loyolaCoords;
-    setCurrentCoords(coords);
 
     if (mapLoaded && cameraRef.current) {
       cameraRef.current.setCamera({
@@ -196,22 +191,20 @@ export default function Map({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={MapComponentStyles.container}>
       <BuildingInformation
         isVisible={isOverlayVisible}
         onClose={closeOverlay}
         buildingLocation={selectedBuilding}
+        setInputDestination={setInputDestination}
       />
       <MapView
-        style={styles.map}
+        style={MapComponentStyles.map}
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding
-          userCoordinates={
-            myLocation ? [myLocation.latitude, myLocation.longitude] : null
-          }
-        />
+        <HighlightBuilding/>
+        <HighlightIndoorMap/>
         <Camera
           ref={(ref) => {
             cameraRef.current = ref;
@@ -230,17 +223,17 @@ export default function Map({
               openOverlay(location);
             }}
           >
-            <View style={styles.marker}>
-              <Text style={styles.markerText}>📍</Text>
+            <View style={MapComponentStyles.marker}>
+              <Text style={MapComponentStyles.markerText}>📍</Text>
             </View>
           </Mapbox.PointAnnotation>
         ))}
 
-        {myLocation && (
+        {myLocationCoords && (
           <PointAnnotation
-            key={`<span class="math-inline">\{myLocation\.latitude\}\-</span>{myLocation.longitude}-${forceUpdate}`}
+            key={`<span class="math-inline">{myLocation.latitude}-</span>{myLocation.longitude}-${forceUpdate}`}
             id="my-location"
-            coordinate={[myLocation.longitude, myLocation.latitude]}
+            coordinate={[myLocationCoords.longitude, myLocationCoords.latitude]}
           >
             <Image
               source={require("../resources/images/currentLocation-Icon.png")}
@@ -294,7 +287,7 @@ export default function Map({
 
       <Animated.View
         style={[
-          styles.buttonContainer,
+          MapComponentStyles.buttonContainer,
           {
             bottom: drawerHeight.interpolate({
               inputRange: [
@@ -312,15 +305,15 @@ export default function Map({
           },
         ]}
       >
-        <TouchableOpacity onPress={focusOnLocation} style={styles.imageButton}>
+        <TouchableOpacity onPress={focusOnLocation} style={MapComponentStyles.imageButton}>
           <Image
             source={require("../resources/images/currentLocation-button.png")}
-            style={styles.buttonImage}
+            style={MapComponentStyles.buttonImage}
           />
         </TouchableOpacity>
       </Animated.View>
 
-      <View style={styles.toggleButtonContainer}>
+      { !inFloorView && (<View style={MapComponentStyles.toggleButtonContainer}>
         <ToggleButton
           mapRef={mapRef}
           sgwCoords={sgwCoords}
@@ -329,64 +322,7 @@ export default function Map({
           initialCampus={true}
         />
       </View>
+      )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  map: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
-  buttonContainer: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-    alignItems: "center",
-  },
-  buttonImage: {
-    width: 50,
-    height: 50,
-    resizeMode: "contain",
-  },
-  imageButton: {
-    padding: 10,
-    backgroundColor: "transparent",
-    borderRadius: 40,
-  },
-  annotationImage: {
-    width: 30,
-    height: 30,
-  },
-  toggleButtonContainer: {
-    position: "absolute",
-    top: 20,
-    alignItems: "center",
-  },
-  marker: {
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  markerText: {
-    fontSize: 24,
-  },
-  callout: {
-    padding: 10,
-    backgroundColor: "white",
-    borderRadius: 5,
-    width: 150,
-  },
-  calloutTitle: {
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-  calloutDescription: {
-    fontSize: 14,
-  },
-});
