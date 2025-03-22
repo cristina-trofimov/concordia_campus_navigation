@@ -8,12 +8,23 @@ import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 
-const SearchBars: React.FC = () => {
-    const { setRouteData, myLocationString,setIsTransit } = useCoords();
+interface SearchBarProps {
+    inputDestination: string;
+}
+
+
+const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
+    
+    const { setRouteData, myLocationString, setIsTransit } = useCoords();
 
     const [origin, setOrigin] = useState('');
-    const [destination, setDestination] = useState('');
-    const [time, setTime]=useState('');
+    const [destination, setDestination] = useState(inputDestination);
+    console.log("Destination inside serach bars",destination);
+    const [time, setTime] = useState('');
+    
+    useEffect(() => {
+        setDestination(inputDestination);
+    }, [inputDestination]);
 
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {

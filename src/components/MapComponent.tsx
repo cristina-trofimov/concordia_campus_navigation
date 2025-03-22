@@ -26,8 +26,10 @@ Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function MapComponent({
   drawerHeight,
+  setInputDestination,
 }: {
-  readonly drawerHeight: Animated.Value;
+    readonly drawerHeight: Animated.Value;
+    setInputDestination: (inputDestination: string) => void;
 }) {
   const {
     routeData: routeCoordinates,
@@ -198,6 +200,7 @@ export default function MapComponent({
         isVisible={isOverlayVisible}
         onClose={closeOverlay}
         buildingLocation={selectedBuilding}
+        setInputDestination={setInputDestination}
       />
       <MapView
         style={MapComponentStyles.map}
