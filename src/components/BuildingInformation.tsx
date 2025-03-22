@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import Modal from 'react-native-modal';
-import { Icon } from 'react-native-elements'; 
+import { Icon } from 'react-native-elements';
 import BuildingLocation from '../interfaces/buildingLocation';
 import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
 
@@ -9,12 +9,13 @@ interface BuildingInformationProps {
     isVisible: boolean;
     onClose: () => void;
     buildingLocation: BuildingLocation | null;
-
+    setInputDestination: (inputDestination: string) => void;
 }
 
-const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation }) => {
+const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation, setInputDestination }) => {
     const { title, description, buildingInfo } = buildingLocation || {};
     const { photo, address, departments, services } = buildingInfo || {};
+
 
     return (
         <Modal isVisible={isVisible} onBackdropPress={onClose} onBackButtonPress={onClose}>
@@ -23,10 +24,16 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                     <View style={BuildingInfoStyle.card}>
                         <View style={BuildingInfoStyle.titleContainer}>
                             <Text style={BuildingInfoStyle.title}>{title}</Text>
-                            <TouchableOpacity style={BuildingInfoStyle.actionButton} onPress={() => console.log('Button Pressed')}>
+                            <TouchableOpacity
+                                style={BuildingInfoStyle.actionButton}
+                                onPress={() => {
+                                    setInputDestination(address || "");
+                                    onClose();
+                                }}
+                            >
                                 <Icon
                                     name="directions"
-                                    type="material"  
+                                    type="material"
                                     size={32}
                                     color="white"
                                 />

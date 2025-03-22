@@ -43,7 +43,6 @@ const currentWeek = (currentDate?: Date): string => {
   const lastDay = new Date(firstDay);
   lastDay.setDate(firstDay.getDate() + 6);
 
-  let month;
   if (firstDay.getDate() > lastDay.getDate()) {
     return `${months[today.getMonth()]} ${firstDay.getDate()} - ${months[lastDay.getMonth()]} ${lastDay.getDate()}, ${today.getFullYear()}`;
   } else {
@@ -106,57 +105,48 @@ const CalendarScreen = () => {
     
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [events, setEvents] = useState<EventItem[]>([]);
+  const [events, setEvents] = useState<EventItem[]>(testEvents);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
-  const [currentDay, setCurrentDate] = useState<Date>(new Date());
-
-  const [eventTitle, setEventTitle] = useState(editingEvent?.title ?? '');
-
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   const handleSaveEvent = () => {
-    console.log('Save button pressed');
     if (editingEvent) {
       setEvents((prevEvents) =>
         prevEvents.map((e) => (e.id === editingEvent.id ? editingEvent : e))
       );
     }
-    console.log('Attempting to close modal');
     setModalVisible(false);
-    console.log('Modal visibility set to false');
   };
 
 
 const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
   return (
-    <React.Fragment>
-      
-      <DraggingEvent
-          {...props}
-          TopEdgeComponent={
-            <View
-              style={{
-                height: 10,
-                width: '100%',
-                backgroundColor: 'red',
-                position: 'absolute',
-              }}
-            />
-          }
-          BottomEdgeComponent={
-            <View
-              style={{
-                height: 10,
-                width: '100%',
-                backgroundColor: 'red',
-                bottom: 0,
-                position: 'absolute',
-              }}
-            />
-          }
-        />
-    </React.Fragment>
+    <DraggingEvent
+        {...props}
+        TopEdgeComponent={
+          <View
+            style={{
+              height: 10,
+              width: '100%',
+              backgroundColor: 'red',
+              position: 'absolute',
+            }}
+          />
+        }
+        BottomEdgeComponent={
+          <View
+            style={{
+              height: 10,
+              width: '100%',
+              backgroundColor: 'red',
+              bottom: 0,
+              position: 'absolute',
+            }}
+          />
+        }
+      />
   );
 }, []);
 
@@ -176,7 +166,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             <TouchableOpacity
               onPress={ () => {
                 calendarRef.current?.goToPrevPage(true);
-                setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() - 7)));
+                setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() - 7)));
               }}
             >
               <Feather name="chevron-left" size={28} color="black" />
@@ -184,12 +174,12 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             <TouchableOpacity
               onPress={ () => {
                 calendarRef.current?.goToNextPage(true);
-                setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() + 7)));
+                setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() + 7)));
               }}
             >
               <Feather name="chevron-right" size={28} color="black" />
             </TouchableOpacity>
-            <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDay)}</Text>
+            <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDate)}</Text>
           </View>
         </View>
         <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
@@ -199,15 +189,10 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
 
       {/* Renders the calendar view */}
       <CalendarContainer
-        // theme={theme}
         ref={calendarRef}
         allowDragToCreate={true}
-        // onDragCreateEventStart={handleDragCreateStart}
-        // onDragCreateEventEnd={handleDragCreateEvent}
-        events={testEvents}
-        // events={events}
+        events={events}
         dragStep={15}
-        // onPressEvent={handleEventPress}
       >
         <CalendarHeader />
         <CalendarBody renderDraggingEvent={renderDraggingEvent} />
@@ -218,7 +203,6 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          console.log('Modal onRequestClose triggered');
           setModalVisible(false);
         }}
         animationType="fade"
@@ -239,7 +223,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             />
 
             <View onTouchEnd={() => { setModalVisible(false); } } >
-              <Button title="Cancel 2" onPress={ () => console.log('Modal content touched')} />
+              <Button title="Cancel 2" onPress={ () => { setModalVisible(false); console.log('Modal content touched') } } />
             </View>
             <Button title="Save" onPress={() => { handleSaveEvent(); }} />
             <Button title="Cancel 3" onPress={() => { setModalVisible(false); }} />
@@ -261,7 +245,5 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
     </View>
   );
 };
-
-
 
 export default CalendarScreen;
