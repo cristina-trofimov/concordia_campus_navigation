@@ -4,13 +4,14 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import SearchBar from './SearchBar';
 import getDirections from './Route';
 import { useCoords } from '../data/CoordsContext';
+import { useIndoor } from '../data/IndoorContext';
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 
 const SearchBars: React.FC = () => {
-    const { setRouteData, myLocationString, setIsTransit, inFloorView, setInFloorView } = useCoords();
-
+    const { setRouteData, myLocationString, setIsTransit } = useCoords();
+    const { inFloorView, setInFloorView } = useIndoor();
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
     const [time, setTime] = useState('');
