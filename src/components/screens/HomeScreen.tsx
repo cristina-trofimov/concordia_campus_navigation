@@ -4,7 +4,6 @@ import { createTheme } from "@rneui/themed";
 import Map from "../Map";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider, useCoords } from "../../data/CoordsContext";
-import { IndoorsProvider } from "../../data/IndoorContext";
 import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
 import { HomeStyle } from "../../styles/HomeStyle";
@@ -83,30 +82,28 @@ export default function HomeScreen() {
 
   return (
     <CoordsProvider>
-      <IndoorsProvider>
-        <View style={HomeStyle.container}>
-          <CalendarButton />
-          <LeftDrawer />
-          <Map drawerHeight={drawerHeight} />
-          <FloorSelector />
+      <View style={HomeStyle.container}>
+        <CalendarButton />
+        <LeftDrawer />
+        <Map drawerHeight={drawerHeight} />
+        <FloorSelector />
+        
+        <BottomDrawer drawerHeight={drawerHeight} >
+          <SearchBars />
+          {/* oviya component  */}
+          <View style={HomeStyle.listContent}>
+            <ScrollView>
+              {htmlInstructions.length > 0 &&
+                htmlInstructions.map((instruction, index) => (
+                  <Text key={index} style={HomeStyle.instructionsList}>
+                    {instruction}
+                  </Text>
+                ))}
+            </ScrollView>
+          </View>
+        </BottomDrawer>
 
-          <BottomDrawer drawerHeight={drawerHeight} >
-            <SearchBars />
-            {/* oviya component  */}
-            <View style={HomeStyle.listContent}>
-              <ScrollView>
-                {htmlInstructions.length > 0 &&
-                  htmlInstructions.map((instruction, index) => (
-                    <Text key={index} style={HomeStyle.instructionsList}>
-                      {instruction}
-                    </Text>
-                  ))}
-              </ScrollView>
-            </View>
-          </BottomDrawer>
-
-        </View>
-      </IndoorsProvider>
+      </View>
     </CoordsProvider>
   );
 }

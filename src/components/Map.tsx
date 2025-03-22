@@ -12,7 +12,6 @@ import { Text } from "@rneui/themed";
 import { locations } from "../data/buildingLocation.ts";
 import * as Location from "expo-location";
 import { useCoords } from "../data/CoordsContext.tsx";
-import { useIndoor } from "../data/IndoorContext";
 import ToggleButton from "./ToggleButton";
 import Polyline from "@mapbox/polyline";
 import { Coords } from "../interfaces/Map.ts";
@@ -22,7 +21,7 @@ import { HighlightBuilding } from "./BuildingCoordinates";
 import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
-import { HighlightIndoorMap } from './IndoorMap.tsx';
+import { HighlightIndoorMap } from './IndoorMap.tsx'; 
 import { MapStyles } from "../styles/MapStyle.tsx";
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
@@ -37,8 +36,8 @@ export default function Map({
     setmyLocationString,
     myLocationCoords,
     setMyLocationCoords,
+    inFloorView,
   } = useCoords();
-  const { inFloorView } = useIndoor();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -203,8 +202,8 @@ export default function Map({
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding />
-        <HighlightIndoorMap />
+        <HighlightBuilding/>
+        <HighlightIndoorMap/>
         <Camera
           ref={(ref) => {
             cameraRef.current = ref;
@@ -313,7 +312,7 @@ export default function Map({
         </TouchableOpacity>
       </Animated.View>
 
-      {!inFloorView && (<View style={MapStyles.toggleButtonContainer}>
+      { !inFloorView && (<View style={MapStyles.toggleButtonContainer}>
         <ToggleButton
           mapRef={mapRef}
           sgwCoords={sgwCoords}
