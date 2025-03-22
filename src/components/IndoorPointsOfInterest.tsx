@@ -23,7 +23,7 @@ export const IndoorPointsOfInterest = () => {
                             coordinate={centroidCoords}
                         >
                             <View style={{ alignItems: 'center', justifyContent: 'center', opacity: 1 }}>
-                                <FontAwesome5 name="restroom" size={18} color="#007AFF" />
+                                <FontAwesome5 name="restroom" size={23} color="#007AFF" />
                             </View>
                         </Mapbox.PointAnnotation>
                     );
@@ -43,7 +43,7 @@ export const IndoorPointsOfInterest = () => {
                             coordinate={centroidCoords}
                         >
                             <View style={{ alignItems: 'center', justifyContent: 'center', opacity: 1 }}>
-                                <FontAwesome6 name="elevator" size={25} color="dark grey" />
+                                <FontAwesome6 name="elevator" size={28} color="dark grey" />
                             </View>
                         </Mapbox.PointAnnotation>
                     );
@@ -63,7 +63,7 @@ export const IndoorPointsOfInterest = () => {
                             coordinate={centroidCoords}
                         >
                             <View style={{ alignItems: 'center', justifyContent: 'center', opacity: 1 }}>
-                                <MaterialCommunityIcons name="escalator" size={28} color="#CBEDFB" />
+                                <MaterialCommunityIcons name="escalator" size={35} color="#B16200" />
                             </View>
                         </Mapbox.PointAnnotation>
                     );
@@ -83,7 +83,7 @@ export const IndoorPointsOfInterest = () => {
                             coordinate={centroidCoords}
                         >
                             <View style={{ alignItems: 'center', justifyContent: 'center', opacity: 1 }}>
-                                <FontAwesome6 name="stairs" size={20} color="#8B4513" />
+                                <FontAwesome6 name="stairs" size={25} color="#8B4513" />
                             </View>
                         </Mapbox.PointAnnotation>
                     );
@@ -103,7 +103,7 @@ export const IndoorPointsOfInterest = () => {
                             coordinate={centroidCoords}
                         >
                             <View style={{ alignItems: 'center', justifyContent: 'center', opacity: 1 }}>
-                                <FontAwesome5 name="coffee" size={23} color="#B8C831" />
+                                <FontAwesome5 name="coffee" size={25} color="#422B25" />
                             </View>
                         </Mapbox.PointAnnotation>
                     );
