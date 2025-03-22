@@ -20,8 +20,6 @@ export default function HomeScreen() {
   const { routeData: routeCoordinates, isTransit } = useCoords();
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
   const [inputDestination, setInputDestination] = useState<string>("");
-  console.log({ inputDestination });
-
 
 
   useEffect(() => {
