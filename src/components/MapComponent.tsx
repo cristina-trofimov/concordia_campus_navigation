@@ -310,7 +310,7 @@ export default function MapComponent({
         </TouchableOpacity>
       </Animated.View>
 
-      <View style={MapComponentStyles.toggleButtonContainer}>
+      { !inFloorView && (<View style={MapComponentStyles.toggleButtonContainer}>
         <ToggleButton
           mapRef={mapRef}
           sgwCoords={sgwCoords}
@@ -319,6 +319,7 @@ export default function MapComponent({
           initialCampus={true}
         />
       </View>
+      )}
     </View>
   );
 }
