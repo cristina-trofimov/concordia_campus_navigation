@@ -21,7 +21,7 @@ import { HighlightBuilding } from "./BuildingCoordinates.tsx";
 import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
-import { HighlightIndoorMap } from './IndoorMap.tsx'; 
+import { HighlightIndoorMap } from './IndoorMap.tsx';
 import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
@@ -30,8 +30,8 @@ export default function MapComponent({
   drawerHeight,
   setInputDestination,
 }: {
-    readonly drawerHeight: Animated.Value;
-    setInputDestination: (inputDestination: string) => void;
+  readonly drawerHeight: Animated.Value;
+  setInputDestination: (inputDestination: string) => void;
 }) {
   const {
     routeData: routeCoordinates,
@@ -122,7 +122,7 @@ export default function MapComponent({
         distanceInterval: 1,
       },
       (location) => {
-        console.log("User location updated:", location.coords);
+        // console.log("User location updated:", location.coords);
         setMyLocationCoords(location.coords);
       }
     );
@@ -154,7 +154,7 @@ export default function MapComponent({
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      console.log("User location received:", location.coords);
+      //console.log("User location received:", location.coords);
       setMyLocationCoords(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
@@ -163,7 +163,6 @@ export default function MapComponent({
 
   const focusOnLocation = () => {
     if (!myLocationCoords || !cameraRef.current || !mapLoaded) {
-      console.warn("User location, camera, or map not available.");
       return;
     }
 
@@ -203,8 +202,8 @@ export default function MapComponent({
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding/>
-        <HighlightIndoorMap/>
+        <HighlightBuilding />
+        <HighlightIndoorMap />
         <Camera
           ref={(ref) => {
             cameraRef.current = ref;
@@ -313,7 +312,7 @@ export default function MapComponent({
         </TouchableOpacity>
       </Animated.View>
 
-      { !inFloorView && (<View style={MapComponentStyles.toggleButtonContainer}>
+      {!inFloorView && (<View style={MapComponentStyles.toggleButtonContainer}>
         <ToggleButton
           mapRef={mapRef}
           sgwCoords={sgwCoords}
