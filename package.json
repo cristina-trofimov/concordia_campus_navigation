@@ -29,6 +29,7 @@
     "@rneui/base": "^4.0.0-rc.7",
     "@rneui/themed": "^4.0.0-rc.8",
     "@rnmapbox/maps": "^10.1.33",
+    "@turf/centroid": "^7.2.0",
     "@turf/turf": "^7.2.0",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
@@ -92,13 +93,16 @@
   "jest": {
     "preset": "jest-expo",
     "moduleNameMapper": {
-      "^expo-modules-core$": "<rootDir>/tests/_mocks_/@rnmapbox/maps.js", 
+      "^expo-modules-core$": "<rootDir>/tests/_mocks_/@rnmapbox/maps.js",
       "@env": "<rootDir>/tests/mock-env.ts"
     },
     "setupFiles": [
       "./tests/jestSetup.ts"
     ],
-    "testMatch": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[tj]s?(x)"],
+    "testMatch": [
+      "**/__tests__/**/*.[jt]s?(x)",
+      "**/?(*.)+(spec|test).[tj]s?(x)"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!(@rneui|@rnmapbox|react-native|expo|@react-native|@expo|react-navigation|@react-navigation/.*|@mapbox|@unimodules|unimodules|sentry-expo|native-base|react-native-svg))"
     ]
