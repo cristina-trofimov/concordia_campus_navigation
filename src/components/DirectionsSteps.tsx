@@ -20,8 +20,6 @@ import { MaterialIcons} from "@expo/vector-icons";
     if (routeCoordinates && routeCoordinates.length > 0) {
       const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => { return step.html_instructions.replace(/<.*?>/g, '').replace(/(?=Destination)/gi, '. '); });
      
-      //Declaring the transit route, they are more precise 
-      //let iconsList : string[]=[];
       let detailedInstructions: string[]=[];
       const number = routeCoordinates[0].legs[0].steps.length;
       const instructionsGeneral = routeCoordinates[0].legs[0].steps.map((step: any) => { return step.html_instructions.replace(/<.*?>/g, ''); });
@@ -34,7 +32,7 @@ import { MaterialIcons} from "@expo/vector-icons";
           detailedInstructions=detailedInstructions.concat(instructionsGeneral[i]);
           detailedInstructions=detailedInstructions.concat(detailedHtmlInstructions);}
       }
-    //Set htmlInstruction to the transit one if chosen mode is transit
+
     if (isTransit==true){
       setHtmlInstructions(detailedInstructions);
     } else {
