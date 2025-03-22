@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, ScrollView, View } from "react-native";
-import { createTheme } from "@rneui/themed";
 import Map from "../MapComponent";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider, useCoords } from "../../data/CoordsContext";
