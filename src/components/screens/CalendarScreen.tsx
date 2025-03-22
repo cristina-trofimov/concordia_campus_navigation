@@ -33,7 +33,6 @@ const theme = {
   selectedDayBackground: '#007bff',
 };
 
-
 const testEvents: EventItem[] = [
   {
     id: '1',
@@ -111,47 +110,41 @@ const CalendarScreen = () => {
   }
 
   const handleSaveEvent = () => {
-    console.log('Save button pressed');
     if (editingEvent) {
       setEvents((prevEvents) =>
         prevEvents.map((e) => (e.id === editingEvent.id ? editingEvent : e))
       );
     }
-    console.log('Attempting to close modal');
     setModalVisible(false);
-    console.log('Modal visibility set to false');
   };
 
 
 const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
   return (
-    <React.Fragment>
-      
-      <DraggingEvent
-          {...props}
-          TopEdgeComponent={
-            <View
-              style={{
-                height: 10,
-                width: '100%',
-                backgroundColor: 'red',
-                position: 'absolute',
-              }}
-            />
-          }
-          BottomEdgeComponent={
-            <View
-              style={{
-                height: 10,
-                width: '100%',
-                backgroundColor: 'red',
-                bottom: 0,
-                position: 'absolute',
-              }}
-            />
-          }
-        />
-    </React.Fragment>
+    <DraggingEvent
+        {...props}
+        TopEdgeComponent={
+          <View
+            style={{
+              height: 10,
+              width: '100%',
+              backgroundColor: 'red',
+              position: 'absolute',
+            }}
+          />
+        }
+        BottomEdgeComponent={
+          <View
+            style={{
+              height: 10,
+              width: '100%',
+              backgroundColor: 'red',
+              bottom: 0,
+              position: 'absolute',
+            }}
+          />
+        }
+      />
   );
 }, []);
 
@@ -194,7 +187,6 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
 
       {/* Renders the calendar view */}
       <CalendarContainer
-        // theme={theme}
         ref={calendarRef}
         onDateChanged={ setCurrentDate }
         allowDragToCreate={true}
@@ -202,7 +194,6 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         // onDragCreateEventEnd={handleDragCreateEvent}
         events={events}
         dragStep={15}
-        // onPressEvent={handleEventPress}
       >
         <CalendarHeader />
         <CalendarBody renderDraggingEvent={renderDraggingEvent} />
@@ -213,7 +204,6 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
-          console.log('Modal onRequestClose triggered');
           setModalVisible(false);
         }}
         animationType="fade"
@@ -234,7 +224,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             />
 
             <View onTouchEnd={() => { setModalVisible(false); } } >
-              <Button title="Cancel 2" onPress={ () => console.log('Modal content touched')} />
+              <Button title="Cancel 2" onPress={ () => { setModalVisible(false); console.log('Modal content touched') } } />
             </View>
             <Button title="Save" onPress={() => { handleSaveEvent(); }} />
             <Button title="Cancel 3" onPress={() => { setModalVisible(false); }} />
