@@ -107,6 +107,7 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
         setDestination("");
         setDestinationCoords(null);
         setRouteData(null);
+        setInFloorView(false);
     }, [setRouteData]);
 
     useEffect(() => {
