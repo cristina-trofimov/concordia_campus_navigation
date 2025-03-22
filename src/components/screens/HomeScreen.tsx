@@ -1,31 +1,25 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, ScrollView, View } from "react-native";
-import { createTheme } from "@rneui/themed";
-import Map from "../Map";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider, useCoords } from "../../data/CoordsContext";
+import { IndoorsProvider } from "../../data/IndoorContext";
 import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
 import { HomeStyle } from "../../styles/HomeStyle";
+import { FloorSelector } from "../FloorSelector";
 import SearchBars from "../SearchBars";
 import { Text } from "react-native-elements";
+import MapComponent from "../MapComponent";
 
 const { height } = Dimensions.get("window");
 
-const theme = createTheme({
-  lightColors: {
-    primary: '#912338',
-    secondary: '#D15329',
-  },
-
-  mode: "light",
-});
 
 export default function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
 
-  const { routeData: routeCoordinates, isTransit, setIsTransit } = useCoords();
+  const { routeData: routeCoordinates, isTransit } = useCoords();
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
+  const [inputDestination, setInputDestination] = useState<string>("");
 
 
   useEffect(() => {
@@ -66,7 +60,7 @@ export default function HomeScreen() {
           );
         }
       }
-      if (isTransit == true) {
+      if (isTransit) {
         setHtmlInstructions(detailedInstructions);
       } else {
         setHtmlInstructions(instructions);
@@ -81,26 +75,30 @@ export default function HomeScreen() {
 
   return (
     <CoordsProvider>
-      <View style={HomeStyle.container}>
-        <CalendarButton />
-        <LeftDrawer />
-        <Map drawerHeight={drawerHeight} />
-        <BottomDrawer drawerHeight={drawerHeight} >
-          <SearchBars />
-          {/* oviya component  */}
-          <View style={HomeStyle.listContent}>
-            <ScrollView>
-              {htmlInstructions.length > 0 &&
-                htmlInstructions.map((instruction, index) => (
-                  <Text key={index} style={HomeStyle.instructionsList}>
-                    {instruction}
-                  </Text>
-                ))}
-            </ScrollView>
-          </View>
+      <IndoorsProvider>
+        <View style={HomeStyle.container}>
+          <CalendarButton />
+          <LeftDrawer />
+          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} />
+          <FloorSelector />
 
-        </BottomDrawer>
-      </View>
+          <BottomDrawer drawerHeight={drawerHeight} >
+            <SearchBars inputDestination={inputDestination} />
+            {/* oviya component  */}
+            <View style={HomeStyle.listContent}>
+              <ScrollView>
+                {htmlInstructions.length > 0 &&
+                  htmlInstructions.map((instruction, index) => (
+                    <Text key={index} style={HomeStyle.instructionsList}>
+                      {instruction}
+                    </Text>
+                  ))}
+              </ScrollView>
+            </View>
+          </BottomDrawer>
+
+        </View>
+      </IndoorsProvider>
     </CoordsProvider>
   );
 }
