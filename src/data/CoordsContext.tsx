@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useMemo } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 import { CoordsContextType } from '../interfaces/CoordsContextType';
 import { BuildingFloorAssociation } from '../interfaces/buildingFloorAssociation';
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature.ts';
@@ -44,36 +44,34 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [currentFloorAssociations, setCurrentFloorAssociations] = useState<BuildingFloorAssociation[]>([]);
     const [indoorFeatures, setIndoorFeatures] = useState<IndoorFeatureCollection[]>([]);
 
-    const contextValue = useMemo(() => ({
-        routeData,
-        setRouteData,
-        isInsideBuilding,
-        setIsInsideBuilding,
-        myLocationString,
-        setmyLocationString,
-        isTransit,
-        setIsTransit,
-        buildingHasFloors,
-        setBuildingHasFloors,
-        highlightedBuilding,
-        setHighlightedBuilding,
-        myLocationCoords,
-        setMyLocationCoords,
-        inFloorView,
-        setInFloorView,
-        currentFloor,
-        setCurrentFloor,
-        floorList,
-        setFloorList,
-        currentFloorAssociations,
-        setCurrentFloorAssociations,
-        indoorFeatures,
-        setIndoorFeatures,
-      }), [routeData, isInsideBuilding, myLocationString, isTransit, buildingHasFloors, highlightedBuilding, myLocationCoords, inFloorView, currentFloor, floorList, currentFloorAssociations, indoorFeatures]);
-    
-      return (
-        <CoordsContext.Provider value={contextValue}>
-          {children}
+    return (
+        <CoordsContext.Provider value={{
+            routeData,
+            setRouteData,
+            isInsideBuilding,
+            setIsInsideBuilding,
+            myLocationString,
+            setmyLocationString,
+            isTransit,
+            setIsTransit,
+            buildingHasFloors,
+            setBuildingHasFloors,
+            highlightedBuilding,
+            setHighlightedBuilding,
+            myLocationCoords,
+            setMyLocationCoords,
+            inFloorView,
+            setInFloorView,
+            currentFloor,
+            setCurrentFloor,
+            floorList,
+            setFloorList,
+            currentFloorAssociations,
+            setCurrentFloorAssociations,
+            indoorFeatures,
+            setIndoorFeatures,
+        }}>
+            {children}
         </CoordsContext.Provider>
     );
 };
