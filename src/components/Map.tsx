@@ -23,7 +23,6 @@ import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
 import { HighlightIndoorMap } from './IndoorMap.tsx'; 
 import { MapStyles } from "../styles/MapStyle.tsx";
-import { useIndoor } from "../data/IndoorContext.tsx";
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
@@ -37,8 +36,8 @@ export default function Map({
     setmyLocationString,
     myLocationCoords,
     setMyLocationCoords,
+    inFloorView,
   } = useCoords();
-  const { inFloorView } = useIndoor();
 
   const sgwCoords = {
     latitude: 45.4949968855897,

@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
-import { useIndoor } from "../data/IndoorContext";
+import { useCoords } from "../data/CoordsContext";
 import { FloorSelectorStyle } from "../styles/FloorSelectorStyle";
 import { useIndoorFeatures } from "../components/IndoorMap";
 
 export const FloorSelector = () => {
-    const { currentFloor, setCurrentFloor, inFloorView, floorList } = useIndoor();
+    const { currentFloor, setCurrentFloor, inFloorView, floorList } = useCoords();
     const { selectIndoorFeatures } = useIndoorFeatures();
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
