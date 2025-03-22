@@ -8,7 +8,6 @@ import { GoogleObject, BusDataResponse } from '../interfaces/ShuttleBusLocation'
 const ShuttleBusTracker: React.FC = () => {
     const [busData, setBusData] = useState<GoogleObject | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const error = null;
 
     const fetchBusData = async () => {
         try {
@@ -58,10 +57,6 @@ const ShuttleBusTracker: React.FC = () => {
                 <ActivityIndicator size="large" color="#0000ff" />
             </View>
         );
-    }
-
-    if (error) {
-        return null;
     }
 
     if (busData?.Points == null) {
