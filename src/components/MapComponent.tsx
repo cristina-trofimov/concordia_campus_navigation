@@ -1,6 +1,5 @@
 import {
   Dimensions,
-  StyleSheet,
   View,
   Image,
   TouchableOpacity,
@@ -18,19 +17,19 @@ import Polyline from "@mapbox/polyline";
 import { Coords } from "../interfaces/Map.ts";
 import { MAPBOX_TOKEN } from "@env";
 
-import { HighlightBuilding } from "./BuildingCoordinates";
+import { HighlightBuilding } from "./BuildingCoordinates.tsx";
 import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
 import { HighlightIndoorMap } from './IndoorMap.tsx'; 
-import { MapStyles } from "../styles/MapStyle.tsx";
+import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
-export default function Map({
+export default function MapComponent({
   drawerHeight,
 }: {
-  drawerHeight: Readonly<Animated.Value>;
+  readonly drawerHeight: Animated.Value;
 }) {
   const {
     routeData: routeCoordinates,
@@ -52,7 +51,6 @@ export default function Map({
 
   const cameraRef = useRef<Camera | null>(null);
   const mapRef = useRef<Mapbox.MapView | null>(null);
-  let currentCoords = sgwCoords;
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
@@ -177,7 +175,6 @@ export default function Map({
 
   const handleCampusChange = (isSGW: boolean) => {
     const coords = isSGW ? sgwCoords : loyolaCoords;
-    currentCoords = coords;
 
     if (mapLoaded && cameraRef.current) {
       cameraRef.current.setCamera({
@@ -192,14 +189,14 @@ export default function Map({
   };
 
   return (
-    <View style={MapStyles.container}>
+    <View style={MapComponentStyles.container}>
       <BuildingInformation
         isVisible={isOverlayVisible}
         onClose={closeOverlay}
         buildingLocation={selectedBuilding}
       />
       <MapView
-        style={MapStyles.map}
+        style={MapComponentStyles.map}
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
@@ -223,8 +220,8 @@ export default function Map({
               openOverlay(location);
             }}
           >
-            <View style={MapStyles.marker}>
-              <Text style={MapStyles.markerText}>📍</Text>
+            <View style={MapComponentStyles.marker}>
+              <Text style={MapComponentStyles.markerText}>📍</Text>
             </View>
           </Mapbox.PointAnnotation>
         ))}
@@ -287,7 +284,7 @@ export default function Map({
 
       <Animated.View
         style={[
-          MapStyles.buttonContainer,
+          MapComponentStyles.buttonContainer,
           {
             bottom: drawerHeight.interpolate({
               inputRange: [
@@ -305,15 +302,15 @@ export default function Map({
           },
         ]}
       >
-        <TouchableOpacity onPress={focusOnLocation} style={MapStyles.imageButton}>
+        <TouchableOpacity onPress={focusOnLocation} style={MapComponentStyles.imageButton}>
           <Image
             source={require("../resources/images/currentLocation-button.png")}
-            style={MapStyles.buttonImage}
+            style={MapComponentStyles.buttonImage}
           />
         </TouchableOpacity>
       </Animated.View>
 
-      { !inFloorView && (<View style={MapStyles.toggleButtonContainer}>
+      <View style={MapComponentStyles.toggleButtonContainer}>
         <ToggleButton
           mapRef={mapRef}
           sgwCoords={sgwCoords}
@@ -322,8 +319,6 @@ export default function Map({
           initialCampus={true}
         />
       </View>
-      )}
     </View>
   );
 }
-

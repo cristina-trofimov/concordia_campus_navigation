@@ -109,7 +109,7 @@ const CalendarScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
-  const [currentDay, setCurrentDate] = useState<Date>(new Date());
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   const handleSaveEvent = () => {
     if (editingEvent) {
@@ -166,7 +166,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             <TouchableOpacity
               onPress={ () => {
                 calendarRef.current?.goToPrevPage(true);
-                setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() - 7)));
+                setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() - 7)));
               }}
             >
               <Feather name="chevron-left" size={28} color="black" />
@@ -174,12 +174,12 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
             <TouchableOpacity
               onPress={ () => {
                 calendarRef.current?.goToNextPage(true);
-                setCurrentDate(new Date(currentDay.setDate(currentDay.getDate() + 7)));
+                setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() + 7)));
               }}
             >
               <Feather name="chevron-right" size={28} color="black" />
             </TouchableOpacity>
-            <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDay)}</Text>
+            <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDate)}</Text>
           </View>
         </View>
         <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
@@ -245,7 +245,5 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
     </View>
   );
 };
-
-
 
 export default CalendarScreen;
