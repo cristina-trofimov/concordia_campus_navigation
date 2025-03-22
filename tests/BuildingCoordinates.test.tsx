@@ -2,119 +2,240 @@
  * @jest-environment jsdom
  */
 
-// Import jest-dom matchers
-import '@testing-library/jest-dom';
-
-// Mock @rnmapbox/maps first
-// Mock @rnmapbox/maps first
-jest.mock('@rnmapbox/maps', () => {
-  return {
-    ShapeSource: jest.fn(({ id, children, minZoomLevel, maxZoomLevel, ...validDOMProps }) => (
-      <div data-testid={`shape-source-${id}`} {...validDOMProps}>
-        {children}
-      </div>
-    )),
-    FillExtrusionLayer: jest.fn(({ id, minZoomLevel, maxZoomLevel, ...otherProps }) => (
-      <div data-testid={`fill-extrusion-layer-${id}`} {...otherProps} />
-    ))
-  };
-});
-
-// Other imports
-import { HighlightBuilding } from '../src/components/BuildingCoordinates.tsx';
-import * as turf from '@turf/turf';
 import React from 'react';
-import { render } from '@testing-library/react';
-import { buildingFeatures } from '../src/data/buildingFeatures.ts';
+import { render, act } from '@testing-library/react';
+import { HighlightBuilding, fixPolygonCoordinates, fixedBuildingFeatures } from '../src/components/BuildingCoordinates';
+import * as turf from '@turf/turf';
+import { useCoords } from "../src/data/CoordsContext";
+import { useIndoor } from "../src/data/IndoorContext";
+import { buildingFeatures } from '../src/data/buildingFeatures';
 
-// Your existing mocks
-jest.mock('@turf/turf', () => {
-  const originalModule = jest.requireActual('@turf/turf');
-  return {
-    ...originalModule,
-    booleanPointInPolygon: jest.fn().mockReturnValue(false),
-    point: jest.fn().mockImplementation((coords) => ({ type: 'Point', coordinates: coords }))
-  };
-});
-
-jest.mock('../src/data/CoordsContext.tsx', () => ({
-  useCoords: jest.fn()
+// Mock the necessary modules and context hooks
+jest.mock('@rnmapbox/maps', () => ({
+  ShapeSource: ({ children }) => <div data-testid="shape-source">{children}</div>,
+  FillExtrusionLayer: () => <div data-testid="fill-extrusion-layer" />,
 }));
 
-const { useCoords } = require('../src/data/CoordsContext.tsx');
-const mockedTurf = turf as jest.Mocked<typeof turf>;
+jest.mock('@turf/turf', () => ({
+  point: jest.fn(),
+  polygon: jest.fn(),
+  booleanPointInPolygon: jest.fn(),
+}));
 
-// Rest of your test file remains the same
+jest.mock('../src/data/CoordsContext');
+jest.mock('../src/data/IndoorContext');
+jest.mock('../src/data/buildingFeatures', () => ({
+  buildingFeatures: [
+    {
+      id: 'building1',
+      type: 'Feature',
+      properties: {
+        name: 'Test Building 1',
+        height: 100,
+        color: '#CCCCCC',
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [1, 2],
+            [3, 4],
+            [5, 6],
+            [1, 2]
+          ]
+        ]
+      }
+    },
+    {
+      id: 'building2',
+      type: 'Feature',
+      properties: {
+        name: 'Test Building 2',
+        height: 150,
+        color: '#DDDDDD',
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [7, 8],
+            [9, 10],
+            [11, 12]
+            // Note: This polygon is not closed
+          ]
+        ]
+      }
+    }
+  ]
+}));
 
-describe('HighlightBuilding', () => {
-  const setIsInsideBuildingMock = jest.fn();
-
-  beforeEach(() => {
-    // Reset all mocks before each test
-    jest.clearAllMocks();
-    
-    // Configure the useCoords mock
-    (useCoords as jest.Mock).mockReturnValue({
-      setIsInsideBuilding: setIsInsideBuildingMock
+describe('BuildingCoordinates', () => {
+  describe('fixPolygonCoordinates', () => {
+    it('should close polygons that are not closed', () => {
+      const coordinates = [
+        [
+          [1, 2],
+          [3, 4],
+          [5, 6]
+        ]
+      ];
+      
+      const result = fixPolygonCoordinates(coordinates);
+      
+      expect(result[0][result[0].length - 1]).toEqual(result[0][0]);
     });
     
-    // Reset the turf booleanPointInPolygon mock for specific tests
-    mockedTurf.booleanPointInPolygon.mockReturnValue(false);
+    it('should not modify already closed polygons', () => {
+      const coordinates = [
+        [
+          [1, 2],
+          [3, 4],
+          [5, 6],
+          [1, 2]
+        ]
+      ];
+      
+      const result = fixPolygonCoordinates(coordinates);
+      
+      expect(result).toEqual(coordinates);
+    });
+    
+    it('should handle invalid input gracefully', () => {
+      expect(fixPolygonCoordinates(null)).toEqual([]);
+      expect(fixPolygonCoordinates(undefined)).toEqual([]);
+      expect(fixPolygonCoordinates([] as any)).toEqual([]);
+    });
   });
-
-  it('renders without user coordinates', () => {
-    const { container } = render(<HighlightBuilding userCoordinates={null} />);
-    // When userCoordinates is null, the component returns null
-    expect(container.firstChild).toBeNull();
-    // setIsInsideBuilding is still called with false when highlightedBuilding is null
-    expect(setIsInsideBuildingMock).toHaveBeenCalledWith(false);
+  
+  describe('fixedBuildingFeatures', () => {
+    it('should contain fixed polygon coordinates', () => {
+      // Check if the second building polygon was fixed (closed)
+      const building2 = fixedBuildingFeatures.find(f => f.id === 'building2');
+      const coords = building2.geometry.coordinates[0];
+      
+      // First and last coordinates should be the same
+      expect(coords[coords.length - 1]).toEqual(coords[0]);
+    });
   });
-
-  it('renders with user coordinates outside any building', () => {
-    const outsideCoords: [number, number] = [40.7128, -74.0060]; // New York coordinates
+  
+  describe('HighlightBuilding component', () => {
+    beforeEach(() => {
+      // Reset all mocks
+      jest.clearAllMocks();
+      
+      // Mock context values
+      (useCoords as jest.Mock).mockReturnValue({
+        setIsInsideBuilding: jest.fn(),
+        highlightedBuilding: null,
+        setHighlightedBuilding: jest.fn(),
+        myLocationCoords: { latitude: 10, longitude: 20 },
+      });
+      
+      (useIndoor as jest.Mock).mockReturnValue({
+        inFloorView: false,
+      });
+      
+      // Mock turf functions
+      turf.point.mockReturnValue('mocked-point');
+      turf.polygon.mockReturnValue('mocked-polygon');
+      turf.booleanPointInPolygon.mockReturnValue(false);
+    });
     
-    const { queryByTestId } = render(<HighlightBuilding userCoordinates={outsideCoords} />);
+    it('should render ShapeSource for buildings when not in floor view', () => {
+      const { getAllByTestId } = render(<HighlightBuilding />);
+      
+      expect(getAllByTestId('shape-source')).toHaveLength(1);
+      expect(getAllByTestId('fill-extrusion-layer')).toHaveLength(1);
+    });
     
-    expect(queryByTestId('shape-source-buildings1')).toBeInTheDocument();
-    expect(queryByTestId('fill-extrusion-layer-all-buildings')).toBeInTheDocument();
-    expect(queryByTestId('shape-source-highlighted-building')).not.toBeInTheDocument();
-    expect(setIsInsideBuildingMock).toHaveBeenCalledWith(false);
-  });
-
-  it('renders with user coordinates inside a building', () => {
-    // Override the default mock to return true for this test
-    mockedTurf.booleanPointInPolygon.mockReturnValue(true);
+    it('should not render when myLocationCoords is null', () => {
+      (useCoords as jest.Mock).mockReturnValue({
+        setIsInsideBuilding: jest.fn(),
+        highlightedBuilding: null,
+        setHighlightedBuilding: jest.fn(),
+        myLocationCoords: null,
+      });
+      
+      const { queryByTestId } = render(<HighlightBuilding />);
+      
+      expect(queryByTestId('shape-source')).toBeNull();
+    });
     
-    const insideCoords: [number, number] = buildingFeatures[0].geometry.coordinates[0][0].slice().reverse();
-    const { queryByTestId } = render(<HighlightBuilding userCoordinates={insideCoords} />);
-
-    expect(queryByTestId('shape-source-buildings1')).toBeInTheDocument();
-    expect(queryByTestId('fill-extrusion-layer-all-buildings')).toBeInTheDocument();
-    expect(queryByTestId('shape-source-highlighted-building')).toBeInTheDocument();
-    expect(queryByTestId('fill-extrusion-layer-highlighted-building-layer')).toBeInTheDocument();
-    expect(setIsInsideBuildingMock).toHaveBeenCalledWith(true);
-  });
-
-  it('updates setIsInsideBuilding when userCoordinates change', () => {
-    // First render with coordinates outside
-    const { rerender } = render(<HighlightBuilding userCoordinates={[40.7128, -74.0060]} />);
+    it('should not render when in floor view', () => {
+      (useIndoor as jest.Mock).mockReturnValue({
+        inFloorView: true,
+      });
+      
+      const { queryByTestId } = render(<HighlightBuilding />);
+      
+      expect(queryByTestId('shape-source')).toBeNull();
+    });
     
-    // Change mock for second render to simulate being inside a building
-    mockedTurf.booleanPointInPolygon.mockReturnValue(true);
+    it('should check if user is inside any building when location changes', () => {
+      const setHighlightedBuilding = jest.fn();
+      const setIsInsideBuilding = jest.fn();
+      
+      (useCoords as jest.Mock).mockReturnValue({
+        setIsInsideBuilding,
+        highlightedBuilding: null,
+        setHighlightedBuilding,
+        myLocationCoords: { latitude: 10, longitude: 20 },
+      });
+      
+      render(<HighlightBuilding />);
+      
+      expect(turf.point).toHaveBeenCalledWith([20, 10]);
+      expect(turf.polygon).toHaveBeenCalled();
+      expect(turf.booleanPointInPolygon).toHaveBeenCalledWith('mocked-point', 'mocked-polygon');
+      expect(setHighlightedBuilding).toHaveBeenCalledWith(undefined);
+      expect(setIsInsideBuilding).toHaveBeenCalledWith(false);
+    });
     
-    // Rerender with different coordinates
-    rerender(<HighlightBuilding userCoordinates={buildingFeatures[0].geometry.coordinates[0][0].slice().reverse()} />);
-
-    expect(setIsInsideBuildingMock).toHaveBeenLastCalledWith(true);
-  });
-
-  it('correctly swaps user coordinates for turf', () => {
-    const userCoordinates: [number, number] = [40.7128, -74.0060];
+    it('should highlight a building when user is inside it', () => {
+      const setHighlightedBuilding = jest.fn();
+      const setIsInsideBuilding = jest.fn();
+      const mockBuilding = buildingFeatures[0];
+      
+      // Mock user being inside a building
+      turf.booleanPointInPolygon.mockReturnValue(true);
+      
+      (useCoords as jest.Mock).mockReturnValue({
+        setIsInsideBuilding,
+        highlightedBuilding: mockBuilding,
+        setHighlightedBuilding,
+        myLocationCoords: { latitude: 10, longitude: 20 },
+      });
+      
+      const { getAllByTestId } = render(<HighlightBuilding />);
+      
+      // Should update context with building info
+      expect(setHighlightedBuilding).toHaveBeenCalledWith(mockBuilding);
+      expect(setIsInsideBuilding).toHaveBeenCalledWith(true);
+      
+      // Should render both all buildings and highlighted building
+      expect(getAllByTestId('shape-source')).toHaveLength(2);
+      expect(getAllByTestId('fill-extrusion-layer')).toHaveLength(2);
+    });
     
-    render(<HighlightBuilding userCoordinates={userCoordinates} />);
-
-    // Check if point was called with swapped coordinates
-    expect(mockedTurf.point).toHaveBeenCalledWith([-74.0060, 40.7128]);
-    expect(mockedTurf.booleanPointInPolygon).toHaveBeenCalled();
+    it('should handle updates to location coordinates', () => {
+      const setHighlightedBuilding = jest.fn();
+      const setIsInsideBuilding = jest.fn();
+      
+      // Initial render with one set of coordinates
+      const { rerender } = render(<HighlightBuilding />);
+      
+      // Then update with new coordinates
+      (useCoords as jest.Mock).mockReturnValue({
+        setIsInsideBuilding,
+        highlightedBuilding: null,
+        setHighlightedBuilding,
+        myLocationCoords: { latitude: 30, longitude: 40 },
+      });
+      
+      rerender(<HighlightBuilding />);
+      
+      // Should have called turf functions with new coordinates
+      expect(turf.point).toHaveBeenCalledWith([40, 30]);
+    });
   });
 });
