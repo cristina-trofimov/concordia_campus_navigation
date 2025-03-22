@@ -63,6 +63,8 @@ import { MaterialIcons} from "@expo/vector-icons";
                                             instruction.toLowerCase().includes('continue')?'straight':
                                             instruction.toLowerCase().includes('northeast')?'turn-slight-right':
                                             instruction.toLowerCase().includes('northwest')?'turn-slight-left':
+                                            instruction.toLowerCase().includes('southeast')?'turn-slight-right':
+                                            instruction.toLowerCase().includes('southwest')?'turn-slight-left':
                                             instruction.toLowerCase().includes('exit')?'arrow-outward':
                                                 null;
           return (
