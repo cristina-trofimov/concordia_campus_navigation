@@ -27,7 +27,7 @@ Mapbox.setAccessToken(MAPBOX_TOKEN);
 export default function MapComponent({
   drawerHeight,
 }: {
-  drawerHeight: Readonly<Animated.Value>;
+  readonly drawerHeight: Animated.Value;
 }) {
   const {
     routeData: routeCoordinates,
