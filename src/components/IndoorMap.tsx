@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import Mapbox from '@rnmapbox/maps';
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { useCoords } from "../data/CoordsContext";
 import { useIndoor } from "../data/IndoorContext";
 import { buildingFloorAssociations } from '../data/buildingFloorAssociations.ts';
@@ -10,8 +9,7 @@ import { h2Features } from '../data/indoor/Hall/H2.ts';
 import { h8Features } from '../data/indoor/Hall/H8.ts';
 import { h9Features } from '../data/indoor/Hall/H9.ts';
 import { cc1Features } from '../data/indoor/CC/CC1.ts';
-import { View } from 'react-native';
-import centroid from '@turf/centroid';
+import { IndoorPointsOfInterest } from './IndoorPointsOfInterest.tsx';
 
 const featureMap: { [key: string]: any } = {
     h1Features,
@@ -123,26 +121,7 @@ export const HighlightIndoorMap = () => {
                 </Mapbox.ShapeSource>
             )}
 
-            {/* Render toilet icons at the centroid of polygons */}
-            {inFloorView && indoorFeatures
-                .filter((feature) => feature.properties?.amenity === "toilets" && feature.geometry.type === "Polygon")
-                .map((feature, index) => {
-                    // Calculate the centroid of the polygon
-                    const centroidPoint = centroid(feature);
-                    const centroidCoords = centroidPoint.geometry.coordinates;
-
-                    return (
-                        <Mapbox.PointAnnotation
-                            key={index.toString()}
-                            id={`toilet-marker-${index}`}
-                            coordinate={centroidCoords}
-                        >
-                            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-                                <FontAwesome5 name="restroom" size={10} color="#912338" />
-                            </View>
-                        </Mapbox.PointAnnotation>
-                    );
-                })}
+            <IndoorPointsOfInterest />
         </>
     );
 };

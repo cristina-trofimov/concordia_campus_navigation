@@ -2512,7 +2512,6 @@ export const h9Features: H9Features[] = [
         "type": "Feature",
         "properties": {
             "escalators": "yes",
-            "highway": "steps",
             "level": "9"
         },
         "geometry": {
