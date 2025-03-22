@@ -3,9 +3,11 @@ import { Animated, Dimensions, ScrollView, View } from "react-native";
 import Map from "../MapComponent";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider, useCoords } from "../../data/CoordsContext";
+import { IndoorsProvider } from "../../data/IndoorContext";
 import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
 import { HomeStyle } from "../../styles/HomeStyle";
+import { FloorSelector } from "../FloorSelector";
 import SearchBars from "../SearchBars";
 import { Text } from "react-native-elements";
 
@@ -72,26 +74,30 @@ export default function HomeScreen() {
 
   return (
     <CoordsProvider>
-      <View style={HomeStyle.container}>
-        <CalendarButton />
-        <LeftDrawer />
-        <Map drawerHeight={drawerHeight} />
-        <BottomDrawer drawerHeight={drawerHeight} >
-          <SearchBars />
-          {/* oviya component  */}
-          <View style={HomeStyle.listContent}>
-            <ScrollView>
-              {htmlInstructions.length > 0 &&
-                htmlInstructions.map((instruction, index) => (
-                  <Text key={index} style={HomeStyle.instructionsList}>
-                    {instruction}
-                  </Text>
-                ))}
-            </ScrollView>
-          </View>
+      <IndoorsProvider>
+        <View style={HomeStyle.container}>
+          <CalendarButton />
+          <LeftDrawer />
+          <Map drawerHeight={drawerHeight} />
+          <FloorSelector />
 
-        </BottomDrawer>
-      </View>
+          <BottomDrawer drawerHeight={drawerHeight} >
+            <SearchBars />
+            {/* oviya component  */}
+            <View style={HomeStyle.listContent}>
+              <ScrollView>
+                {htmlInstructions.length > 0 &&
+                  htmlInstructions.map((instruction, index) => (
+                    <Text key={index} style={HomeStyle.instructionsList}>
+                      {instruction}
+                    </Text>
+                  ))}
+              </ScrollView>
+            </View>
+          </BottomDrawer>
+
+        </View>
+      </IndoorsProvider>
     </CoordsProvider>
   );
 }

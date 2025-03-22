@@ -11,7 +11,8 @@ import { Text } from "@rneui/themed";
 import { locations } from "../data/buildingLocation.ts";
 import * as Location from "expo-location";
 import { useCoords } from "../data/CoordsContext.tsx";
-import ToggleButton from "./ToggleButton.tsx";
+import { useIndoor } from "../data/IndoorContext";
+import ToggleButton from "./ToggleButton";
 import Polyline from "@mapbox/polyline";
 import { Coords } from "../interfaces/Map.ts";
 import { MAPBOX_TOKEN } from "@env";
@@ -20,6 +21,7 @@ import { HighlightBuilding } from "./BuildingCoordinates.tsx";
 import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
+import { HighlightIndoorMap } from './IndoorMap.tsx'; 
 import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
@@ -32,7 +34,10 @@ export default function MapComponent({
   const {
     routeData: routeCoordinates,
     setmyLocationString,
+    myLocationCoords,
+    setMyLocationCoords,
   } = useCoords();
+  const { inFloorView } = useIndoor();
 
   const sgwCoords = {
     latitude: 45.4949968855897,
@@ -45,20 +50,11 @@ export default function MapComponent({
   };
 
   const cameraRef = useRef<Camera | null>(null);
-  const [myLocation, setMyLocation] = useState<{
-    latitude: number;
-    longitude: number;
-  } | null>(null);
   const mapRef = useRef<Mapbox.MapView | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(0);
-
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
-
-  const [selectedBuilding, setSelectedBuilding] =
-    useState<BuildingLocation | null>(null);
-
-  console.log({ selectedBuilding });
+  const [selectedBuilding, setSelectedBuilding] = useState<BuildingLocation | null>(null);
 
   const openOverlay = (building: BuildingLocation) => {
     setSelectedBuilding(building);
@@ -71,12 +67,12 @@ export default function MapComponent({
   const [decodedPolyline, setDecodedPolyline] = useState<Coords[]>([]);
 
   useEffect(() => {
-    if (myLocation) {
-      const { latitude, longitude } = myLocation;
+    if (myLocationCoords) {
+      const { latitude, longitude } = myLocationCoords;
       const locationString = `${latitude},${longitude}`;
       setmyLocationString(locationString);
     }
-  }, [myLocation, setmyLocationString]);
+  }, [myLocationCoords, setmyLocationString]);
 
   useEffect(() => {
     if (routeCoordinates && routeCoordinates.length > 0) {
@@ -125,7 +121,7 @@ export default function MapComponent({
       },
       (location) => {
         console.log("User location updated:", location.coords);
-        setMyLocation(location.coords);
+        setMyLocationCoords(location.coords);
       }
     );
 
@@ -144,7 +140,7 @@ export default function MapComponent({
   // Trigger a re-render when the user location changes
   useEffect(() => {
     setForceUpdate((prev) => prev + 1);
-  }, [myLocation]);
+  }, [myLocationCoords]);
 
   const _getLocation = async () => {
     try {
@@ -157,20 +153,20 @@ export default function MapComponent({
 
       let location = await Location.getCurrentPositionAsync({});
       console.log("User location received:", location.coords);
-      setMyLocation(location.coords);
+      setMyLocationCoords(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
     }
   };
 
   const focusOnLocation = () => {
-    if (!myLocation || !cameraRef.current || !mapLoaded) {
+    if (!myLocationCoords || !cameraRef.current || !mapLoaded) {
       console.warn("User location, camera, or map not available.");
       return;
     }
 
     cameraRef.current.setCamera({
-      centerCoordinate: [myLocation.longitude, myLocation.latitude],
+      centerCoordinate: [myLocationCoords.longitude, myLocationCoords.latitude],
       zoomLevel: 17,
       animationMode: "flyTo",
       animationDuration: 1000,
@@ -204,11 +200,8 @@ export default function MapComponent({
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding
-          userCoordinates={
-            myLocation ? [myLocation.latitude, myLocation.longitude] : null
-          }
-        />
+        <HighlightBuilding/>
+        <HighlightIndoorMap/>
         <Camera
           ref={(ref) => {
             cameraRef.current = ref;
@@ -233,11 +226,11 @@ export default function MapComponent({
           </Mapbox.PointAnnotation>
         ))}
 
-        {myLocation && (
+        {myLocationCoords && (
           <PointAnnotation
             key={`<span class="math-inline">{myLocation.latitude}-</span>{myLocation.longitude}-${forceUpdate}`}
             id="my-location"
-            coordinate={[myLocation.longitude, myLocation.latitude]}
+            coordinate={[myLocationCoords.longitude, myLocationCoords.latitude]}
           >
             <Image
               source={require("../resources/images/currentLocation-Icon.png")}
@@ -317,7 +310,7 @@ export default function MapComponent({
         </TouchableOpacity>
       </Animated.View>
 
-      <View style={MapComponentStyles.toggleButtonContainer}>
+      { !inFloorView && (<View style={MapComponentStyles.toggleButtonContainer}>
         <ToggleButton
           mapRef={mapRef}
           sgwCoords={sgwCoords}
@@ -326,6 +319,7 @@ export default function MapComponent({
           initialCampus={true}
         />
       </View>
+      )}
     </View>
   );
 }
