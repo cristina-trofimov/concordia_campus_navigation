@@ -51,7 +51,6 @@ import { MaterialIcons} from "@expo/vector-icons";
             const instructionsIconsDisplay=                                            
                                             instruction.toLowerCase().includes('destination')?'location-on':
                                             instruction.toLowerCase().includes('left')?'turn-left':
-                                            instruction.toLowerCase().includes('left')?'turn-left':
                                             instruction.toLowerCase().includes('right')?'turn-right':
                                             instruction.toLowerCase().includes('walk')?'directions-walk':
                                             instruction.toLowerCase().includes('bus')?'directions-bus':
