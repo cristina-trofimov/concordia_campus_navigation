@@ -7,7 +7,7 @@ import { useIndoor } from "../data/IndoorContext";
 
 export const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
   if (!coordinates || !Array.isArray(coordinates)) {
-    console.warn("Invalid coordinates input:", coordinates);
+    // console.warn("Invalid coordinates input:", coordinates);
     return [];
   }
 
