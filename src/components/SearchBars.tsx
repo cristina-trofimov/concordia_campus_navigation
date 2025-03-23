@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 import ShuttleBusTransit from './ShuttleBusTransit';
+import { color } from '@rneui/base';
 
 interface SearchBarProps {
     inputDestination: string;
@@ -57,10 +58,10 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
     const [originCoords, setOriginCoords] = useState<any>(null);
     const [destinationCoords, setDestinationCoords] = useState<any>(null);
     const transportModes = [
-        { mode: "driving", icon: "car-outline", label: "Drive", time: "-" },
-        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "-" },
-        { mode: "walking", icon: "walk-outline", label: "Walk", time: "-" },
-        { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-" },
+        { mode: "driving", icon: "car-outline", label: "Drive", time: "-", color: "#673AB7" },
+        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "-",color: "#2196F3" },
+        { mode: "walking", icon: "walk-outline", label: "Walk", time: "-",color: "#800000" },
+        { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-" ,color: "#4CAF50"},
     ];
     const [selectedMode, setSelectedMode] = useState("driving");
     const { isInsideBuilding } = useCoords();
@@ -166,7 +167,7 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
                     </View>
                     {/* Transport Buttons with Time Estimates */}
                     <View style={SearchBarsStyle.transportButtonContainer}>
-                        {transportModes.map(({ mode, icon }) => (
+                        {transportModes.map(({ mode, icon,color }) => (
                             <TouchableOpacity
                                 key={mode}
                                 style={SearchBarsStyle.transportButton}
@@ -177,7 +178,7 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
                                     <Ionicons
                                         name={icon as keyof typeof Ionicons.glyphMap}
                                         size={24}
-                                        color={selectedMode === mode ? "#912338" : "black"}
+                                        color={selectedMode === mode ? color : "black"}
                                     />
                                     {selectedMode === mode}
                     
