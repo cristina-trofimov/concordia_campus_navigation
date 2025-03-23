@@ -54,11 +54,7 @@ export const fetchCalendarEvents = async (accessToken: string) => {
             }
         );
 
-        console.log(`Retrieved ${response.data.items.length} calendar events`);
         const events = response.data.items;
-        for (let i = 0; i < events.length; i++) {
-            console.log(JSON.stringify(events[i]));
-        }
         return events;
 
     } catch (error) {
@@ -93,8 +89,6 @@ export const fetchUserCalendars = async (accessToken: string): Promise<CalendarA
             accessRole: calendar.accessRole || 'reader',
             timeZone: calendar.timeZone || 'UTC'
         }));
-
-        console.log(`Retrieved ${calendars.length} calendars`);
 
         return {
             type: 'success',
@@ -134,27 +128,6 @@ export const getCalendarEvent = async (accessToken: string, eventId: number) => 
     }
 };
 
-// Function to create a new calendar event
-// export const createCalendarEvent = async (accessToken, eventDetails) => {
-//     try {
-//         const response = await axios.post(
-//             'https://www.googleapis.com/calendar/v3/calendars/primary/events',
-//             eventDetails,
-//             {
-//                 headers: {
-//                     Authorization: `Bearer ${accessToken}`,
-//                     'Content-Type': 'application/json',
-//                 },
-//             }
-//         );
-
-//         console.log('Event created successfully:', response.data.id);
-//         return response.data;
-//     } catch (error) {
-//         console.error('Error creating calendar event:', error.response?.data || error.message);
-//         throw error;
-//     }
-// };
 
 export const fetchCalendarEventsByCalendarId = async (
     accessToken: string,
@@ -205,8 +178,6 @@ export const fetchCalendarEventsByCalendarId = async (
             status: event.status || "confirmed",
             calendarId: calendarId
         }));
-
-        console.log(`Retrieved ${events.length} events from calendar "${calendarId}"`);
 
         return {
             type: 'success',

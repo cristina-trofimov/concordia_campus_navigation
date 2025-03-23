@@ -22,7 +22,6 @@ const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Cale
     const handleSignIn = async () => {
         const token = await signIn();
         if (token) {
-            // fetchCalendarEvents(token);
             const calendars = await fetchUserCalendars(token);
             if (calendars) {
                 setCalendars(calendars.data?.calendars);
