@@ -1,91 +1,100 @@
-import React, { useEffect, useState } from 'react';
-import { shuttleSchedule, sgwBuildings, loyBuildings } from '../data/ShuttleBusSchedule';
-import { ShuttleResult } from '../interfaces/ShuttleBusSchedule';
+import React, { useEffect } from 'react';
+
+// Define types
+type CampusBounds = {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+};
 
 interface ShuttleBusTransitProps {
-  startLocation: string; // Building code or current location
-  endLocation: string;   // Building code (destination)
+  startLocation: any; // Origin coordinates
+  endLocation: any;   // Destination coordinates
 }
+
+// Define campus boundaries
+const SGW_CAMPUS_BOUNDS: CampusBounds = {
+  north: 45.497500,
+  south: 45.493300,
+  east: -73.574000,
+  west: -73.582000
+};
+
+const LOY_CAMPUS_BOUNDS: CampusBounds = {
+  north: 45.460000,
+  south: 45.455000,
+  east: -73.635000,
+  west: -73.642000
+};
+
+// Helper function to check if coordinates are within campus bounds
+const isInCampusBounds = (lat: number, lng: number, campusBounds: CampusBounds): boolean => {
+  return (
+    lat <= campusBounds.north && 
+    lat >= campusBounds.south && 
+    lng <= campusBounds.east && 
+    lng >= campusBounds.west
+  );
+};
+
+// Function to determine campus from coordinates
+const determineCampusFromCoords = (coords: any): 'SGW' | 'LOY' | 'UNKNOWN' => {
+  if (!coords) return 'UNKNOWN';
+  
+  let lat, lng;
+  
+  // Handle string coordinates like "45.49706,-73.5788017"
+  if (typeof coords === 'string' && coords.includes(',')) {
+    [lat, lng] = coords.split(',').map(c => parseFloat(c.trim()));
+  } 
+  // Handle object coordinates like {latitude: 45.495413, longitude: -73.577693}
+  else if (coords.latitude && coords.longitude) {
+    lat = coords.latitude;
+    lng = coords.longitude;
+  }
+  // If we couldn't extract coordinates
+  else {
+    return 'UNKNOWN';
+  }
+  
+  if (isInCampusBounds(lat, lng, SGW_CAMPUS_BOUNDS)) {
+    return 'SGW';
+  } else if (isInCampusBounds(lat, lng, LOY_CAMPUS_BOUNDS)) {
+    return 'LOY';
+  }
+  
+  return 'UNKNOWN';
+};
 
 const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({ 
   startLocation, 
   endLocation 
 }) => {
-  const [isShuttleAvailable, setIsShuttleAvailable] = useState<boolean>(false);
-  const [nextDepartures, setNextDepartures] = useState<ShuttleResult[]>([]);
-
   useEffect(() => {
-    // Check if both locations are provided
-    if (!startLocation || !endLocation) {
-      console.log('Shuttle Bus: Missing locations');
-      setIsShuttleAvailable(false);
-      return;
-    }
-
-    // Function to determine which campus a building belongs to
-    const getCampusForBuilding = (buildingCode: string): 'SGW' | 'LOY' | 'UNKNOWN' => {
-      if (sgwBuildings.includes(buildingCode)) return 'SGW';
-      if (loyBuildings.includes(buildingCode)) return 'LOY';
-      return 'UNKNOWN';
-    };
-
-    // Get campuses for start and end locations
-    const startCampus = getCampusForBuilding(startLocation);
-    const endCampus = getCampusForBuilding(endLocation);
-
-    // Check if shuttle is an option (buildings on different campuses)
-    const isOptionAvailable = (
-      startCampus !== 'UNKNOWN' && 
-      endCampus !== 'UNKNOWN' && 
-      startCampus !== endCampus
-    );
-
-    // Set availability state
-    setIsShuttleAvailable(isOptionAvailable);
-
-    // Log the result
-    if (isOptionAvailable) {
-      console.log(`Shuttle Bus: Available between ${startCampus} and ${endCampus}`);
-      
-      // Get current time to check schedule
-      const currentTime = new Date();
-      const dayOfWeek = currentTime.getDay(); // 0 = Sunday, 1 = Monday, etc.
-      
-      // Check if service is available today
-      if (dayOfWeek === 0 || dayOfWeek === 6) {
-        console.log('Shuttle Bus: No service available on weekends');
-      } else {
-        // Determine which schedule to use
-        const scheduleKey = dayOfWeek >= 1 && dayOfWeek <= 4 ? 'monday-thursday' : 'friday';
-        const directionKey = `${startCampus}_to_${endCampus}`;
-        
-        console.log(`Shuttle Bus: Using ${scheduleKey} schedule, direction ${directionKey}`);
-        
-        // Log the first departure time as an example
-        if (directionKey === 'SGW_to_LOY' || directionKey === 'LOY_to_SGW') {
-          // Type assertion to please TypeScript 
-          const schedule = shuttleSchedule.schedule[scheduleKey][directionKey as 'SGW_to_LOY' | 'LOY_to_SGW'];
-          if (schedule && schedule.length > 0) {
-            console.log(`Shuttle Bus: First departure at ${schedule[0].departureTime}`);
-          }
-        }
-      }
+    // Check if coordinates are within campus bounds
+    const startCampus = determineCampusFromCoords(startLocation);
+    const endCampus = determineCampusFromCoords(endLocation);
+    
+    console.log(`Origin campus: ${startCampus}, Destination campus: ${endCampus}`);
+    
+    if (startCampus !== 'UNKNOWN' && endCampus !== 'UNKNOWN' && startCampus !== endCampus) {
+      console.log("Shuttle bus is available between these campuses!");
     } else {
-      console.log('Shuttle Bus: Not available for these locations');
+      console.log("Shuttle bus is not available for this route");
       if (startCampus === 'UNKNOWN') {
-        console.log(`Shuttle Bus: Start location ${startLocation} not recognized as a campus building`);
+        console.log("Origin is not on a recognized campus");
       }
       if (endCampus === 'UNKNOWN') {
-        console.log(`Shuttle Bus: End location ${endLocation} not recognized as a campus building`);
+        console.log("Destination is not on a recognized campus");
       }
-      if (startCampus !== 'UNKNOWN' && endCampus !== 'UNKNOWN' && startCampus === endCampus) {
-        console.log(`Shuttle Bus: Both buildings are on the same campus (${startCampus})`);
+      if (startCampus === endCampus && startCampus !== 'UNKNOWN') {
+        console.log(`Both locations are on the same campus (${startCampus})`);
       }
     }
   }, [startLocation, endLocation]);
 
-  // For now, this component doesn't render anything visible
-  // It just checks availability and logs the result
+  // This component doesn't render anything visible
   return null;
 };
 

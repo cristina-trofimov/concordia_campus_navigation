@@ -8,6 +8,7 @@ import { useIndoor } from '../data/IndoorContext';
 import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
+import ShuttleBusTransit from './ShuttleBusTransit';
 
 interface SearchBarProps {
     inputDestination: string;
@@ -163,8 +164,20 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
                     
                                 </View>
                             </TouchableOpacity>
-                        ))}
+                        ))}    
                     </View>
+                    {/* Add this debug logging */}
+                    {selectedMode === "transit" && console.log("mode selected:", selectedMode,  "coords:", origin, destinationCoords)}
+
+                   
+                    {/* Only render ShuttleBusTransit component when transit mode is selected */}
+                    {selectedMode === "transit" && origin && destinationCoords && (
+                    <ShuttleBusTransit
+                        startLocation={origin}
+                        endLocation={destinationCoords}
+                    />
+                    )}
+
                     {/* Total Time, Start Button, and Floor/Outside View Button */}
                     <View style={SearchBarsStyle.timeAndButtonsContainer}>
                         <View style={SearchBarsStyle.timeContainer}>
