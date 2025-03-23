@@ -1,9 +1,7 @@
-import React, { useEffect } from "react";
-import {
-  shuttleSchedule,
-  sgwBuildings,
-  loyBuildings,
-} from "../data/ShuttleBusSchedule";
+import React, { useEffect, useState } from "react";
+import { shuttleSchedule, sgwBuildings, loyBuildings } from "../data/ShuttleBusSchedule";
+import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
+import { ShuttleBusTransitStyle } from "../styles/ShuttleBusTransitStyle";
 
 // Define types
 type CampusBounds = {
@@ -16,6 +14,7 @@ type CampusBounds = {
 interface ShuttleBusTransitProps {
   startLocation: any; // Origin coordinates
   endLocation: any; // Destination coordinates
+  onSelect?: () => void; // Callback when shuttle is selected
 }
 
 // Define campus boundaries
@@ -146,54 +145,83 @@ const getNextShuttleDepartures = (
 const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
   startLocation,
   endLocation,
+  onSelect
 }) => {
+  const [isShuttleAvailable, setIsShuttleAvailable] = useState(false);
+  const [startCampus, setStartCampus] = useState<"SGW" | "LOY" | "UNKNOWN">("UNKNOWN");
+  const [endCampus, setEndCampus] = useState<"SGW" | "LOY" | "UNKNOWN">("UNKNOWN");
+  const [nextDeparture, setNextDeparture] = useState<{departureTime: string, arrivalTime: string} | null>(null);
+
   useEffect(() => {
     // Check if coordinates are within campus bounds
-    const startCampus = determineCampusFromCoords(startLocation);
-    const endCampus = determineCampusFromCoords(endLocation);
+    const start = determineCampusFromCoords(startLocation);
+    const end = determineCampusFromCoords(endLocation);
 
-    console.log(
-      `Origin campus: ${startCampus}, Destination campus: ${endCampus}`
-    );
+    setStartCampus(start);
+    setEndCampus(end);
 
-    if (
-      startCampus !== "UNKNOWN" &&
-      endCampus !== "UNKNOWN" &&
-      startCampus !== endCampus
-    ) {
+    console.log(`Origin campus: ${start}, Destination campus: ${end}`);
+
+    // Check if shuttle is available
+    const shuttleAvailable = 
+      start !== "UNKNOWN" &&
+      end !== "UNKNOWN" &&
+      start !== end;
+    
+    setIsShuttleAvailable(shuttleAvailable);
+
+    // Get next departure if shuttle is available
+    if (shuttleAvailable) {
       console.log("Shuttle bus is available between these campuses!");
-
-      // Get next departures
-      const nextDepartures = getNextShuttleDepartures(startCampus, endCampus);
-      
-      if (nextDepartures.length > 0) {
-        console.log(`Next departures from ${startCampus} to ${endCampus}:`);
-        nextDepartures.forEach((departure, index) => {
-          console.log(`${index + 1}. Departs: ${departure.departureTime}, Arrives: ${departure.arrivalTime}`);
-        });
+      const departures = getNextShuttleDepartures(start, end, 1);
+      if (departures.length > 0) {
+        setNextDeparture(departures[0]);
+        console.log(`Next departure: ${departures[0].departureTime}`);
       } else {
-        console.log(`No more departures from ${startCampus} to ${endCampus} today`);
+        setNextDeparture(null);
+        console.log("No more departures today");
       }
-      
-      // Include information about the shuttle stop locations
-      console.log(`Shuttle stop at ${startCampus}: ${shuttleSchedule.locations[startCampus].station}`);
-      console.log(`Shuttle stop at ${endCampus}: ${shuttleSchedule.locations[endCampus].station}`);
     } else {
       console.log("Shuttle bus is not available for this route");
-      if (startCampus === "UNKNOWN") {
-        console.log("Origin is not on a recognized campus");
-      }
-      if (endCampus === "UNKNOWN") {
-        console.log("Destination is not on a recognized campus");
-      }
-      if (startCampus === endCampus && startCampus !== "UNKNOWN") {
-        console.log(`Both locations are on the same campus (${startCampus})`);
-      }
     }
   }, [startLocation, endLocation]);
 
-  // This component doesn't render anything visible
-  return null;
+  // If shuttle is not available, don't render anything
+  if (!isShuttleAvailable) {
+    return null;
+  }
+
+  // Get campus names for display
+  const startCampusName = startCampus === "SGW" ? "Sir George Williams" : "Loyola";
+  const endCampusName = endCampus === "SGW" ? "Sir George Williams" : "Loyola";
+
+  return (
+    <View style={ShuttleBusTransitStyle.container}>
+      <View style={ShuttleBusTransitStyle.infoContainer}>
+        <Text style={ShuttleBusTransitStyle.title}>Concordia Shuttle Bus Available</Text>
+        <Text style={ShuttleBusTransitStyle.info}>
+          Concordia University provides a free shuttle service between {startCampusName} and {endCampusName} campuses.
+        </Text>
+        
+        {nextDeparture && (
+          <Text style={ShuttleBusTransitStyle.schedule}>
+            Next departure: {nextDeparture.departureTime} (arrives at {nextDeparture.arrivalTime})
+          </Text>
+        )}
+        
+        <Text style={ShuttleBusTransitStyle.stationInfo}>
+          Pickup: {startCampus !== "UNKNOWN" ? shuttleSchedule.locations[startCampus as "SGW" | "LOY"].station : "Location not on campus"}
+        </Text>
+      </View>
+      
+      <TouchableOpacity 
+        style={ShuttleBusTransitStyle.button}
+        onPress={onSelect}
+      >
+        <Text style={ShuttleBusTransitStyle.buttonText}>View Shuttle Bus Route</Text>
+      </TouchableOpacity>
+    </View>
+  );
 };
 
 export default ShuttleBusTransit;
