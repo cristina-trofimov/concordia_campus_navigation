@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1742764929404" clover="3.2.0">
-  <project timestamp="1742764929405" name="All files">
-    <metrics statements="319" coveredstatements="240" conditionals="177" coveredconditionals="133" methods="86" coveredmethods="56" elements="582" coveredelements="429" complexity="0" loc="319" ncloc="319" packages="5" files="22" classes="22"/>
+<coverage generated="1742765255291" clover="3.2.0">
+  <project timestamp="1742765255291" name="All files">
+    <metrics statements="297" coveredstatements="218" conditionals="173" coveredconditionals="129" methods="80" coveredmethods="50" elements="550" coveredelements="397" complexity="0" loc="297" ncloc="297" packages="5" files="21" classes="21"/>
     <package name="src.components">
-      <metrics statements="285" coveredstatements="206" conditionals="177" coveredconditionals="133" methods="67" coveredmethods="49"/>
+      <metrics statements="263" coveredstatements="184" conditionals="173" coveredconditionals="129" methods="61" coveredmethods="43"/>
       <file name="BottomDrawer.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/BottomDrawer.tsx">
         <metrics statements="53" coveredstatements="5" conditionals="24" coveredconditionals="0" methods="8" coveredmethods="0"/>
         <line num="13" count="1" type="stmt"/>
@@ -277,31 +277,6 @@
         <line num="116" count="15" type="stmt"/>
         <line num="118" count="10" type="stmt"/>
         <line num="120" count="3" type="stmt"/>
-      </file>
-      <file name="ShuttleBusTracker.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/ShuttleBusTracker.tsx">
-        <metrics statements="22" coveredstatements="22" conditionals="4" coveredconditionals="4" methods="6" coveredmethods="6"/>
-        <line num="8" count="1" type="stmt"/>
-        <line num="9" count="16" type="stmt"/>
-        <line num="10" count="15" type="stmt"/>
-        <line num="12" count="15" type="stmt"/>
-        <line num="13" count="6" type="stmt"/>
-        <line num="15" count="6" type="stmt"/>
-        <line num="22" count="5" type="stmt"/>
-        <line num="34" count="5" type="stmt"/>
-        <line num="36" count="5" type="stmt"/>
-        <line num="39" count="1" type="stmt"/>
-        <line num="40" count="1" type="stmt"/>
-        <line num="44" count="15" type="stmt"/>
-        <line num="45" count="6" type="stmt"/>
-        <line num="48" count="6" type="stmt"/>
-        <line num="51" count="6" type="stmt"/>
-        <line num="54" count="15" type="cond" truecount="2" falsecount="0"/>
-        <line num="55" count="10" type="stmt"/>
-        <line num="62" count="5" type="cond" truecount="2" falsecount="0"/>
-        <line num="63" count="2" type="stmt"/>
-        <line num="67" count="9" type="stmt"/>
-        <line num="69" count="3" type="stmt"/>
-        <line num="72" count="6" type="stmt"/>
       </file>
       <file name="ToggleButton.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/ToggleButton.tsx">
         <metrics statements="13" coveredstatements="13" conditionals="9" coveredconditionals="9" methods="2" coveredmethods="2"/>
