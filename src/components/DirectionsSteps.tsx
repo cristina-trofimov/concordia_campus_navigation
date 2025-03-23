@@ -38,7 +38,7 @@ import { MaterialIcons} from "@expo/vector-icons";
     } else {
       setHtmlInstructions(instructions);
     }
-    console.log(htmlInstructions);
+    // console.log(htmlInstructions);
     } else {
       setHtmlInstructions([]);
     }
