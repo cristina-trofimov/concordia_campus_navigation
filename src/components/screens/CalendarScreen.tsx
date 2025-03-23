@@ -1,19 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, Button, Modal, TextInput, TouchableOpacity, } from "react-native";
 import { CalendarBody, CalendarContainer, CalendarHeader, DraggingEvent, DraggingEventProps, EventItem, CalendarKitHandle, } from "@howljs/calendar-kit";
-import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
 import { StackNavigationProp } from '@react-navigation/stack';
 import Feather from '@expo/vector-icons/Feather';
 import { CalendarStyle } from "../../styles/CalendarStyle";
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-} from '@react-native-google-signin/google-signin';
+import RightDrawer from "../RightDrawer";
+import { Calendar } from "../../interfaces/calendar";
+import { fetchCalendarEventsByCalendarId } from "../googleCalendarFetching";
 import { signIn } from "../signin";
-import { signOut } from "../signout";
-import { fetchCalendarEvents } from "../googleCalendarFetching";
+import { CalendarEvent } from "../../interfaces/CalendraEvent";
 
 const theme = {
   calendarBackground: '#f0f0f0',
@@ -37,71 +34,58 @@ const currentWeek = (currentDate?: Date): string => {
   }
 }
 
-const testEvents: EventItem[] = [
-  {
-    id: '1',
-    title: 'Meeting with Team',
-    start: { dateTime: '2025-03-15T10:00:00Z' },
-    end: { dateTime: '2025-03-15T12:00:00Z' },
-    color: '#4285F4',
-  },
-  {
-    id: '2',
-    title: 'Conference',
-    start: { dateTime: '2025-03-17T00:00:00', timeZone: 'America/New_York' },
-    end: { dateTime: '2025-03-18T00:00:00', timeZone: 'America/New_York' },
-    color: '#34A853',
-  },
-  {
-    id: '3',
-    title: 'Weekly Team Sync',
-    start: { dateTime: '2025-03-18T15:00:00Z' },
-    end: { dateTime: '2025-03-18T16:00:00Z' },
-    color: '#FBBC05',
-    recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=MO'
-  },
-  {
-    id: '4',
-    title: 'Weekly Team Building Day',
-    start: { date: '2025-03-07' },
-    end: { date: '2025-03-07' },
-    color: '#34A853',
-    recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=FR'
-  },
-  {
-    id: '5',
-    title: 'Weekly Team Building Day',
-    start: { dateTime: '2025-03-08T08:00:00', timeZone: 'America/New_York' },
-    end: { dateTime: '2025-03-08T18:00:00', timeZone: 'America/New_York' },
-    color: '#34A853',
-  },
-];
+// const testEvents: EventItem[] = [
+//   {
+//     id: '1',
+//     title: 'Meeting with Team',
+//     start: { dateTime: '2025-03-15T10:00:00Z' },
+//     end: { dateTime: '2025-03-15T12:00:00Z' },
+//     color: '#4285F4',
+//   },
+//   {
+//     id: '2',
+//     title: 'Conference',
+//     start: { dateTime: '2025-03-17T00:00:00', timeZone: 'America/New_York' },
+//     end: { dateTime: '2025-03-18T00:00:00', timeZone: 'America/New_York' },
+//     color: '#34A853',
+//   },
+//   {
+//     id: '3',
+//     title: 'Weekly Team Sync',
+//     start: { dateTime: '2025-03-18T15:00:00Z' },
+//     end: { dateTime: '2025-03-18T16:00:00Z' },
+//     color: '#FBBC05',
+//     recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=MO'
+//   },
+//   {
+//     id: '4',
+//     title: 'Weekly Team Building Day',
+//     start: { date: '2025-03-07' },
+//     end: { date: '2025-03-07' },
+//     color: '#34A853',
+//     recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=FR'
+//   },
+//   {
+//     id: '5',
+//     title: 'Weekly Team Building Day',
+//     start: { dateTime: '2025-03-08T08:00:00', timeZone: 'America/New_York' },
+//     end: { dateTime: '2025-03-08T18:00:00', timeZone: 'America/New_York' },
+//     color: '#34A853',
+//   },
+// ];
 
 
 const CalendarScreen = () => {
-  const [isSignedIn, setIsSignedIn] = useState(false);
-
-  const handleSignIn = async () => {
-    const token = await signIn();
-    if (token) {
-      fetchCalendarEvents(token);
-      setIsSignedIn(true);
-    };
-
-  }
-
-  const handleSignOut = () => {
-    signOut().then(() => setIsSignedIn(false));
-  };
-
-
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [events, setEvents] = useState<EventItem[]>(testEvents);
+  const [events, setEvents] = useState<EventItem[]>([]);
+  // const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [chosenCalendar, setChosenCalendar] = useState<Calendar | null>(null);
+
 
   const handleSaveEvent = () => {
     if (editingEvent) {
@@ -111,6 +95,31 @@ const CalendarScreen = () => {
     }
     setModalVisible(false);
   };
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (chosenCalendar) {
+        const accessToken = await signIn();
+        if (accessToken) {
+          const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
+          const modifiedEvents = events.data?.events.map((event) => {
+            return {
+              id: event.id,
+              title: event.title,
+              start: { dateTime: event.startTime },
+              end: { dateTime: event.endTime },
+              color: '#4285F4',
+            };
+          })
+          setEvents(modifiedEvents || []);
+        }
+
+      }
+
+    }
+    fetchEvents();
+
+  }, [chosenCalendar]);
 
 
   const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
@@ -171,11 +180,15 @@ const CalendarScreen = () => {
               <Feather name="chevron-right" size={28} color="black" />
             </TouchableOpacity>
             <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDate)}</Text>
+
           </View>
         </View>
-        <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
+        {/* we want to keep the functionality so I will keep the code heer, but it needs to be better placed */}
+        {/* <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
           <Text style={{ color: "white", fontWeight: "bold" }} >TODAY</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <RightDrawer setChosenCalendar={setChosenCalendar} />
+
       </View>
 
       {/* Renders the calendar view */}
@@ -221,18 +234,6 @@ const CalendarScreen = () => {
           </View>
         </View>
       </Modal>
-      <View style={CalendarStyle.signInButtonView}>
-        {!isSignedIn ? (
-          <GoogleSigninButton
-            size={GoogleSigninButton.Size.Wide}
-            color={GoogleSigninButton.Color.Dark}
-            onPress={handleSignIn}
-
-          />
-        ) : (
-          <Button title="Sign Out" onPress={handleSignOut} />
-        )}
-      </View>
     </View>
   );
 };
