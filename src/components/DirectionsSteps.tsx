@@ -56,6 +56,8 @@ import { MaterialIcons} from "@expo/vector-icons";
                                             instruction.toLowerCase().includes('walk')?'directions-walk':
                                             instruction.toLowerCase().includes('bus')?'directions-bus':
                                             instruction.toLowerCase().includes('metro')?'directions-subway':
+                                            instruction.toLowerCase().includes('subway')?'directions-subway':
+                                            instruction.toLowerCase().includes('train')?'directions-train':
                                             instruction.toLowerCase().includes('merge')?'merge':
                                             instruction.toLowerCase().includes('straight')?'straight':
                                             instruction.toLowerCase().includes('continue')?'straight':

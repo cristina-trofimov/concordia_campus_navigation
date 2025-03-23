@@ -46,5 +46,12 @@ export const ShuttleBusTransitStyle = StyleSheet.create({
         color: "white",
         fontWeight: "bold",
         fontSize: 14,
-      }
+      },
+      subtitle: {
+        fontSize: 14,
+        fontWeight: "bold",
+        marginTop: 8,
+        marginBottom: 4,
+        color: "#912338", 
+      },
 });

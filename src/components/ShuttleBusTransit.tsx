@@ -90,7 +90,7 @@ const determineCampusFromCoords = (coords: any): "SGW" | "LOY" | "UNKNOWN" => {
 const getNextShuttleDepartures = (
   startCampus: "SGW" | "LOY",
   endCampus: "SGW" | "LOY",
-  limit: number = 3
+  limit: number = 2
 ): Array<{ departureTime: string; arrivalTime: string }> => {
   // Get current date and time
   const now = new Date();
@@ -192,10 +192,12 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
   const [endCampus, setEndCampus] = useState<"SGW" | "LOY" | "UNKNOWN">(
     "UNKNOWN"
   );
-  const [nextDeparture, setNextDeparture] = useState<{
-    departureTime: string;
-    arrivalTime: string;
-  } | null>(null);
+  const [nextDepartures, setNextDepartures] = useState<
+    {
+      departureTime: string;
+      arrivalTime: string;
+    }[]
+  >([]);
 
   useEffect(() => {
     // Check if coordinates are within campus bounds
@@ -213,15 +215,15 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
 
     setIsShuttleAvailable(shuttleAvailable);
 
-    // Get next departure if shuttle is available
+    // Get next departures if shuttle is available
     if (shuttleAvailable) {
       console.log("Shuttle bus is available between these campuses!");
-      const departures = getNextShuttleDepartures(start, end, 1);
+      const departures = getNextShuttleDepartures(start, end, 2); // Get 3 departures
       if (departures.length > 0) {
-        setNextDeparture(departures[0]);
-        console.log(`Next departure: ${departures[0].departureTime}`);
+        setNextDepartures(departures);
+        console.log(`Next departures:`, departures);
       } else {
-        setNextDeparture(null);
+        setNextDepartures([]);
         console.log("No more departures today");
       }
     } else {
@@ -250,10 +252,21 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
           {startCampusName} and {endCampusName} campuses.
         </Text>
 
-        {nextDeparture && (
+        {nextDepartures.length > 0 ? (
+          <View>
+            <Text style={ShuttleBusTransitStyle.subtitle}>
+              Next departures:
+            </Text>
+            {nextDepartures.map((departure, index) => (
+              <Text key={index} style={ShuttleBusTransitStyle.schedule}>
+                 {departure.departureTime} (arrives{" "}
+                {departure.arrivalTime})
+              </Text>
+            ))}
+          </View>
+        ) : (
           <Text style={ShuttleBusTransitStyle.schedule}>
-            Next departure: {nextDeparture.departureTime} (arrives at{" "}
-            {nextDeparture.arrivalTime})
+          No more departures available today
           </Text>
         )}
 
@@ -266,9 +279,12 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
       </View>
 
       <TouchableOpacity
-        style={ShuttleBusTransitStyle.button}
+        style={[
+          ShuttleBusTransitStyle.button,
+          nextDepartures.length === 0 && { opacity: 0.5, backgroundColor: '#999' }
+        ]}
         onPress={() => {
-          if (onSelect && nextDeparture) {
+          if (onSelect && nextDepartures.length > 0) {
             const shuttleStation =
               startCampus === "SGW"
                 ? "1455 Maisonneuve Blvd W, Montreal, QC H3G 1M8"
@@ -276,7 +292,7 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
 
             // Calculate the actual departure time accounting for 5 min walk
             const adjustedDepartureTime = calculateAdjustedDepartureTime(
-              nextDeparture.departureTime,
+              nextDepartures[0].departureTime,
               startCampus as "SGW" | "LOY",
               endCampus as "SGW" | "LOY"
             );
@@ -287,7 +303,7 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
               startCampusName: startCampusName,
               endCampusName: endCampusName,
               nextDepartureTime: adjustedDepartureTime,
-              shuttleStation: shuttleStation
+              shuttleStation: shuttleStation,
             });
           }
         }}
