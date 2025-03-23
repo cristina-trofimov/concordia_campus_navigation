@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1742742613095" clover="3.2.0">
-  <project timestamp="1742742613095" name="All files">
-    <metrics statements="319" coveredstatements="224" conditionals="177" coveredconditionals="133" methods="86" coveredmethods="50" elements="582" coveredelements="407" complexity="0" loc="319" ncloc="319" packages="5" files="22" classes="22"/>
+<coverage generated="1742764929404" clover="3.2.0">
+  <project timestamp="1742764929405" name="All files">
+    <metrics statements="319" coveredstatements="240" conditionals="177" coveredconditionals="133" methods="86" coveredmethods="56" elements="582" coveredelements="429" complexity="0" loc="319" ncloc="319" packages="5" files="22" classes="22"/>
     <package name="src.components">
       <metrics statements="285" coveredstatements="206" conditionals="177" coveredconditionals="133" methods="67" coveredmethods="49"/>
       <file name="BottomDrawer.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/BottomDrawer.tsx">
@@ -321,34 +321,34 @@
       </file>
     </package>
     <package name="src.data">
-      <metrics statements="23" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="18" coveredmethods="0"/>
+      <metrics statements="23" coveredstatements="23" conditionals="0" coveredconditionals="0" methods="18" coveredmethods="6"/>
       <file name="CoordsContext.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/data/CoordsContext.tsx">
-        <metrics statements="11" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="0"/>
-        <line num="4" count="1" type="stmt"/>
-        <line num="19" count="1" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="27" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="49" count="1" type="stmt"/>
+        <metrics statements="11" coveredstatements="11" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="3"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="19" count="2" type="stmt"/>
+        <line num="20" count="17" type="stmt"/>
+        <line num="21" count="17" type="stmt"/>
+        <line num="22" count="17" type="stmt"/>
+        <line num="23" count="17" type="stmt"/>
+        <line num="24" count="17" type="stmt"/>
+        <line num="25" count="17" type="stmt"/>
+        <line num="27" count="17" type="stmt"/>
+        <line num="42" count="17" type="stmt"/>
+        <line num="49" count="18" type="stmt"/>
       </file>
       <file name="IndoorContext.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/data/IndoorContext.tsx">
-        <metrics statements="11" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="0"/>
-        <line num="6" count="1" type="stmt"/>
-        <line num="21" count="1" type="stmt"/>
-        <line num="22" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="24" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="26" count="0" type="stmt"/>
-        <line num="27" count="0" type="stmt"/>
-        <line num="29" count="0" type="stmt"/>
-        <line num="44" count="0" type="stmt"/>
-        <line num="51" count="1" type="stmt"/>
+        <metrics statements="11" coveredstatements="11" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="3"/>
+        <line num="6" count="2" type="stmt"/>
+        <line num="21" count="2" type="stmt"/>
+        <line num="22" count="17" type="stmt"/>
+        <line num="23" count="17" type="stmt"/>
+        <line num="24" count="17" type="stmt"/>
+        <line num="25" count="17" type="stmt"/>
+        <line num="26" count="17" type="stmt"/>
+        <line num="27" count="17" type="stmt"/>
+        <line num="29" count="17" type="stmt"/>
+        <line num="44" count="17" type="stmt"/>
+        <line num="51" count="18" type="stmt"/>
       </file>
       <file name="buildingLocation.ts" path="/Users/constance/Downloads/concordia_campus_navigation/src/data/buildingLocation.ts">
         <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
