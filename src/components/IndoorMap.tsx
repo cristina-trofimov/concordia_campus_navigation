@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Mapbox from '@rnmapbox/maps';
 import { useCoords } from "../data/CoordsContext";
 import { useIndoor } from "../data/IndoorContext";
@@ -9,6 +9,7 @@ import { h2Features } from '../data/indoor/Hall/H2.ts';
 import { h8Features } from '../data/indoor/Hall/H8.ts';
 import { h9Features } from '../data/indoor/Hall/H9.ts';
 import { cc1Features } from '../data/indoor/CC/CC1.ts';
+import { IndoorPointsOfInterest } from './IndoorPointsOfInterest.tsx';
 
 const featureMap: { [key: string]: any } = {
     h1Features,
@@ -31,8 +32,8 @@ export const useIndoorFeatures = () => {
                     (currentFloorAssociations[index].floor === "1"
                         ? "st Floor"
                         : currentFloorAssociations[index].floor === "2"
-                        ? "nd Floor"
-                        : "th Floor")
+                            ? "nd Floor"
+                            : "th Floor")
                 );
             } else {
                 setIndoorFeatures([]);
@@ -49,7 +50,7 @@ export const useIndoorFeatures = () => {
 };
 
 export const HighlightIndoorMap = () => {
-    const { highlightedBuilding,  } = useCoords();
+    const { highlightedBuilding } = useCoords();
     const { setBuildingHasFloors, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations, setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures } = useIndoor();
     const { selectIndoorFeatures } = useIndoorFeatures();
 
@@ -119,6 +120,8 @@ export const HighlightIndoorMap = () => {
                     />
                 </Mapbox.ShapeSource>
             )}
+
+            <IndoorPointsOfInterest />
         </>
     );
 };

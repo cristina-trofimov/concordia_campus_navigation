@@ -212,7 +212,7 @@ export default function MapComponent({
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
 
-        {locations.map((location) => (
+        {!inFloorView && locations.map((location) => (
           <Mapbox.PointAnnotation
             key={location.id.toString()}
             id={`point-${location.id}`}
