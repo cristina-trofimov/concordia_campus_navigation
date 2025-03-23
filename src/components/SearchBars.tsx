@@ -26,6 +26,25 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
     
     useEffect(() => {
         setDestination(inputDestination);
+
+        // Added this because when selecting a building from map as a destination, coordinates is null, tso need to geocode it
+        if (inputDestination && !destinationCoords) {
+            if (origin) {
+                getDirections(origin, inputDestination, selectedMode)
+                .then(result => {
+                    if (result && result.length > 0 && result[0].legs && result[0].legs[0].end_location) {
+                        const coords = {
+                            latitude: result[0].legs[0].end_location.lat,
+                            longitude: result[0].legs[0].end_location.lng
+                        };
+                        setDestinationCoords(coords);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error getting coordinates for destination:", error);
+                });
+            }
+        }
     }, [inputDestination]);
 
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
