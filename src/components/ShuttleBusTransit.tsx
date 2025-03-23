@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { shuttleSchedule, sgwBuildings, loyBuildings } from "../data/ShuttleBusSchedule";
+import {
+  shuttleSchedule,
+  sgwBuildings,
+  loyBuildings,
+} from "../data/ShuttleBusSchedule";
 import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import { ShuttleBusTransitStyle } from "../styles/ShuttleBusTransitStyle";
 
@@ -12,9 +16,15 @@ type CampusBounds = {
 };
 
 interface ShuttleBusTransitProps {
-  startLocation: any; // Origin coordinates
-  endLocation: any; // Destination coordinates
-  onSelect?: () => void; // Callback when shuttle is selected
+  startLocation: any;
+  endLocation: any;
+  onSelect?: (shuttleInfo: {
+    startCampus: "SGW" | "LOY";
+    endCampus: "SGW" | "LOY";
+    startCampusName: string;
+    endCampusName: string;
+    nextDepartureTime: string;
+  }) => void;
 }
 
 // Define campus boundaries
@@ -142,15 +152,49 @@ const getNextShuttleDepartures = (
   }));
 };
 
+// Add this helper function to calculate the adjusted departure time
+const calculateAdjustedDepartureTime = (
+  departureTime: string,
+  startCampus: "SGW" | "LOY",
+  endCampus: "SGW" | "LOY"
+) => {
+  // If walk time is 5 minutes, check if we need to wait for a later shuttle
+  const [hours, minutes] = departureTime.split(":").map(Number);
+  const departureDate = new Date();
+  departureDate.setHours(hours, minutes, 0, 0);
+
+  const now = new Date();
+  const walkTime = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+  // If we can make it to the station in time (current time + walk time <= departure time)
+  if (now.getTime() + walkTime <= departureDate.getTime()) {
+    return departureTime;
+  } else {
+    // Otherwise, we need the next shuttle after this one
+    const departures = getNextShuttleDepartures(startCampus, endCampus, 2);
+    if (departures.length > 1) {
+      return departures[1].departureTime;
+    }
+    return departureTime; // Fallback to original time if no next shuttle
+  }
+};
+
 const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
   startLocation,
   endLocation,
-  onSelect
+  onSelect,
 }) => {
   const [isShuttleAvailable, setIsShuttleAvailable] = useState(false);
-  const [startCampus, setStartCampus] = useState<"SGW" | "LOY" | "UNKNOWN">("UNKNOWN");
-  const [endCampus, setEndCampus] = useState<"SGW" | "LOY" | "UNKNOWN">("UNKNOWN");
-  const [nextDeparture, setNextDeparture] = useState<{departureTime: string, arrivalTime: string} | null>(null);
+  const [startCampus, setStartCampus] = useState<"SGW" | "LOY" | "UNKNOWN">(
+    "UNKNOWN"
+  );
+  const [endCampus, setEndCampus] = useState<"SGW" | "LOY" | "UNKNOWN">(
+    "UNKNOWN"
+  );
+  const [nextDeparture, setNextDeparture] = useState<{
+    departureTime: string;
+    arrivalTime: string;
+  } | null>(null);
 
   useEffect(() => {
     // Check if coordinates are within campus bounds
@@ -163,11 +207,9 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
     console.log(`Origin campus: ${start}, Destination campus: ${end}`);
 
     // Check if shuttle is available
-    const shuttleAvailable = 
-      start !== "UNKNOWN" &&
-      end !== "UNKNOWN" &&
-      start !== end;
-    
+    const shuttleAvailable =
+      start !== "UNKNOWN" && end !== "UNKNOWN" && start !== end;
+
     setIsShuttleAvailable(shuttleAvailable);
 
     // Get next departure if shuttle is available
@@ -192,33 +234,60 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
   }
 
   // Get campus names for display
-  const startCampusName = startCampus === "SGW" ? "Sir George Williams" : "Loyola";
+  const startCampusName =
+    startCampus === "SGW" ? "Sir George Williams" : "Loyola";
   const endCampusName = endCampus === "SGW" ? "Sir George Williams" : "Loyola";
 
   return (
     <View style={ShuttleBusTransitStyle.container}>
       <View style={ShuttleBusTransitStyle.infoContainer}>
-        <Text style={ShuttleBusTransitStyle.title}>Concordia Shuttle Bus Available</Text>
-        <Text style={ShuttleBusTransitStyle.info}>
-          Concordia University provides a free shuttle service between {startCampusName} and {endCampusName} campuses.
+        <Text style={ShuttleBusTransitStyle.title}>
+          Concordia Shuttle Bus Available
         </Text>
-        
+        <Text style={ShuttleBusTransitStyle.info}>
+          Concordia University provides a free shuttle service between{" "}
+          {startCampusName} and {endCampusName} campuses.
+        </Text>
+
         {nextDeparture && (
           <Text style={ShuttleBusTransitStyle.schedule}>
-            Next departure: {nextDeparture.departureTime} (arrives at {nextDeparture.arrivalTime})
+            Next departure: {nextDeparture.departureTime} (arrives at{" "}
+            {nextDeparture.arrivalTime})
           </Text>
         )}
-        
+
         <Text style={ShuttleBusTransitStyle.stationInfo}>
-          Pickup: {startCampus !== "UNKNOWN" ? shuttleSchedule.locations[startCampus as "SGW" | "LOY"].station : "Location not on campus"}
+          Pickup:{" "}
+          {startCampus !== "UNKNOWN"
+            ? shuttleSchedule.locations[startCampus as "SGW" | "LOY"].station
+            : "Location not on campus"}
         </Text>
       </View>
-      
-      <TouchableOpacity 
+
+      <TouchableOpacity
         style={ShuttleBusTransitStyle.button}
-        onPress={onSelect}
+        onPress={() => {
+          if (onSelect && nextDeparture) {
+            // Calculate the actual departure time accounting for 5 min walk
+            const adjustedDepartureTime = calculateAdjustedDepartureTime(
+              nextDeparture.departureTime,
+              startCampus as "SGW" | "LOY",
+              endCampus as "SGW" | "LOY"
+            );
+
+            onSelect({
+              startCampus: startCampus as "SGW" | "LOY",
+              endCampus: endCampus as "SGW" | "LOY",
+              startCampusName: startCampusName,
+              endCampusName: endCampusName,
+              nextDepartureTime: adjustedDepartureTime,
+            });
+          }
+        }}
       >
-        <Text style={ShuttleBusTransitStyle.buttonText}>View Shuttle Bus Route</Text>
+        <Text style={ShuttleBusTransitStyle.buttonText}>
+          View Shuttle Bus Route
+        </Text>
       </TouchableOpacity>
     </View>
   );

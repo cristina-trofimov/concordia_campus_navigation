@@ -35,9 +35,12 @@ export const ShuttleBusTransitStyle = StyleSheet.create({
       },
       button: {
         backgroundColor: "#912338", // Concordia maroon
-        padding: 12,
-        borderRadius: 6,
+        paddingVertical: 12,
+        paddingHorizontal: 15,
+        borderRadius: 25,
         alignItems: "center",
+        flexDirection: "row",
+        justifyContent: "center",
       },
       buttonText: {
         color: "white",
