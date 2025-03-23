@@ -182,9 +182,4 @@ export const shuttleSchedule: ShuttleSchedule = {
       "station": "Shuttle bus stop located on Sherbrooke St., in front of the main entrance of the Loyola Campus."
     }
   },
-  "notes": [
-    "Travel time between campuses is approximately 30 minutes, subject to traffic and weather conditions",
-    "Schedule is for Winter semester",
-    "Times may be subject to change without notice"
-  ]
 };

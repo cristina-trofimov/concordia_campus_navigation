@@ -27,7 +27,6 @@ export interface ShuttleTime {
       SGW: ShuttleStation;
       LOY: ShuttleStation;
     };
-    notes: string[];
   }
   
   export interface ShuttleInfo {

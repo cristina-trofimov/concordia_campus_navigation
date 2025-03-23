@@ -64,6 +64,7 @@ import { MaterialIcons} from "@expo/vector-icons";
                                             instruction.toLowerCase().includes('southeast')?'turn-slight-right':
                                             instruction.toLowerCase().includes('southwest')?'turn-slight-left':
                                             instruction.toLowerCase().includes('exit')?'arrow-outward':
+                                            instruction.toLowerCase().includes('wait')?'access-time':
                                                 null;
           return (
             <View key={index} style={ DirectionStepsStyle.instructionsList}>

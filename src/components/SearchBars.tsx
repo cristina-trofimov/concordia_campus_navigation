@@ -194,6 +194,60 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
                     <ShuttleBusTransit
                         startLocation={origin}
                         endLocation={destinationCoords}
+                        onSelect={(info) => {
+                            // Set time to 35 min (30 min shuttle ride + 5 min walk)
+                            setTime("35");
+
+                            // Calculate wait time based on current time and departure time
+                            const now = new Date();
+                            const [hours, minutes] = info.nextDepartureTime.split(':').map(Number);
+                            const departureTime = new Date();
+                            departureTime.setHours(hours, minutes, 0, 0);
+    
+                            // Add 5 min walk time to current time
+                            const arrivalAtStationTime = new Date(now.getTime() + 5 * 60 * 1000);
+    
+                            // Calculate wait time in minutes (time between arriving at station and shuttle departure)
+                            let waitTimeMinutes = Math.max(0, Math.floor((departureTime.getTime() - arrivalAtStationTime.getTime()) / (60 * 1000)));
+    
+                            
+                            // Create a custom route object using the info provided by ShuttleBusTransit
+                            const customShuttleRoute = [{
+                              legs: [{
+                                steps: [
+                                  {
+                                    html_instructions: `Walk to ${info.shuttleStation} (Shuttle Bus Stop)`,
+                                    duration: { text: "5 mins" }
+                                  },
+                                  {
+                                    html_instructions: `Wait for ${waitTimeMinutes} min the next shuttle departing at ${info.nextDepartureTime}`,
+                                    duration: { text: "${waitTimeMinutes} time" }
+                                  },
+                                  {
+                                    html_instructions: `Take the Concordia Shuttle Bus from ${info.startCampusName} to ${info.endCampusName} Campus`,
+                                    duration: { text: "30 mins" }
+                                  },
+                                  {
+                                    html_instructions: `Walk to ${destination}`,
+                                    duration: { text: "5 mins" }
+                                  },
+                                  {
+                                    html_instructions: `Arrive at your destination`,
+                                    duration: { text: "0 mins" }
+                                  }
+                                ],
+                                duration: { text: "35 mins" }
+                              }]
+                            }];
+                            
+                            // Set the route data to our custom route
+                            setRouteData(customShuttleRoute);
+                            
+                            // Set isTransit to true so the detailed instructions show in DirectionsSteps
+                            setIsTransit(true);
+                            
+                            console.log("User selected shuttle bus route");
+                          }}
                     />
                     )}
 

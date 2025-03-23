@@ -24,6 +24,7 @@ interface ShuttleBusTransitProps {
     startCampusName: string;
     endCampusName: string;
     nextDepartureTime: string;
+    shuttleStation: string;
   }) => void;
 }
 
@@ -268,6 +269,11 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
         style={ShuttleBusTransitStyle.button}
         onPress={() => {
           if (onSelect && nextDeparture) {
+            const shuttleStation =
+              startCampus === "SGW"
+                ? "1455 Maisonneuve Blvd W, Montreal, QC H3G 1M8"
+                : "7137 Rue Sherbrooke W, Montréal, QC H4B 1R2";
+
             // Calculate the actual departure time accounting for 5 min walk
             const adjustedDepartureTime = calculateAdjustedDepartureTime(
               nextDeparture.departureTime,
@@ -281,6 +287,7 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
               startCampusName: startCampusName,
               endCampusName: endCampusName,
               nextDepartureTime: adjustedDepartureTime,
+              shuttleStation: shuttleStation
             });
           }
         }}
