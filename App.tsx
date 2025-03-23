@@ -39,7 +39,6 @@ useEffect(() => {
   }
 }, []);
 
-const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
@@ -51,4 +50,3 @@ const App = () => {
   );
 };
 
-export default App;
