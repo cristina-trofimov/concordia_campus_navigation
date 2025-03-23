@@ -1386,7 +1386,6 @@ export const h8Features: H8Features[] = [
         "type": "Feature",
         "properties": {
             "escalators": "yes",
-            "highway": "steps",
             "level": "8"
         },
         "geometry": {
