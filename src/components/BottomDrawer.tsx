@@ -7,6 +7,8 @@ import {
   PanResponderGestureState,
 } from "react-native";
 import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
+import DirectionsSteps from "./DirectionsSteps";
+import { SearchBar } from "react-native-elements";
 
 const { height } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;

@@ -9,13 +9,23 @@ import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 
-const SearchBars: React.FC = () => {
+interface SearchBarProps {
+    inputDestination: string;
+}
+
+
+const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
+    
     const { setRouteData, myLocationString, setIsTransit } = useCoords();
-    const { inFloorView, setInFloorView } = useIndoor();
 
     const [origin, setOrigin] = useState('');
-    const [destination, setDestination] = useState('');
+    const [destination, setDestination] = useState(inputDestination);
     const [time, setTime] = useState('');
+    const { inFloorView, setInFloorView } = useIndoor();
+    
+    useEffect(() => {
+        setDestination(inputDestination);
+    }, [inputDestination]);
 
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {
@@ -97,6 +107,7 @@ const SearchBars: React.FC = () => {
         setDestination("");
         setDestinationCoords(null);
         setRouteData(null);
+        setInFloorView(false);
     }, [setRouteData]);
 
     useEffect(() => {
@@ -140,6 +151,7 @@ const SearchBars: React.FC = () => {
                                 key={mode}
                                 style={SearchBarsStyle.transportButton}
                                 onPress={() => setSelectedMode(mode)}
+                                
                             >
                                 <View style={SearchBarsStyle.transportButtonContent}>
                                     <Ionicons
@@ -147,9 +159,8 @@ const SearchBars: React.FC = () => {
                                         size={24}
                                         color={selectedMode === mode ? "#912338" : "black"}
                                     />
-                                    <Text style={[SearchBarsStyle.timeText, { color: selectedMode === mode ? "#912338" : "black" }]}>
-                                        {selectedMode === mode ? time : transportModes.find(t => t.mode === mode)?.time} min
-                                    </Text>
+                                    {selectedMode === mode}
+                    
                                 </View>
                             </TouchableOpacity>
                         ))}

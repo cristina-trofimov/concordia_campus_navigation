@@ -89,6 +89,14 @@ const LeftDrawer = () => {
                     <Text style={{ fontWeight: "bold" }} >Settings</Text>
                   </View>
                 </TouchableOpacity>
+                {(globalThis as any).isTesting && (
+                    <TouchableOpacity onPress={() => { console.log("Start Task pressed") }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 300 }}>
+                           <Feather name="play" size={20} color="black" style={LeftDrawerStyle.contentImage} />
+                           <Text style={{ fontWeight: "bold" }}>Start Task</Text>
+                        </View>
+                    </TouchableOpacity>
+                )}
               </View>
               </TouchableOpacity>
             </Animated.View>
