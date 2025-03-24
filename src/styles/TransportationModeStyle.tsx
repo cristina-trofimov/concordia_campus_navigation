@@ -1,22 +1,6 @@
 import { StyleSheet } from "react-native";
 
-export const SearchBarsStyle = StyleSheet.create({
-
-    container: {
-        width: '100%',
-        paddingHorizontal: 16,
-        paddingBottom: 10,
-    },
-    instructionContainer: {
-        padding: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: "#ddd",
-    },
-
-
-
-
-
+export const TransportationModeSTyle = StyleSheet.create({
     transportButtonContainer: {
         flexDirection: "row",
         justifyContent: "space-around",
@@ -91,5 +75,5 @@ export const SearchBarsStyle = StyleSheet.create({
         fontSize: 15,
         fontWeight: "500",
     },
-    
+
 });
