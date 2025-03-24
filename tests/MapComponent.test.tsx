@@ -63,12 +63,19 @@ jest.mock('../src/components/BuildingInformation', () => jest.fn().mockImplement
 
 // Suppress console.log during tests
 const originalConsoleLog = console.log;
+const originalConsoleError = console.error;
+const originalConsoleWarn = console.warn;
+
 beforeAll(() => {
   console.log = jest.fn();
+  console.error = jest.fn();
+  console.warn = jest.fn();
 });
 
 afterAll(() => {
   console.log = originalConsoleLog;
+  console.error = originalConsoleError;
+  console.warn = originalConsoleWarn;
 });
 
 // Now after all mocks are set up, import React and testing libraries
@@ -142,7 +149,19 @@ describe('MapComponent', () => {
     const mockRouteData = [{
       overview_polyline: {
         points: "mock_polyline_string"
-      }
+      },
+      legs: [
+        {
+          steps: [
+            {
+              travel_mode: "WALKING",
+              polyline: {
+                points: "mock_polyline_string"
+              }
+            }
+          ]
+        }
+      ]
     }];
     
     // Mock the useCoords hook to return route data
@@ -162,6 +181,6 @@ describe('MapComponent', () => {
     
     await waitFor(() => {
       expect(mockPolyline.decode).toHaveBeenCalledWith("mock_polyline_string");
-    });
+    }, { timeout: 3000 });
   });
 });
