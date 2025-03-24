@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import {
   shuttleSchedule,
-  sgwBuildings,
-  loyBuildings,
 } from "../data/ShuttleBusSchedule";
-import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
+import { Text, View, TouchableOpacity } from "react-native";
 import { ShuttleBusTransitStyle } from "../styles/ShuttleBusTransitStyle";
 
 // Define types
@@ -43,6 +41,8 @@ const LOY_CAMPUS_BOUNDS: CampusBounds = {
   west: -73.642,
 };
 
+type Campus = "SGW" | "LOY" | "UNKNOWN";
+
 // Helper function to check if coordinates are within campus bounds
 const isInCampusBounds = (
   lat: number,
@@ -58,7 +58,7 @@ const isInCampusBounds = (
 };
 
 // Function to determine campus from coordinates
-const determineCampusFromCoords = (coords: any): "SGW" | "LOY" | "UNKNOWN" => {
+const determineCampusFromCoords = (coords: any): Campus => {
   if (!coords) return "UNKNOWN";
 
   let lat, lng;
@@ -186,10 +186,10 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
   onSelect,
 }) => {
   const [isShuttleAvailable, setIsShuttleAvailable] = useState(false);
-  const [startCampus, setStartCampus] = useState<"SGW" | "LOY" | "UNKNOWN">(
+  const [startCampus, setStartCampus] = useState<Campus>(
     "UNKNOWN"
   );
-  const [endCampus, setEndCampus] = useState<"SGW" | "LOY" | "UNKNOWN">(
+  const [endCampus, setEndCampus] = useState<Campus>(
     "UNKNOWN"
   );
   const [nextDepartures, setNextDepartures] = useState<
@@ -273,7 +273,7 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
         <Text style={ShuttleBusTransitStyle.stationInfo}>
           Pickup:{" "}
           {startCampus !== "UNKNOWN"
-            ? shuttleSchedule.locations[startCampus as "SGW" | "LOY"].station
+            ? shuttleSchedule.locations[startCampus].station
             : "Location not on campus"}
         </Text>
       </View>

@@ -27,7 +27,7 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                             <TouchableOpacity
                                 style={BuildingInfoStyle.actionButton}
                                 onPress={() => {
-                                    setInputDestination(address || "");
+                                    setInputDestination(address ?? "");
                                     onClose();
                                 }}
                             >

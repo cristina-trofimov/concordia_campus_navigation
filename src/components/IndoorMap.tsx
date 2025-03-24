@@ -45,7 +45,7 @@ export const useIndoorFeatures = () => {
     const { setCurrentFloor, currentFloorAssociations, setIndoorFeatures } = useIndoor();
 
     const selectIndoorFeatures = (index: number) => {
-        if (currentFloorAssociations && currentFloorAssociations[index]) {
+        if (currentFloorAssociations?.[index]) {
             const featureComponent = featureMap[currentFloorAssociations[index].component] as IndoorFeatureCollection[];
             if (featureComponent) {
                 setIndoorFeatures(featureComponent);
