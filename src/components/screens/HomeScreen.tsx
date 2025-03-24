@@ -14,13 +14,41 @@ import MapComponent from "../MapComponent";
 
 const { height } = Dimensions.get("window");
 
-
 export default function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
 
   const [inputDestination, setInputDestination] = useState<string>("");
 
+  const exitDirectionMode = () => {
+    setInputDestination("");
+  };
 
+  const renderDirectionModeSearchBars = () => (
+    <View style={HomeStyle.topViewSearchBars}>
+      <SearchBars inputDestination={inputDestination} />
+    </View>
+  );
+
+  // const renderNotDirectionModeSearchBars = () => (
+  //   <CoordsProvider>
+  //     <IndoorsProvider>
+  //       <View style={HomeStyle.container}>
+  //         <CalendarButton />
+  //         <LeftDrawer />
+  //         <MapComponent
+  //           drawerHeight={drawerHeight}
+  //           setInputDestination={setInputDestination}
+  //         />
+  //         <FloorSelector />
+
+  //         <BottomDrawer drawerHeight={drawerHeight}>
+  //           <SearchBars inputDestination={inputDestination} />
+  //           <DirectionsSteps />
+  //         </BottomDrawer>
+  //       </View>
+  //     </IndoorsProvider>
+  //   </CoordsProvider>
+  // );
 
   return (
     <CoordsProvider>
@@ -28,17 +56,18 @@ export default function HomeScreen() {
         <View style={HomeStyle.container}>
           <CalendarButton />
           <LeftDrawer />
-          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} />
+          <MapComponent
+            drawerHeight={drawerHeight}
+            setInputDestination={setInputDestination}
+          />
           <FloorSelector />
 
-          <BottomDrawer drawerHeight={drawerHeight} >
+          <BottomDrawer drawerHeight={drawerHeight}>
             <SearchBars inputDestination={inputDestination} />
-            <DirectionsSteps/>  
+            <DirectionsSteps />
           </BottomDrawer>
-
         </View>
       </IndoorsProvider>
     </CoordsProvider>
   );
 }
- 

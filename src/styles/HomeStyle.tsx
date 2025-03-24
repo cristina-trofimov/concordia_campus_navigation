@@ -1,4 +1,6 @@
-import { StyleSheet } from "react-native";
+import { Dimensions, StyleSheet } from "react-native";
+
+const { width } = Dimensions.get("window");
 
 export const HomeStyle = StyleSheet.create({
   container: {
@@ -28,13 +30,25 @@ export const HomeStyle = StyleSheet.create({
     fontSize: 14,
     lineHeight: 24,
     fontWeight: "500",
-
   },
   iconsBox: {
-    marginRight:20,
-    justifyContent:'center',
-    alignItems:'center',
+    marginRight: 20,
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 12,
-    backgroundColor:"purple"
-  }
+    backgroundColor: "purple",
+  },
+  topViewSearchBars: {
+    position: 'absolute',
+    top: 10,
+    backgroundColor: "white",
+    width: width * 0.95,
+    height: 150,
+    padding: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 20,
+    elevation: 15,
+    zIndex: 1,
+  },
 });
