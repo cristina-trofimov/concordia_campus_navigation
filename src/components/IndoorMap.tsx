@@ -34,7 +34,7 @@ const floorNameFormat = (floor: string) => {
             suffix = "nd Floor";
             break;
         default:
-            suffix = floor.includes("$") ? " Floor" : "th Floor";
+            suffix = floor.includes("S") ? " Floor" : "th Floor";
             break;
     }
 
