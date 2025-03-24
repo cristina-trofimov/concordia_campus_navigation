@@ -24,12 +24,20 @@ const featureMap: { [key: string]: any } = {
 };
 
 const floorNameFormat = (floor: string) => {
-    const suffix = 
-        floor === "1" ? "st Floor" :
-        floor === "2" ? "nd Floor" :
-        floor.includes("S") ? " Floor" :
-        "th Floor";
-    
+    let suffix;
+
+    switch (floor) {
+        case "1":
+            suffix = "st Floor";
+            break;
+        case "2":
+            suffix = "nd Floor";
+            break;
+        default:
+            suffix = floor.includes("$") ? " Floor" : "th Floor";
+            break;
+    }
+
     return floor + suffix;
 };
 
