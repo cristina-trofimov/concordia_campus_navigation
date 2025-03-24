@@ -4,6 +4,8 @@ import Modal from 'react-native-modal';
 import { Icon } from 'react-native-elements';
 import BuildingLocation from '../interfaces/buildingLocation';
 import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
+import firebase from './src/components/firebase';
+import analytics from '@react-native-firebase/analytics';
 
 interface BuildingInformationProps {
     isVisible: boolean;
@@ -11,6 +13,23 @@ interface BuildingInformationProps {
     buildingLocation: BuildingLocation | null;
     setInputDestination: (inputDestination: string) => void;
 }
+const stopTimerAndLogEvent = (title: string) => {
+  if ((globalThis as any).isTesting && (globalThis as any).taskTimer) {
+    // Stop the timer and get the elapsed time
+
+    const elapsedTime = (globalThis as any).taskTimer.stop();
+    console.log(elapsedTime);
+    // Log the custom event with building name and the elapsed time
+      analytics().logEvent('Task_1_finished', {
+        building_name: title,
+        elapsed_time: elapsedTime/1000,  // Add the elapsed time
+        user_id: (globalThis as any).userId,
+      });
+
+      console.log(`Custom Event Logged: Task 1 Finished`);
+      console.log(`Elapsed Time: ${elapsedTime / 1000} seconds`);  // Log in seconds for readability
+  }
+};
 
 const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation, setInputDestination }) => {
     const { title, description, buildingInfo } = buildingLocation || {};
@@ -28,6 +47,9 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                                 style={BuildingInfoStyle.actionButton}
                                 onPress={() => {
                                     setInputDestination(address || "");
+                                    if(title=== "H Henry F. Hall Building"){
+                                          stopTimerAndLogEvent(title);
+                                        }
                                     onClose();
                                 }}
                             >

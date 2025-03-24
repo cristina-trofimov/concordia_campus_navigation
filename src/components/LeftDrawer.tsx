@@ -3,11 +3,44 @@ import { TouchableOpacity, Modal, View, Animated, Dimensions, GestureResponderEv
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LeftDrawerStyle } from "../styles/LeftDrawerStyle";
+import firebase from './src/components/firebase';
+import analytics from '@react-native-firebase/analytics';
+
 
 
 const { width } = Dimensions.get("window");
+// timer for usabilty test
+let startTime = 0;
+let timerInterval: any = null;
+(globalThis as any).taskTimer = {
+  start: () => {
+    if (startTime === 0) {  // Only start a new timer if no timer is running
+      startTime = Date.now(); // Record the start time
+      console.log("Timer started");
+    } else {
+      console.log("Timer already running, resetting.");
+      startTime = Date.now(); // Reset the timer
+    }
+  },
+  stop: () => {
+    if (startTime !== 0) {
+      const elapsedTime = Date.now() - startTime;
+      console.log(`Timer stopped. Time elapsed: ${(elapsedTime / 1000).toFixed(2)} seconds`);
+      // Reset the timer after stopping
+      startTime = 0;
+      return elapsedTime; // Return the time taken
+    }
+    console.log("No Timer running currently");
+    return 0;
+  },
+  getElapsedTime: () => {
+    if (startTime === 0) return 0;
+    return Date.now() - startTime;
+  }
+};
 
 const LeftDrawer = () => {
+  const [isTesting, setIsTesting] = useState((globalThis as any).isTesting);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(-width)).current;
 
@@ -15,6 +48,31 @@ const LeftDrawer = () => {
     if (event.target === event.currentTarget) {
       setIsDrawerVisible(false);
     }
+  };
+  const handleStartTask = () => {
+    // Start or reset the timer
+    (globalThis as any).taskTimer.start();
+
+    // Log the "start_task" event with Firebase Analytics
+    analytics().logEvent('start_task', {
+      message: 'Started a task',
+      user_id: (globalThis as any).userId,
+    });
+
+    console.log("Start Task pressed");
+  };
+
+  const handleCancelTask = () => {
+    // Stop the timer and log the time elapsed
+    const elapsedTime = (globalThis as any).taskTimer.stop();
+    if(elapsedTime!=0){
+    // Log the "cancel_task" event with Firebase Analytics
+    analytics().logEvent('cancel_task', {
+      message: 'Cancelled a task',
+      user_id: (globalThis as any).userId,
+    });}
+
+    console.log("Cancel Task pressed");
   };
 
   useEffect(() => {
@@ -90,12 +148,23 @@ const LeftDrawer = () => {
                   </View>
                 </TouchableOpacity>
                 {(globalThis as any).isTesting && (
-                    <TouchableOpacity onPress={() => { console.log("Start Task pressed") }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 300 }}>
-                           <Feather name="play" size={20} color="black" style={LeftDrawerStyle.contentImage} />
-                           <Text style={{ fontWeight: "bold" }}>Start Task</Text>
-                        </View>
-                    </TouchableOpacity>
+                    <>
+                    {/* Start Task Button */}
+                        <TouchableOpacity onPress={handleStartTask}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 300 }}>
+                                <Feather name="play" size={20} color="black" style={LeftDrawerStyle.contentImage} />
+                                <Text style={{ fontWeight: "bold" }}>Start Task</Text>
+                            </View>
+                        </TouchableOpacity>
+
+                    {/* Cancel Task Button */}
+                        <TouchableOpacity onPress={handleCancelTask}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
+                                <Feather name="x" size={20} color="black" style={LeftDrawerStyle.contentImage} />
+                                <Text style={{ fontWeight: "bold" }}>Cancel Task</Text>
+                            </View>
+                        </TouchableOpacity>
+                </>
                 )}
               </View>
               </TouchableOpacity>

@@ -23,6 +23,8 @@ import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
 import { HighlightIndoorMap } from './IndoorMap.tsx'; 
 import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
+import firebase from './src/components/firebase';
+import analytics from '@react-native-firebase/analytics';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
@@ -220,6 +222,13 @@ export default function MapComponent({
             coordinate={location.coordinates}
             style={{ zIndex: 1 }}
             onSelected={() => {
+                if ((globalThis as any).isTesting && (globalThis as any).taskTimer) {
+                        analytics().logEvent('building_pressed', {
+                          building_name: location.title,
+                          user_id: (globalThis as any).userId,
+                        });
+                        console.log(`Custom Event Logged: Building: ${location.title} was pressed`);
+                      }
               openOverlay(location);
             }}
           >
