@@ -24,8 +24,14 @@ const featureMap: { [key: string]: any } = {
 };
 
 const floorNameFormat = (floor: string) => {
-    return floor + (floor === "1" ? "st Floor" : floor === "2" ? "nd Floor" : floor.includes("S") ? " Floor" : "th Floor");
-}
+    const suffix = 
+        floor === "1" ? "st Floor" :
+        floor === "2" ? "nd Floor" :
+        floor.includes("S") ? " Floor" :
+        "th Floor";
+    
+    return floor + suffix;
+};
 
 export const useIndoorFeatures = () => {
     const { setCurrentFloor, currentFloorAssociations, setIndoorFeatures } = useIndoor();
