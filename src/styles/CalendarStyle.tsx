@@ -81,8 +81,5 @@ export const CalendarStyle = StyleSheet.create({
       padding: 10,
       width: "80%",
     },
-    signInButtonView: {
-      alignItems: 'center',
-      justifyContent: 'center'
-    }
+
   });

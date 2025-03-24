@@ -4,25 +4,48 @@ import {
     statusCodes,
 } from '@react-native-google-signin/google-signin';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { WEBCLIENTID } from '@env'
+import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
+
+
+export const configureGooggleSignIn = () => {
+    GoogleSignin.configure({
+        webClientId: WEBCLIENTID, // You need to fill this in with your actual web client ID
+        scopes: ['email', 'profile', 'https://www.googleapis.com/auth/calendar'],
+        offlineAccess: true,
+        forceCodeForRefreshToken: false,
+    });
+    configureReanimatedLogger({
+        level: ReanimatedLogLevel.warn,
+        strict: true, // Disables strict mode
+    });
+}
 
 
 export const signIn = async () => {
     try {
+
+        configureGooggleSignIn();
+
         const currentUser = await GoogleSignin.getCurrentUser();
         if (currentUser) {
-            
-            const currentUser = await GoogleSignin.getCurrentUser();
             console.log("Already signed in user:", JSON.stringify(currentUser, null, 2));
-            return currentUser;
+
+            const tokens = await GoogleSignin.getTokens();
+            return tokens.accessToken;
         }
 
-        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
 
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
         const userInfo = await GoogleSignin.signIn();
-        await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+
         console.log("Sign-in successful. User Info:", JSON.stringify(userInfo, null, 2));
 
-        return userInfo;
+        const tokens = await GoogleSignin.getTokens();
+        console.log("Sign-in successful. Access token obtained." + JSON.stringify(tokens.accessToken, null, 2));
+        return tokens.accessToken;
+
+
     } catch (error) {
         console.error("Sign-in error full details:", error);
 

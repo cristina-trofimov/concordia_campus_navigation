@@ -1,31 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, Button, Modal, TextInput, TouchableOpacity, } from "react-native";
 import { CalendarBody, CalendarContainer, CalendarHeader, DraggingEvent, DraggingEventProps, EventItem, CalendarKitHandle, } from "@howljs/calendar-kit";
-import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
 import { StackNavigationProp } from '@react-navigation/stack';
 import Feather from '@expo/vector-icons/Feather';
 import { CalendarStyle } from "../../styles/CalendarStyle";
-import {
-  GoogleSignin,
-  GoogleSigninButton,
-} from '@react-native-google-signin/google-signin';
-import { signIn, signOut } from "../HandleGoogle";
-import { WEBCLIENTID } from '@env'
-
-
-GoogleSignin.configure({
-  webClientId: WEBCLIENTID, // You need to fill this in with your actual web client ID
-  scopes: ['email', 'profile','https://www.googleapis.com/auth/calendar'],
-  offlineAccess: true,
-  forceCodeForRefreshToken: false,
-});
-configureReanimatedLogger({
-  level: ReanimatedLogLevel.warn,
-  strict: false, // Disables strict mode
-});
-
+import RightDrawer from "../RightDrawer";
+import { Calendar } from "../../interfaces/calendar";
+import { fetchCalendarEventsByCalendarId } from "../googleCalendarFetching";
+import { signIn } from "../signin";
 
 const theme = {
   calendarBackground: '#f0f0f0',
@@ -33,68 +17,19 @@ const theme = {
   selectedDayBackground: '#007bff',
 };
 
-const testEvents: EventItem[] = [
-  {
-    id: '1',
-    title: 'Meeting with Team',
-    start: { dateTime: '2025-03-15T10:00:00Z' },
-    end: { dateTime: '2025-03-15T12:00:00Z' },
-    color: '#4285F4',
-  },
-  {
-    id: '2',
-    title: 'Conference',
-    start: { dateTime: '2025-03-17T00:00:00', timeZone: 'America/New_York' },
-    end: { dateTime: '2025-03-18T00:00:00', timeZone: 'America/New_York' },
-    color: '#34A853',
-  },
-  {
-    id: '3',
-    title: 'Weekly Team Sync',
-    start: { dateTime: '2025-03-18T15:00:00Z' },
-    end: { dateTime: '2025-03-18T16:00:00Z' },
-    color: '#FBBC05',
-    recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=MO'
-  },
-  {
-    id: '4',
-    title: 'Weekly Team Building Day',
-    start: { date: '2025-03-07' },
-    end: { date: '2025-03-07' },
-    color: '#34A853',
-    recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=FR'
-  },
-  {
-    id: '5',
-    title: 'Weekly Team Building Day',
-    start: { dateTime: '2025-03-08T08:00:00', timeZone: 'America/New_York' },
-    end: { dateTime: '2025-03-08T18:00:00', timeZone: 'America/New_York' },
-    color: '#34A853',
-  },
-];
-
-
 const CalendarScreen = () => {
-  const handleSignOut = () => {
-    signOut();
-    handleGoingBack();
-  };
-
-  const handleGoingBack = () => {
-    navigation.navigate("Home");
-  }
-
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [events, setEvents] = useState<EventItem[]>(testEvents);
+  const [events, setEvents] = useState<EventItem[]>([]);
+  // const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
   const [currentDate, setCurrentDate] = useState<string>(`${new Date()}`);
-
-  const [eventTitle, setEventTitle] = useState(editingEvent?.title ?? '');
+  const [chosenCalendar, setChosenCalendar] = useState<Calendar | null>(null);
 
   const currentWeek = (currentDate: string) => {
     const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
+    // const today = currentDate || new Date();
     const today = new Date(currentDate);
     const dayOfWeek = today.getDay(); // 0 = Sun, 1 = Mon, etc
     const firstDay = new Date(today);
@@ -109,6 +44,16 @@ const CalendarScreen = () => {
     }
   }
 
+  const handleSignOut = () => {
+    signOut();
+    handleGoingBack();
+  };
+
+  const handleGoingBack = () => {
+    navigation.navigate("Home");
+  }
+
+
   const handleSaveEvent = () => {
     if (editingEvent) {
       setEvents((prevEvents) =>
@@ -118,10 +63,35 @@ const CalendarScreen = () => {
     setModalVisible(false);
   };
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      if (chosenCalendar) {
+        const accessToken = await signIn();
+        if (accessToken) {
+          const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
+          const modifiedEvents = events.data?.events.map((event) => {
+            return {
+              id: event.id,
+              title: event.title,
+              start: { dateTime: event.startTime },
+              end: { dateTime: event.endTime },
+              color: '#4285F4',
+            };
+          })
+          setEvents(modifiedEvents || []);
+        }
 
-const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
-  return (
-    <DraggingEvent
+      }
+
+    }
+    fetchEvents();
+
+  }, [chosenCalendar]);
+
+
+  const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
+    return (
+      <DraggingEvent
         {...props}
         TopEdgeComponent={
           <View
@@ -145,11 +115,10 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
           />
         }
       />
-  );
-}, []);
+    );
+  }, []);
 
   useEffect(() => {
-    console.log('modalVisible changed:', modalVisible);
   }, [modalVisible]);
 
   return (
@@ -157,7 +126,7 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
       {/* Header */}
       <View style={CalendarStyle.headerContainer}>
         <View style={{ flexDirection: "row" }} >
-          <TouchableOpacity onPress={handleGoingBack} >
+          <TouchableOpacity onPress={() => { navigation.navigate("Home") }} >
             <Feather name="arrow-left-circle" size={40} color="black" style={{ marginTop: 5 }} />
           </TouchableOpacity>
           <View style={CalendarStyle.headerButtonsContainer} >
@@ -166,23 +135,31 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
                 setCurrentDate( `${new Date(currentDate).getDate() - 7}`);
                 calendarRef.current?.goToDate({date: new Date(currentDate)});
                 // calendarRef.current?.goToPrevPage(true);
+                
+              // onPress={() => {
+              //   calendarRef.current?.goToPrevPage(true);
+              //   setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() - 7)));
               }}
             >
               <Feather name="chevron-left" size={28} color="black" />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={ () => {
+              onPress={() => {
                 calendarRef.current?.goToNextPage(true);
               }}
             >
               <Feather name="chevron-right" size={28} color="black" />
             </TouchableOpacity>
             <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDate)}</Text>
+
           </View>
         </View>
-        <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
+        {/* we want to keep the functionality so I will keep the code heer, but it needs to be better placed */}
+        {/* <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
           <Text style={{ color: "white", fontWeight: "bold" }} >TODAY</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+        <RightDrawer setChosenCalendar={setChosenCalendar} />
+
       </View>
 
       {/* Renders the calendar view */}
@@ -223,17 +200,14 @@ const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
               placeholder="Event Title"
             />
 
-            <View onTouchEnd={() => { setModalVisible(false); } } >
-              <Button title="Cancel 2" onPress={ () => { setModalVisible(false); console.log('Modal content touched') } } />
+            <View onTouchEnd={() => { setModalVisible(false); }} >
+              <Button title="Cancel 2" onPress={() => { setModalVisible(false); console.log('Modal content touched') }} />
             </View>
             <Button title="Save" onPress={() => { handleSaveEvent(); }} />
             <Button title="Cancel 3" onPress={() => { setModalVisible(false); }} />
           </View>
         </View>
       </Modal>
-      <View style={CalendarStyle.signInButtonView}>
-        <Button title="Sign Out" onPress={handleSignOut} />
-      </View>
     </View>
   );
 };
