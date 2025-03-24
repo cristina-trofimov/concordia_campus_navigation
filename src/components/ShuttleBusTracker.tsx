@@ -9,6 +9,22 @@ const ShuttleBusTracker: React.FC = () => {
     const [busData, setBusData] = useState<GoogleObject | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
+    // Define the shuttle bus stop coordinates
+    const busStops = [
+        {
+            id: 'SGW_STOP',
+            name: 'SGW Campus Shuttle Stop',
+            coordinate: [-73.5786672, 45.4969137], // Approximate coordinates for SGW stop
+            campus: 'SGW'
+        },
+        {
+            id: 'LOY_STOP',
+            name: 'Loyola Campus Shuttle Stop',
+            coordinate: [-73.6398, 45.4580], // Approximate coordinates for Loyola stop
+            campus: 'LOY'
+        }
+    ];
+
     const fetchBusData = async () => {
         try {
              // Step 1: First make a GET request to get session cookies
@@ -68,13 +84,26 @@ const ShuttleBusTracker: React.FC = () => {
 
     return (
         <>
+
+             {/* Render the bus stops */}
+             {busStops.map((stop) => (
+                <PointAnnotation
+                    key={stop.id}
+                    id={stop.id}
+                    coordinate={stop.coordinate}
+                    title={stop.name}
+                >
+                    <MaterialCommunityIcons name="bus-stop" size={40} color="#912338" />
+                </PointAnnotation>
+            ))}
+
             {busPoints.map((point) => (
                 <PointAnnotation
                     key={point.ID}
                     id={point.ID}
                     coordinate={[point.Longitude, point.Latitude]}
                 >
-                    <MaterialCommunityIcons name="bus-side" size={62} color="#912338" />
+                    <MaterialCommunityIcons name="bus-side" size={40} color="#912338" />
                 </PointAnnotation>
             ))}
         </>

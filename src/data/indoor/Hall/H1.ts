@@ -2964,7 +2964,6 @@ export const h1Features: H1Features[] = [
     {
         "type": "Feature",
         "properties": {
-            "highway": "steps",
             "level": "1",
             "escalators": "yes"
         },
