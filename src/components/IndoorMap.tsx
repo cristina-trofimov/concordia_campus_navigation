@@ -9,6 +9,8 @@ import { h2Features } from '../data/indoor/Hall/H2.ts';
 import { h8Features } from '../data/indoor/Hall/H8.ts';
 import { h9Features } from '../data/indoor/Hall/H9.ts';
 import { cc1Features } from '../data/indoor/CC/CC1.ts';
+import { mb1Features } from '../data/indoor/MB/MB1.ts';
+import { mb2Features } from '../data/indoor/MB/MBS2.ts';
 import { IndoorPointsOfInterest } from './IndoorPointsOfInterest.tsx';
 
 const featureMap: { [key: string]: any } = {
@@ -17,6 +19,26 @@ const featureMap: { [key: string]: any } = {
     h8Features,
     h9Features,
     cc1Features,
+    mb1Features,
+    mb2Features
+};
+
+const floorNameFormat = (floor: string) => {
+    let suffix;
+
+    switch (floor) {
+        case "1":
+            suffix = "st Floor";
+            break;
+        case "2":
+            suffix = "nd Floor";
+            break;
+        default:
+            suffix = floor.includes("S") ? " Floor" : "th Floor";
+            break;
+    }
+
+    return floor + suffix;
 };
 
 export const useIndoorFeatures = () => {
@@ -27,14 +49,7 @@ export const useIndoorFeatures = () => {
             const featureComponent = featureMap[currentFloorAssociations[index].component] as IndoorFeatureCollection[];
             if (featureComponent) {
                 setIndoorFeatures(featureComponent);
-                setCurrentFloor(
-                    currentFloorAssociations[index].floor +
-                    (currentFloorAssociations[index].floor === "1"
-                        ? "st Floor"
-                        : currentFloorAssociations[index].floor === "2"
-                            ? "nd Floor"
-                            : "th Floor")
-                );
+                setCurrentFloor(floorNameFormat(currentFloorAssociations[index].floor));
             } else {
                 setIndoorFeatures([]);
                 setCurrentFloor(null);
@@ -69,7 +84,7 @@ export const HighlightIndoorMap = () => {
     useEffect(() => {
         if (currentFloorAssociations.length > 0) {
             setBuildingHasFloors(true);
-            setFloorList(currentFloorAssociations.map((association) => association.floor + (association.floor == "1" ? "st Floor" : (association.floor == "2" ? "nd Floor" : "th Floor"))));
+            setFloorList(currentFloorAssociations.map((association) => floorNameFormat(association.floor)));
             selectIndoorFeatures(0);
         } else {
             setBuildingHasFloors(false);

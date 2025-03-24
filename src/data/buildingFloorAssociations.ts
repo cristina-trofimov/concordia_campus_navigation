@@ -26,4 +26,14 @@ export const buildingFloorAssociations: BuildingFloorAssociation[] = [
         floor: '1',
         component: 'cc1Features'
     },
+    {
+        buildingID: 'MB',
+        floor: '1',
+        component: 'mb1Features'
+    },
+    {
+        buildingID: 'MB',
+        floor: 'S2',
+        component: 'mb2Features'
+    },
 ];
