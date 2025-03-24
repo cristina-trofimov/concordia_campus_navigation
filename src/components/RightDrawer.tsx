@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TouchableOpacity, Modal, View, Animated, Dimensions, GestureResponderEvent, Button, Text, } from "react-native";
-import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { RightDrawerStyle } from "../styles/RightDrawerStyle";
 import { signIn } from "./signin";

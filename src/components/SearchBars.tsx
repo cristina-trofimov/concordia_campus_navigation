@@ -32,7 +32,7 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
             if (origin) {
                 getDirections(origin, inputDestination, selectedMode)
                 .then(result => {
-                    if (result && result.length > 0 && result[0].legs && result[0].legs[0].end_location) {
+                    if (result?.[0]?.legs?.[0]?.end_location) {
                         const coords = {
                             latitude: result[0].legs[0].end_location.lat,
                             longitude: result[0].legs[0].end_location.lng
@@ -190,7 +190,7 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
 
                    
                     {/* Only render ShuttleBusTransit component when transit mode is selected */}
-                    {selectedMode === "transit" && origin && destinationCoords && (
+                    {!!(selectedMode === "transit" && origin && destinationCoords) && (
                     <ShuttleBusTransit
                         startLocation={origin}
                         endLocation={destinationCoords}
