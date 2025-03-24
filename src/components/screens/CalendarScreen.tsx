@@ -10,7 +10,6 @@ import RightDrawer from "../RightDrawer";
 import { Calendar } from "../../interfaces/calendar";
 import { fetchCalendarEventsByCalendarId } from "../googleCalendarFetching";
 import { signIn } from "../signin";
-import { CalendarEvent } from "../../interfaces/CalendraEvent";
 
 const theme = {
   calendarBackground: '#f0f0f0',
@@ -34,52 +33,10 @@ const currentWeek = (currentDate?: Date): string => {
   }
 }
 
-// const testEvents: EventItem[] = [
-//   {
-//     id: '1',
-//     title: 'Meeting with Team',
-//     start: { dateTime: '2025-03-15T10:00:00Z' },
-//     end: { dateTime: '2025-03-15T12:00:00Z' },
-//     color: '#4285F4',
-//   },
-//   {
-//     id: '2',
-//     title: 'Conference',
-//     start: { dateTime: '2025-03-17T00:00:00', timeZone: 'America/New_York' },
-//     end: { dateTime: '2025-03-18T00:00:00', timeZone: 'America/New_York' },
-//     color: '#34A853',
-//   },
-//   {
-//     id: '3',
-//     title: 'Weekly Team Sync',
-//     start: { dateTime: '2025-03-18T15:00:00Z' },
-//     end: { dateTime: '2025-03-18T16:00:00Z' },
-//     color: '#FBBC05',
-//     recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=MO'
-//   },
-//   {
-//     id: '4',
-//     title: 'Weekly Team Building Day',
-//     start: { date: '2025-03-07' },
-//     end: { date: '2025-03-07' },
-//     color: '#34A853',
-//     recurrenceRule: 'RRULE:FREQ=WEEKLY;BYDAY=FR'
-//   },
-//   {
-//     id: '5',
-//     title: 'Weekly Team Building Day',
-//     start: { dateTime: '2025-03-08T08:00:00', timeZone: 'America/New_York' },
-//     end: { dateTime: '2025-03-08T18:00:00', timeZone: 'America/New_York' },
-//     color: '#34A853',
-//   },
-// ];
-
-
 const CalendarScreen = () => {
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [events, setEvents] = useState<EventItem[]>([]);
-  // const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);

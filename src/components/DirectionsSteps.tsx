@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { useCoords } from "../data/CoordsContext";
-import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
 import { DirectionStepsStyle } from "../styles/DirectionsStepsStyle";
 import { MaterialIcons } from "@expo/vector-icons";
 
-const DirectionsSteps = () => {
-  const { routeData: routeCoordinates, isTransit, setIsTransit } = useCoords();
-  const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
+  const DirectionsSteps = () => {
+
+    const { routeData: routeCoordinates,isTransit} = useCoords();
+    const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
 
   useEffect(() => {
     if (routeCoordinates && routeCoordinates.length > 0) {
@@ -48,84 +48,69 @@ const DirectionsSteps = () => {
         }
       }
 
-      if (isTransit == true) {
-        setHtmlInstructions(detailedInstructions);
-      } else {
-        setHtmlInstructions(instructions);
-      }
-      // console.log(htmlInstructions);
+      isTransit ? setHtmlInstructions(detailedInstructions) : setHtmlInstructions(instructions);
+
+    // console.log(htmlInstructions);
     } else {
       setHtmlInstructions([]);
     }
   }, [routeCoordinates]);
-  return (
-    <View style={DirectionStepsStyle.container}>
+
+  return(
+      <View style={ DirectionStepsStyle.container}>
       <ScrollView>
-        {htmlInstructions.length > 0 &&
-          htmlInstructions.map((instruction, index) => {
-            const instructionsIconsDisplay = instruction
-              .toLowerCase()
-              .includes("destination")
-              ? "location-on"
-              : instruction.toLowerCase().includes("left")
-              ? "turn-left"
-              : instruction.toLowerCase().includes("right")
-              ? "turn-right"
-              : instruction.toLowerCase().includes("walk")
-              ? "directions-walk"
-              : instruction.toLowerCase().includes("bus")
-              ? "directions-bus"
-              : instruction.toLowerCase().includes("metro")
-              ? "directions-subway"
-              : instruction.toLowerCase().includes("subway")
-              ? "directions-subway"
-              : instruction.toLowerCase().includes("train")
-              ? "directions-train"
-              : instruction.toLowerCase().includes("merge")
-              ? "merge"
-              : instruction.toLowerCase().includes("straight")
-              ? "straight"
-              : instruction.toLowerCase().includes("continue")
-              ? "straight"
-              : instruction.toLowerCase().includes("northeast")
-              ? "turn-slight-right"
-              : instruction.toLowerCase().includes("northwest")
-              ? "turn-slight-left"
-              : instruction.toLowerCase().includes("southeast")
-              ? "turn-slight-right"
-              : instruction.toLowerCase().includes("southwest")
-              ? "turn-slight-left"
-              : instruction.toLowerCase().includes("exit")
-              ? "arrow-outward"
-              : instruction.toLowerCase().includes("wait")
-              ? "access-time"
+      {htmlInstructions.length > 0 &&
+        htmlInstructions.map((instruction, index) => {
+          const iconMappings: { [key: string]: string } = {
+            destination: 'location-on',
+            left: 'turn-left',
+            right: 'turn-right',
+            walk: 'directions-walk',
+            bus: 'directions-bus',
+            metro: 'directions-subway',
+            subway: 'directions-subway',
+            train: 'directions-train',
+            merge: 'merge',
+            straight: 'straight',
+            continue: 'straight',
+            northeast: 'turn-slight-right',
+            northwest: 'turn-slight-left',
+            southeast: 'turn-slight-right',
+            southwest: 'turn-slight-left',
+            exit: 'arrow-outward',
+            wait: 'access-time'
+          };
+
+          const lowerCaseInstruction = instruction.toLowerCase();
+
+          const instructionsIconsDisplay = Object.keys(iconMappings).find((key) => lowerCaseInstruction.includes(key))
+              ? iconMappings[Object.keys(iconMappings).find((key) => lowerCaseInstruction.includes(key))!]
               : null;
-            return (
-              <View key={index} style={DirectionStepsStyle.instructionsList}>
-                <View>
-                  <View style={DirectionStepsStyle.iconsBox}>
-                    {instructionsIconsDisplay && (
-                      <MaterialIcons
-                        name={
-                          instructionsIconsDisplay as keyof typeof MaterialIcons.glyphMap
-                        }
-                        size={30}
-                        color="black"
-                      />
-                    )}
-                  </View>
-                </View>
-                <View style={DirectionStepsStyle.topBorder}>
-                  <Text style={DirectionStepsStyle.instructionText}>
-                    {instruction}
-                  </Text>
-                </View>
+        return (
+          <View key={index} style={ DirectionStepsStyle.instructionsList}>
+            <View>
+              <View style={ DirectionStepsStyle.iconsBox}>
+                {instructionsIconsDisplay && (
+                  <MaterialIcons
+                    name={instructionsIconsDisplay as keyof typeof MaterialIcons.glyphMap}
+                    size={30}
+                    color="black"
+                  />
+              )}
               </View>
-            );
+            </View>
+            <View style={DirectionStepsStyle.topBorder}>
+              <Text style={DirectionStepsStyle.instructionText}>
+                {instruction}
+              </Text>
+            </View>
+          </View>
+        );
+          
           })}
-      </ScrollView>
-    </View>
-  );
-};
+          </ScrollView>
+        </View>
+    )
+  }
 
 export default DirectionsSteps;
