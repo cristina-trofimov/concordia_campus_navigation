@@ -18,7 +18,6 @@ const stopTimerAndLogEvent = (title: string) => {
     // Stop the timer and get the elapsed time
 
     const elapsedTime = (globalThis as any).taskTimer.stop();
-    console.log(elapsedTime);
     // Log the custom event with building name and the elapsed time
       analytics().logEvent('Task_1_finished', {
         building_name: title,
