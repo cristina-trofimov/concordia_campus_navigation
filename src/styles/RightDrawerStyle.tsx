@@ -11,7 +11,7 @@ export const RightDrawerStyle = StyleSheet.create({
         position: "absolute",
         top: 0,
         right: 10, // Change from left: 10 to right: 10
-        height: 40,
+        height: 36,
         width: 40,
         backgroundColor: "rgba(255, 255, 255, 1)",
         borderRadius: 5,

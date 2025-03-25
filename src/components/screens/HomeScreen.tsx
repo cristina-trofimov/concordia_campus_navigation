@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Animated, Dimensions, ScrollView, View } from "react-native";
+import React, { useRef, useState } from "react";
+import { Animated, Dimensions, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
-import { CoordsProvider, useCoords } from "../../data/CoordsContext";
+import { CoordsProvider } from "../../data/CoordsContext";
 import { IndoorsProvider } from "../../data/IndoorContext";
 import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
@@ -9,7 +9,6 @@ import { HomeStyle } from "../../styles/HomeStyle";
 import { FloorSelector } from "../FloorSelector";
 import SearchBars from "../SearchBars";
 import DirectionsSteps from "../DirectionsSteps";
-import { Text } from "react-native-elements";
 import MapComponent from "../MapComponent";
 
 const { height } = Dimensions.get("window");
@@ -17,10 +16,7 @@ const { height } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
-
   const [inputDestination, setInputDestination] = useState<string>("");
-
-
 
   return (
     <CoordsProvider>

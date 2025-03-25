@@ -1,36 +1,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import { TouchableOpacity, Modal, View, Animated, Dimensions, GestureResponderEvent, Button, Text, } from "react-native";
-import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { RightDrawerStyle } from "../styles/RightDrawerStyle";
-import { signIn } from "./signin";
 import { fetchUserCalendars } from "./googleCalendarFetching";
-import { signOut } from "./signout";
+import { signIn, signOut } from "./HandleGoogle";
 import { GoogleSigninButton } from "@react-native-google-signin/google-signin";
 import { Calendar } from "../interfaces/calendar";
+import { useRoute } from "@react-navigation/native";
+import { CalendarScreenProp } from "../../App";
 
 const { width } = Dimensions.get("window");
 
 const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Calendar) => void}) => {
     const [isDrawerVisible, setIsDrawerVisible] = useState(false);
     const [isSignedIn, setIsSignedIn] = useState(false);
-    const [calendars, setCalendars] = useState<Calendar[] | undefined>([]);
+    const route = useRoute<CalendarScreenProp>();
+    const calendars = route.params?.calendars || [];
+    // const [calendars, setCalendars] = useState<Calendar[] | undefined>([]);
 
 
     const slideAnim = useRef(new Animated.Value(width)).current;
 
-    const handleSignIn = async () => {
-        const token = await signIn();
-        if (token) {
-            const calendars = await fetchUserCalendars(token);
-            if (calendars) {
-                setCalendars(calendars.data?.calendars);
-            }
-            console.log(calendars.data?.calendars);
-            setIsSignedIn(true);
-        };
-
-    }
+    // const handleSignIn = async () => {
+    //     const token = await signIn();
+    //     if (token) {
+    //         const calendars = await fetchUserCalendars(token);
+    //         if (calendars) {
+    //             setCalendars(calendars.data?.calendars);
+    //         }
+    //         console.log(calendars.data?.calendars);
+    //         setIsSignedIn(true);
+    //     };
+    // }
 
     const handleSignOut = () => {
         signOut().then(() => setIsSignedIn(false));
@@ -94,30 +95,29 @@ const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Cale
                                     <View style={RightDrawerStyle.contentContainer} >
                                         {/* Calendar choice component  */}
                                         <View>
-                                            {isSignedIn && calendars && (
-                                                calendars.map((calendar) => {
-                                                    return (
-                                                        <TouchableOpacity key={calendar.id} onPress={() => setChosenCalendar(calendar)} >
-                                                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
-                                                                <Ionicons name="calendar-outline" size={24} color="black" />
-                                                                <Text>{calendar.title}</Text>
-                                                            </View>
-                                                        </TouchableOpacity>
-                                                    )
-                                                })
-                                            )}
+                                            {isSignedIn && calendars?.map((calendar) => {
+                                                return (
+                                                    <TouchableOpacity key={calendar.id} onPress={() => setChosenCalendar(calendar)} >
+                                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
+                                                            <Ionicons name="calendar-outline" size={24} color="black" />
+                                                            <Text>{calendar.title}</Text>
+                                                        </View>
+                                                    </TouchableOpacity>
+                                                )
+                                            })
+                                            }
                                         </View>
 
                                         <View style={RightDrawerStyle.signInButtonView}>
-                                            {!isSignedIn ? (
+                                            {/* {!isSignedIn ? (
                                                 <GoogleSigninButton
                                                     size={GoogleSigninButton.Size.Standard}
                                                     color={GoogleSigninButton.Color.Dark}
-                                                    onPress={handleSignIn}
+                                                    // onPress={handleSignIn}
                                                 />
-                                            ) : (
+                                            ) : ( */}
                                                 <Button title="Sign Out" onPress={handleSignOut} />
-                                            )}
+                                            {/* )} */}
                                         </View>
 
 

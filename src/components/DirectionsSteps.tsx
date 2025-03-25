@@ -5,7 +5,6 @@ import {
   ScrollView
 } from "react-native";
 import { useCoords } from "../data/CoordsContext";
-import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
 import { DirectionStepsStyle } from "../styles/DirectionsStepsStyle";
 import { MaterialIcons} from "@expo/vector-icons";
 

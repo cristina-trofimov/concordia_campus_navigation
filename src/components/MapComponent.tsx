@@ -6,7 +6,7 @@ import {
   Animated,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import Mapbox, { Camera, MapView, PointAnnotation, ShapeSource, LineLayer } from "@rnmapbox/maps";
+import Mapbox, { Camera, MapView, PointAnnotation } from "@rnmapbox/maps";
 import { Text } from "@rneui/themed";
 import { locations } from "../data/buildingLocation.ts";
 import * as Location from "expo-location";
@@ -277,7 +277,7 @@ export default function MapComponent({
           </PointAnnotation>
         )}
 
-        {routeSegments && routeSegments.map((segment, index) => (
+        {routeSegments?.map((segment, index) => (
           <Mapbox.ShapeSource
             key={`segment-${index}`}
             id={`routeSource-${index}`}

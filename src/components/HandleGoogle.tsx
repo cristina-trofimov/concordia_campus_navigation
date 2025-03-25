@@ -21,7 +21,6 @@ export const configureGooggleSignIn = () => {
     });
 }
 
-
 export const signIn = async () => {
     try {
 
@@ -43,6 +42,9 @@ export const signIn = async () => {
 
         const tokens = await GoogleSignin.getTokens();
         console.log("Sign-in successful. Access token obtained." + JSON.stringify(tokens.accessToken, null, 2));
+
+        // await AsyncStorage.setItem('userInfo', tokens.accessToken);
+
         return tokens.accessToken;
 
 
@@ -73,8 +75,9 @@ export const signIn = async () => {
 export const signOut = async () => {
     try {
         await GoogleSignin.signOut();
-        await AsyncStorage.removeItem('userInfo');
         console.log('User signed out successfully');
+
+        await AsyncStorage.removeItem('userInfo');
         
     } catch (error) {
         console.error('Error signing out:', error);

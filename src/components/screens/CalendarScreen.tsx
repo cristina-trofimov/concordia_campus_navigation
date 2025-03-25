@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, Button, Modal, TextInput, TouchableOpacity, } from "react-native";
 import { CalendarBody, CalendarContainer, CalendarHeader, DraggingEvent, DraggingEventProps, EventItem, CalendarKitHandle, } from "@howljs/calendar-kit";
-import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../../../App";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { CalendarScreenProp, RootStackParamList } from "../../../App";
 import { StackNavigationProp } from '@react-navigation/stack';
 import Feather from '@expo/vector-icons/Feather';
 import { CalendarStyle } from "../../styles/CalendarStyle";
 import RightDrawer from "../RightDrawer";
 import { Calendar } from "../../interfaces/calendar";
 import { fetchCalendarEventsByCalendarId } from "../googleCalendarFetching";
-import { signIn } from "../signin";
+import { signIn, signOut } from "../HandleGoogle";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 const theme = {
   calendarBackground: '#f0f0f0',
@@ -28,6 +29,10 @@ const CalendarScreen = () => {
   const [chosenCalendar, setChosenCalendar] = useState<Calendar | null>(null);
 
   const currentWeek = (currentDate: string) => {
+    // const route = useRoute<CalendarScreenProp>();
+    // const calendars = route.params?.calendars || [];
+
+
     const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
     // const today = currentDate || new Date();
     const today = new Date(currentDate);
@@ -43,16 +48,6 @@ const CalendarScreen = () => {
       return `${months[today.getMonth()]} ${firstDay.getDate()} - ${lastDay.getDate()}, ${today.getFullYear()}`;
     }
   }
-
-  const handleSignOut = () => {
-    signOut();
-    handleGoingBack();
-  };
-
-  const handleGoingBack = () => {
-    navigation.navigate("Home");
-  }
-
 
   const handleSaveEvent = () => {
     if (editingEvent) {
@@ -126,40 +121,42 @@ const CalendarScreen = () => {
       {/* Header */}
       <View style={CalendarStyle.headerContainer}>
         <View style={{ flexDirection: "row" }} >
-          <TouchableOpacity onPress={() => { navigation.navigate("Home") }} >
-            <Feather name="arrow-left-circle" size={40} color="black" style={{ marginTop: 5 }} />
+          <TouchableOpacity style={CalendarStyle.backBTN} onPress={() => { navigation.navigate("Home") }} >
+            <Feather name="arrow-left-circle" size={40} color="#912338" />
           </TouchableOpacity>
-          <View style={CalendarStyle.headerButtonsContainer} >
-            <TouchableOpacity
-              onPress={ () => {
-                setCurrentDate( `${new Date(currentDate).getDate() - 7}`);
-                calendarRef.current?.goToDate({date: new Date(currentDate)});
-                // calendarRef.current?.goToPrevPage(true);
-                
-              // onPress={() => {
-              //   calendarRef.current?.goToPrevPage(true);
-              //   setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() - 7)));
-              }}
-            >
-              <Feather name="chevron-left" size={28} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                calendarRef.current?.goToNextPage(true);
-              }}
-            >
-              <Feather name="chevron-right" size={28} color="black" />
-            </TouchableOpacity>
-            <Text style={{ paddingLeft: 10 }} >{currentWeek(currentDate)}</Text>
-
-          </View>
         </View>
         {/* we want to keep the functionality so I will keep the code heer, but it needs to be better placed */}
-        {/* <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
-          <Text style={{ color: "white", fontWeight: "bold" }} >TODAY</Text>
-        </TouchableOpacity> */}
+        <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
+          <MaterialIcons name="today" size={24} color="white" />
+          <Text style={{ color: "white", fontWeight: "bold", margin: 2.5 }} >TODAY</Text>
+        </TouchableOpacity>
         <RightDrawer setChosenCalendar={setChosenCalendar} />
+      </View>
 
+      <View style={CalendarStyle.headerCalendarButtonsContainer} >
+        <TouchableOpacity
+          onPress={ () => {
+            setCurrentDate( `${new Date(currentDate).getDate() - 7}`);
+            calendarRef.current?.goToDate({date: new Date(currentDate)});
+            // calendarRef.current?.goToPrevPage(true);
+            
+          // onPress={() => {
+          //   calendarRef.current?.goToPrevPage(true);
+          //   setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() - 7)));
+          }}
+        >
+          <Feather name="chevron-left" size={30} color="black" />
+        </TouchableOpacity>
+
+        <Text style={{ paddingLeft: 10, marginTop: 5 }} >{currentWeek(currentDate)}</Text>
+
+        <TouchableOpacity
+          onPress={() => {
+            calendarRef.current?.goToNextPage(true);
+          }}
+        >
+          <Feather name="chevron-right" size={30} color="black" />
+        </TouchableOpacity>
       </View>
 
       {/* Renders the calendar view */}
