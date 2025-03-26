@@ -64,6 +64,18 @@ describe('CalendarScreen', () => {
     );
   };
 
+  it('navigates back to Home when back button is pressed', () => {
+    const { getByTestId } = renderComponent();
+    
+    // Press the back button
+    const backButton = getByTestId('back-button');
+    fireEvent.press(backButton);
+    
+    // Check if navigation.goBack was called
+    const navigation = useNavigation();
+    expect(navigation.navigate).toHaveBeenCalledWith('Home');
+  });
+
   it('renders without crashing', () => {
     const { getByText } = renderComponent();
     
