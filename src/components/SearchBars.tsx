@@ -229,6 +229,7 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                                     // Shuttle route steps (marked for dashed line)
                                     ...shuttleRouteCoords[0].legs[0].steps.map((step: { html_instructions: string; is_shuttle_route: boolean; }) => {
                                         step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
+                                        step.is_shuttle_route = true;
                                         return step;
                                     }),
                                 
@@ -281,6 +282,8 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                               console.error("Error creating shuttle route:", error);
                             });
                           }}
+  
+               />
   
                />
                     )}
