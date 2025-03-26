@@ -16,33 +16,25 @@ const DirectionsSteps = () => {
 
   useEffect(() => {
     if (routeCoordinates && routeCoordinates.length > 0) {
-      const instructions = routeCoordinates[0].legs[0].steps.map((step: any) =>
-        formatSteps(step)
+      // First filter out any steps marked with our special prefix
+      const filteredSteps = routeCoordinates[0].legs[0].steps.filter((
+        step: { html_instructions: string | string[]; }) => step.html_instructions && !step.html_instructions.includes("HIDDEN_STEP_DO_NOT_DISPLAY")
       );
-
-      let detailedInstructions: string[] = [];
-      const number = routeCoordinates[0].legs[0].steps.length;
-      const instructionsGeneral = routeCoordinates[0].legs[0].steps.map(
-        (step: any) => {
-          return step.html_instructions.replace(/<[^<>]*>/g, "");
-        }
-      );
-      for (let i = 0; i < number; i++) {
-        const detailedHtmlInstructions = routeCoordinates[0]?.legs[0]?.steps[
-          i
-        ]?.steps?.map((step: any) => formatSteps(step));
-        if (detailedHtmlInstructions == undefined) {
-          detailedInstructions = detailedInstructions.concat(
-            instructionsGeneral[i]
-          );
-        } else {
-          detailedInstructions = detailedInstructions.concat(
-            instructionsGeneral[i]
-          );
-          detailedInstructions = detailedInstructions.concat(
-            detailedHtmlInstructions
-          );
-        }
+      const instructions = routeCoordinates[0].legs[0].steps.map((step: any) => { return step.html_instructions.replace(/<.*?>/g, '').replace(/(?=Destination)/gi, '. '); });
+     
+      let detailedInstructions: string[]=[];
+      const number = filteredSteps.length;
+      const instructionsGeneral = filteredSteps.map((step: any) => { 
+        return step.html_instructions.replace(/<.*?>/g, ''); 
+      });
+      for (let i=0; i<number; i++){
+        const detailedHtmlInstructions = routeCoordinates[0]?.legs[0]?.steps[i]?.steps?.map((step: any) => {
+          return step.html_instructions.replace(/<.*?>/g, '').replace(/(?=Destination)/gi, '. '); });
+          if (detailedHtmlInstructions==undefined){
+              detailedInstructions= detailedInstructions.concat(instructionsGeneral[i]);
+          }else {
+          detailedInstructions=detailedInstructions.concat(instructionsGeneral[i]);
+          detailedInstructions=detailedInstructions.concat(detailedHtmlInstructions);}
       }
 
       isTransit
