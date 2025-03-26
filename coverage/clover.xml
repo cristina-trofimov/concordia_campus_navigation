@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1743020516050" clover="3.2.0">
-  <project timestamp="1743020516050" name="All files">
-    <metrics statements="402" coveredstatements="310" conditionals="185" coveredconditionals="120" methods="117" coveredmethods="75" elements="704" coveredelements="505" complexity="0" loc="402" ncloc="402" packages="6" files="26" classes="26"/>
+<coverage generated="1743021353812" clover="3.2.0">
+  <project timestamp="1743021353812" name="All files">
+    <metrics statements="411" coveredstatements="314" conditionals="199" coveredconditionals="124" methods="123" coveredmethods="76" elements="733" coveredelements="514" complexity="0" loc="411" ncloc="411" packages="6" files="27" classes="27"/>
     <package name="src.components">
-      <metrics statements="314" coveredstatements="246" conditionals="165" coveredconditionals="114" methods="79" coveredmethods="63"/>
+      <metrics statements="323" coveredstatements="250" conditionals="179" coveredconditionals="118" methods="85" coveredmethods="64"/>
       <file name="BottomDrawer.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/BottomDrawer.tsx">
         <metrics statements="53" coveredstatements="15" conditionals="24" coveredconditionals="0" methods="8" coveredmethods="2"/>
         <line num="11" count="1" type="stmt"/>
@@ -164,6 +164,18 @@
         <line num="30" count="5" type="stmt"/>
         <line num="42" count="12" type="stmt"/>
         <line num="45" count="2" type="stmt"/>
+      </file>
+      <file name="IndoorPointsOfInterest.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/IndoorPointsOfInterest.tsx">
+        <metrics statements="9" coveredstatements="4" conditionals="14" coveredconditionals="4" methods="6" coveredmethods="1"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="4" type="stmt"/>
+        <line num="9" count="4" type="cond" truecount="4" falsecount="0"/>
+        <line num="11" count="2" type="stmt"/>
+        <line num="16" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="25" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="34" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="43" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="52" count="0" type="cond" truecount="0" falsecount="2"/>
       </file>
       <file name="MapComponent.tsx" path="/Users/constance/Downloads/concordia_campus_navigation/src/components/MapComponent.tsx">
         <metrics statements="80" coveredstatements="59" conditionals="39" coveredconditionals="18" methods="25" coveredmethods="16"/>
