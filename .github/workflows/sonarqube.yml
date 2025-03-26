@@ -40,3 +40,9 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=./coverage/lcov.info
             -Dsonar.sources=src
             -Dsonar.tests=tests
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
