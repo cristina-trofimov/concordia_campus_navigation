@@ -186,6 +186,7 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                         ))}
                     </View>
                    
+                   
                     {/* Only render ShuttleBusTransit component when transit mode is selected */}
                     {!!(selectedMode === "transit" && origin && destinationCoords) && (
                     <ShuttleBusTransit
@@ -273,100 +274,21 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
 
                             // Update the UI
                             setRouteData([routeCopy]);
+                            // Update the UI
+                            setRouteData([routeCopy]);
 
                             setTime((walkToStationMinutes + waitTimeMinutes + 30 + walkFromStationMinutes).toString());
+                            setTime((walkToStationMinutes + waitTimeMinutes + 30 + walkFromStationMinutes).toString());
 
+                            setIsTransit(true);
                             setIsTransit(true);
 
                             }).catch(error => {
                               console.error("Error creating shuttle route:", error);
                             });
-                            Promise.all([
-                                getDirections(origin, info.startShuttleStation, "walking"),
-                                getDirections(info.endShuttleStation, destination, "walking"),
-                                getDirections(info.startShuttleStation, info.endShuttleStation, "driving")
-                            ]).then(([stationRouteCoords, endRouteCoords, shuttleRouteCoords]) => {
-                                if (!stationRouteCoords?.length || !endRouteCoords?.length || !shuttleRouteCoords?.length) {
-                                    console.error("Missing route data");
-                                    return;
-                                }
-                              
-                                // Create deep copy of the first route segment
-                                const routeCopy = JSON.parse(JSON.stringify(stationRouteCoords[0]));
-                              
-                                // Calculate times
-                                const now = new Date();
-                                const [hours, minutes] = info.nextDepartureTime.split(':').map(Number);
-                                const departureTime = new Date();
-                                departureTime.setHours(hours, minutes, 0, 0);
-                                const arrivalAtStationTime = new Date(now.getTime() + routeCopy.legs[0].duration.value * 1000);
-                                const waitTimeMinutes = Math.max(0, Math.floor((departureTime.getTime() - arrivalAtStationTime.getTime()) / (60 * 1000)));
-                                const walkToStationMinutes = Math.ceil(routeCopy.legs[0].duration.value / 60);
-                                const walkFromStationMinutes = Math.ceil(endRouteCoords[0].legs[0].duration.value / 60);
-                              
-                                // Create template step object for custom steps
-                                const templateStep = routeCopy.legs[0].steps[0] || {};
-                              
-                                // Create all steps with hidden instructions for route visualization
-                                const allHiddenSteps = [
-                                    // Walking to station steps
-                                    ...routeCopy.legs[0].steps.map((step: { html_instructions: string; }) => {
-                                        step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
-                                        return step;
-                                    }),
-                                
-                                    // Shuttle route steps (marked for dashed line)
-                                    ...shuttleRouteCoords[0].legs[0].steps.map((step: { html_instructions: string; is_shuttle_route: boolean; }) => {
-                                        step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
-                                        step.is_shuttle_route = true;
-                                        return step;
-                                    }),
-                                
-                                    // Walking from station steps
-                                    ...endRouteCoords[0].legs[0].steps.map((step: { html_instructions: string; }) => {
-                                        step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
-                                        return step;
-                                    })
-                                ];
-                              
-                                // Create visible custom instruction steps
-                                const visibleSteps = [
-                                {
-                                    ...templateStep,
-                                    html_instructions: `Walk to ${info.startShuttleStation} (Shuttle Bus Stop)`,
-                                    duration: routeCopy.legs[0].duration,
-                                    distance: routeCopy.legs[0].distance
-                                },
-                                {
-                                    ...templateStep,
-                                    html_instructions: `Wait for ${waitTimeMinutes} min until the shuttle departing at ${info.nextDepartureTime}`,
-                                    duration: { text: `${waitTimeMinutes} mins`, value: waitTimeMinutes * 60 },
-                                    distance: { text: "", value: 0 }
-                                },
-                                {
-                                    ...templateStep,
-                                    html_instructions: `Take the Concordia Shuttle Bus from ${info.startCampusName} to ${info.endCampusName} Campus`,
-                                    duration: { text: "30 mins", value: 1800 },
-                                    distance: { text: "8.3 km", value: 8300 }
-                                },
-                                {
-                                    ...templateStep,
-                                    html_instructions: `Walk from ${info.endShuttleStation} to your destination`,
-                                    duration: endRouteCoords[0].legs[0].duration,
-                                    distance: endRouteCoords[0].legs[0].distance
-                                }
-                            ];
-                              
-                            // Update the complete route
-                            routeCopy.legs[0].steps = [...allHiddenSteps, ...visibleSteps];
-
-                            // Update the UI
-                            setRouteData([routeCopy]);
-
-                            setTime((walkToStationMinutes + waitTimeMinutes + 30 + walkFromStationMinutes).toString());
-
-                            setIsTransit(true);
-
+                          }}
+  
+               />
                             }).catch(error => {
                               console.error("Error creating shuttle route:", error);
                             });
