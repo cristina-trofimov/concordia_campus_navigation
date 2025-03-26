@@ -102,13 +102,15 @@ export default function MapComponent({
             if (step.travel_mode === "TRANSIT") {
               segments.push({
                 mode: "TRANSIT",
-                coordinates: decodedSegment
+                coordinates: decodedSegment,
+                is_shuttle_route: (step as any).is_shuttle_route || false 
               });
             } else {
 
               segments.push({
                 mode: step.travel_mode as 'WALKING' | 'TRANSIT' | 'DRIVING' | 'BICYCLING',
-                coordinates: decodedSegment
+                coordinates: decodedSegment,
+                is_shuttle_route: (step as any).is_shuttle_route || false  
               });
             }
           });
@@ -308,7 +310,7 @@ export default function MapComponent({
                         segment.mode === "BICYCLING" ? '#4CAF50' :
                           '#000000', // Default Black
                 lineWidth: 3,
-
+                lineDasharray: segment.is_shuttle_route ? [2, 2] : [1, 0], // Dashed for shuttle, solid for others
               }}
             />
           </Mapbox.ShapeSource>
