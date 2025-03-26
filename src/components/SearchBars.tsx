@@ -289,10 +289,6 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                           }}
   
                />
-                            }).catch(error => {
-                              console.error("Error creating shuttle route:", error);
-                            });
-                          }}
   
                />
                     )}
