@@ -1,0 +1,121 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BottomDrawer Component Snapshot Testing matches previous snapshot 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "backgroundColor": "white",
+      "borderTopLeftRadius": 20,
+      "borderTopRightRadius": 20,
+      "bottom": 0,
+      "height": 667,
+      "position": "absolute",
+      "width": 750,
+    }
+  }
+>
+  <View
+    onMoveShouldSetResponder={[Function]}
+    onMoveShouldSetResponderCapture={[Function]}
+    onResponderEnd={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderReject={[Function]}
+    onResponderRelease={[Function]}
+    onResponderStart={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    onStartShouldSetResponderCapture={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "paddingVertical": 10,
+        "width": 750,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "backgroundColor": "#8F8F8F",
+          "borderRadius": 3,
+          "height": 5,
+          "marginBottom": 10,
+          "width": 60,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      {
+        "flex": 1,
+      }
+    }
+  >
+    Mock Drawer Content
+  </View>
+</View>
+`;
+
+exports[`BottomDrawer Component renders correctly with initial expanded state 1`] = `
+<View
+  collapsable={false}
+  style={
+    {
+      "backgroundColor": "white",
+      "borderTopLeftRadius": 20,
+      "borderTopRightRadius": 20,
+      "bottom": 0,
+      "height": 667,
+      "position": "absolute",
+      "width": 750,
+    }
+  }
+>
+  <View
+    onMoveShouldSetResponder={[Function]}
+    onMoveShouldSetResponderCapture={[Function]}
+    onResponderEnd={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderReject={[Function]}
+    onResponderRelease={[Function]}
+    onResponderStart={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    onStartShouldSetResponderCapture={[Function]}
+    style={
+      {
+        "alignItems": "center",
+        "paddingVertical": 10,
+        "width": 750,
+      }
+    }
+  >
+    <View
+      style={
+        {
+          "backgroundColor": "#8F8F8F",
+          "borderRadius": 3,
+          "height": 5,
+          "marginBottom": 10,
+          "width": 60,
+        }
+      }
+    />
+  </View>
+  <View
+    style={
+      {
+        "flex": 1,
+      }
+    }
+  >
+    Mock Drawer Content
+  </View>
+</View>
+`;
