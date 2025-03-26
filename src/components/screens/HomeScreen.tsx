@@ -10,6 +10,7 @@ import { FloorSelector } from "../FloorSelector";
 import SearchBars from "../SearchBars";
 import { Text } from "react-native-elements";
 import MapComponent from "../MapComponent";
+import PointOfInterestSelector from "../Point-of-interest_Form";
 
 const { height } = Dimensions.get("window");
 
@@ -21,6 +22,19 @@ export default function HomeScreen() {
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
   const [inputDestination, setInputDestination] = useState<string>("");
 
+const [pointsOfInterest, setPointsOfInterest] = useState({
+    restaurant: false,
+    gasStation: false,
+    stores: false,
+  });
+
+  // Handle Point of Interest changes
+  const handlePointOfInterestChange = (poi: string) => {
+    setPointsOfInterest((prevState) => ({
+      ...prevState,
+      [poi]: !prevState[poi],
+    }));
+  };
 
   useEffect(() => {
     if (routeCoordinates && routeCoordinates.length > 0) {
@@ -84,6 +98,10 @@ export default function HomeScreen() {
 
           <BottomDrawer drawerHeight={drawerHeight} >
             <SearchBars inputDestination={inputDestination} />
+            <PointOfInterestSelector
+                          pointsOfInterest={pointsOfInterest}
+                          onChange={handlePointOfInterestChange}
+                        />
             {/* oviya component  */}
             <View style={HomeStyle.listContent}>
               <ScrollView>

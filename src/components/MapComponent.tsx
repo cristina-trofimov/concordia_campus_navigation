@@ -21,8 +21,11 @@ import { HighlightBuilding } from "./BuildingCoordinates.tsx";
 import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
-import { HighlightIndoorMap } from './IndoorMap.tsx'; 
+import PointOfInterestMap from "./Point-of-interest_Map.tsx";
+
+import { HighlightIndoorMap } from './IndoorMap.tsx';
 import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
+import NearbyRestaurants from './NearbyRestaurants';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
@@ -58,6 +61,7 @@ export default function MapComponent({
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingLocation | null>(null);
 
+
   const openOverlay = (building: BuildingLocation) => {
     setSelectedBuilding(building);
     setIsOverlayVisible(true);
@@ -67,6 +71,7 @@ export default function MapComponent({
     setIsOverlayVisible(false);
   };
   const [decodedPolyline, setDecodedPolyline] = useState<Coords[]>([]);
+
 
   useEffect(() => {
     if (myLocationCoords) {
@@ -98,6 +103,7 @@ export default function MapComponent({
     } else {
       setDecodedPolyline([]);
     }
+
 
     // Focus on SGW when the app starts
     const timer = setTimeout(() => {
@@ -242,6 +248,12 @@ export default function MapComponent({
           </PointAnnotation>
         )}
 
+
+
+
+
+
+
         {decodedPolyline.length > 0 && (
           <Mapbox.ShapeSource
             id="routeSource"
@@ -283,6 +295,11 @@ export default function MapComponent({
 
         {/* Add ShuttleBusMarkers component */}
         <ShuttleBusTracker />
+        <PointOfInterestMap
+        myLocationCoords={myLocationCoords}
+        setInputDestination={setInputDestination}/>
+
+
       </MapView>
 
       <Animated.View

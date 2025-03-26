@@ -20,7 +20,9 @@
     "@fortawesome/react-native-fontawesome": "^0.3.2",
     "@howljs/calendar-kit": "^2.2.1",
     "@mapbox/polyline": "^1.2.1",
+    "@react-native-community/checkbox": "^0.5.17",
     "@react-native-google-signin/google-signin": "^13.2.0",
+    "@react-native-picker/picker": "^2.11.0",
     "@react-native/gradle-plugin": "^0.77.0",
     "@react-navigation/drawer": "^7.1.2",
     "@react-navigation/native": "^7.0.15",
@@ -92,13 +94,16 @@
   "jest": {
     "preset": "jest-expo",
     "moduleNameMapper": {
-      "^expo-modules-core$": "<rootDir>/tests/_mocks_/@rnmapbox/maps.js", 
+      "^expo-modules-core$": "<rootDir>/tests/_mocks_/@rnmapbox/maps.js",
       "@env": "<rootDir>/tests/mock-env.ts"
     },
     "setupFiles": [
       "./tests/jestSetup.ts"
     ],
-    "testMatch": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[tj]s?(x)"],
+    "testMatch": [
+      "**/__tests__/**/*.[jt]s?(x)",
+      "**/?(*.)+(spec|test).[tj]s?(x)"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!(@rneui|@rnmapbox|react-native|expo|@react-native|@expo|react-navigation|@react-navigation/.*|@mapbox|@unimodules|unimodules|sentry-expo|native-base|react-native-svg))"
     ]
