@@ -284,8 +284,11 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                           }}
   
                />
+<<<<<<< HEAD
   
                />
+=======
+>>>>>>> 8c99bc0 (bugfix and new loyola bus stop coords)
                     )}
 
                     {/* Total Time, Start Button, and Floor/Outside View Button */}
