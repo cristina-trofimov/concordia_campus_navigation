@@ -21,20 +21,8 @@ export default function HomeScreen() {
   const { routeData: routeCoordinates, isTransit } = useCoords();
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
   const [inputDestination, setInputDestination] = useState<string>("");
-
-const [pointsOfInterest, setPointsOfInterest] = useState({
-    restaurant: false,
-    gasStation: false,
-    stores: false,
-  });
-
-  // Handle Point of Interest changes
-  const handlePointOfInterestChange = (poi: string) => {
-    setPointsOfInterest((prevState) => ({
-      ...prevState,
-      [poi]: !prevState[poi],
-    }));
-  };
+  const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
+  const [radius, setRadius] = useState<number | null>(null);
 
   useEffect(() => {
     if (routeCoordinates && routeCoordinates.length > 0) {
@@ -85,23 +73,23 @@ const [pointsOfInterest, setPointsOfInterest] = useState({
     }
   }, [routeCoordinates]);
 
-
-
   return (
     <CoordsProvider>
       <IndoorsProvider>
         <View style={HomeStyle.container}>
           <CalendarButton />
           <LeftDrawer />
-          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} />
+          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} selectedPOI={selectedPOI} radius={radius} />
           <FloorSelector />
 
           <BottomDrawer drawerHeight={drawerHeight} >
             <SearchBars inputDestination={inputDestination} />
-            <PointOfInterestSelector
-                          pointsOfInterest={pointsOfInterest}
-                          onChange={handlePointOfInterestChange}
-                        />
+           <PointOfInterestSelector
+             pointsOfInterest={selectedPOI}
+             radius={radius}
+             onPOIChange={setSelectedPOI}
+             onRadiusChange={setRadius}
+           />
             {/* oviya component  */}
             <View style={HomeStyle.listContent}>
               <ScrollView>

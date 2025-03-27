@@ -32,9 +32,13 @@ Mapbox.setAccessToken(MAPBOX_TOKEN);
 export default function MapComponent({
   drawerHeight,
   setInputDestination,
+  selectedPOI,
+  radius,
 }: {
     readonly drawerHeight: Animated.Value;
     setInputDestination: (inputDestination: string) => void;
+    selectedPOI?: string | null;
+    radius?: number | null;
 }) {
   const {
     routeData: routeCoordinates,
@@ -297,8 +301,9 @@ export default function MapComponent({
         <ShuttleBusTracker />
         <PointOfInterestMap
         myLocationCoords={myLocationCoords}
-        setInputDestination={setInputDestination}/>
-
+        setInputDestination={setInputDestination}
+        selectedPOI={selectedPOI}
+        radius={radius}/>
 
       </MapView>
 
