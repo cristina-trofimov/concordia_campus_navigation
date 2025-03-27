@@ -6,7 +6,7 @@ import {
   Animated,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import Mapbox, { Camera, MapView, PointAnnotation } from "@rnmapbox/maps";
+import Mapbox, { Camera, MapView, PointAnnotation, ShapeSource, LineLayer } from "@rnmapbox/maps";
 import { Text } from "@rneui/themed";
 import { locations } from "../data/buildingLocation.ts";
 import * as Location from "expo-location";
@@ -14,7 +14,6 @@ import { useCoords } from "../data/CoordsContext.tsx";
 import { useIndoor } from "../data/IndoorContext";
 import ToggleButton from "./ToggleButton";
 import Polyline from "@mapbox/polyline";
-import { Coords } from "../interfaces/Map.ts";
 import { MAPBOX_TOKEN } from "@env";
 
 import { HighlightBuilding } from "./BuildingCoordinates.tsx";
@@ -22,10 +21,8 @@ import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
 import PointOfInterestMap from "./Point-of-interest_Map.tsx";
-
 import { HighlightIndoorMap } from './IndoorMap.tsx';
 import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
-import NearbyRestaurants from './NearbyRestaurants';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
@@ -64,7 +61,7 @@ export default function MapComponent({
   const [forceUpdate, setForceUpdate] = useState(0);
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingLocation | null>(null);
-
+  const [routeSegments, setRouteSegments] = useState<RouteSegment[]>([]);
 
   const openOverlay = (building: BuildingLocation) => {
     setSelectedBuilding(building);
@@ -74,7 +71,6 @@ export default function MapComponent({
   const closeOverlay = () => {
     setIsOverlayVisible(false);
   };
-  const [decodedPolyline, setDecodedPolyline] = useState<Coords[]>([]);
 
 
   useEffect(() => {
@@ -88,26 +84,60 @@ export default function MapComponent({
   useEffect(() => {
     if (routeCoordinates && routeCoordinates.length > 0) {
       try {
-        const points = Polyline.decode(
-          routeCoordinates[0].overview_polyline.points
-        );
-        const decoded = points.map(([lat, lng]) => ({
+        const route = routeCoordinates[0];
+        const legs = route.legs;
+
+
+        const segments: RouteSegment[] = [];
+
+        legs.forEach((leg: { steps: any[]; }) => {
+          leg.steps.forEach((step: {
+            travel_mode: string;
+            polyline: { points: string; };
+          }) => {
+
+            const points = Polyline.decode(step.polyline.points);
+            const decodedSegment: Coordinate[] = points.map(([lat, lng]: [number, number]) => ({
+              latitude: lat,
+              longitude: lng
+            }));
+
+
+            if (step.travel_mode === "TRANSIT") {
+              segments.push({
+                mode: "TRANSIT",
+                coordinates: decodedSegment
+              });
+            } else {
+
+              segments.push({
+                mode: step.travel_mode as 'WALKING' | 'TRANSIT' | 'DRIVING' | 'BICYCLING',
+                coordinates: decodedSegment
+              });
+            }
+          });
+        });
+
+
+        setRouteSegments(segments);
+
+
+        const allPoints = Polyline.decode(route.overview_polyline.points);
+        const allDecoded: Coordinate[] = allPoints.map(([lat, lng]: [number, number]) => ({
           latitude: lat,
           longitude: lng,
         }));
-        const finaldecoded = decoded.map((coord) => ({
-          latitude: coord.latitude,
-          longitude: coord.longitude,
-        }));
-        setDecodedPolyline(finaldecoded);
+
+
       } catch (error) {
         console.error("Error processing route coordinates:", error);
-        setDecodedPolyline([]);
+
+        setRouteSegments([]);
       }
     } else {
-      setDecodedPolyline([]);
-    }
 
+      setRouteSegments([]);
+    }
 
     // Focus on SGW when the app starts
     const timer = setTimeout(() => {
@@ -132,7 +162,7 @@ export default function MapComponent({
         distanceInterval: 1,
       },
       (location) => {
-        console.log("User location updated:", location.coords);
+        // console.log("User location updated:", location.coords);
         setMyLocationCoords(location.coords);
       }
     );
@@ -164,7 +194,7 @@ export default function MapComponent({
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      console.log("User location received:", location.coords);
+      //console.log("User location received:", location.coords);
       setMyLocationCoords(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
@@ -173,7 +203,6 @@ export default function MapComponent({
 
   const focusOnLocation = () => {
     if (!myLocationCoords || !cameraRef.current || !mapLoaded) {
-      console.warn("User location, camera, or map not available.");
       return;
     }
 
@@ -213,8 +242,8 @@ export default function MapComponent({
         ref={mapRef}
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
-        <HighlightBuilding/>
-        <HighlightIndoorMap/>
+        <HighlightBuilding />
+        <HighlightIndoorMap />
         <Camera
           ref={(ref) => {
             cameraRef.current = ref;
@@ -223,7 +252,7 @@ export default function MapComponent({
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
 
-        {locations.map((location) => (
+        {!inFloorView && locations.map((location) => (
           <Mapbox.PointAnnotation
             key={location.id.toString()}
             id={`point-${location.id}`}
@@ -252,15 +281,10 @@ export default function MapComponent({
           </PointAnnotation>
         )}
 
-
-
-
-
-
-
-        {decodedPolyline.length > 0 && (
+        {routeSegments && routeSegments.map((segment, index) => (
           <Mapbox.ShapeSource
-            id="routeSource"
+            key={`segment-${index}`}
+            id={`routeSource-${index}`}
             shape={{
               type: "FeatureCollection",
               features: [
@@ -268,35 +292,31 @@ export default function MapComponent({
                   type: "Feature",
                   geometry: {
                     type: "LineString",
-                    coordinates: decodedPolyline.map((point) => [
+                    coordinates: segment.coordinates.map((point) => [
                       point.longitude,
                       point.latitude,
                     ]),
                   },
-                  properties: {},
+                  properties: null
                 },
               ],
             }}
           >
             <Mapbox.LineLayer
-              id="routeLayer"
+              id={`routeLine-${index}`}
               style={{
-                lineColor: "#ff0000",
-                lineWidth: 4,
-                lineOpacity: 0.8,
-              }}
-            />
-            <Mapbox.LineLayer
-              id="routeLayer"
-              style={{
-                lineColor: "#3399FF",
-                lineWidth: 4,
-                lineOpacity: 0.8,
+                lineColor:
+                  segment.mode === "WALKING" ? '#800000' :
+                    segment.mode === "DRIVING" ? '#673AB7' :
+                      segment.mode === "TRANSIT" ? '#2196F3' :
+                        segment.mode === "BICYCLING" ? '#4CAF50' :
+                          '#000000', // Default Black
+                lineWidth: 3,
+
               }}
             />
           </Mapbox.ShapeSource>
-        )}
-
+        ))}
         {/* Add ShuttleBusMarkers component */}
         <ShuttleBusTracker />
         <PointOfInterestMap
@@ -335,7 +355,7 @@ export default function MapComponent({
         </TouchableOpacity>
       </Animated.View>
 
-      { !inFloorView && (<View style={MapComponentStyles.toggleButtonContainer}>
+      {!inFloorView && (<View style={MapComponentStyles.toggleButtonContainer}>
         <ToggleButton
           mapRef={mapRef}
           sgwCoords={sgwCoords}

@@ -124,27 +124,30 @@ describe('BuildingInformation Component', () => {
   });
 
   test('logs message when directions button is pressed', () => {
-    const { getAllByText, getByTestId } = render(
+    const mockSetInputDestination = jest.fn();
+    
+    const { getByTestId } = render(
       <BuildingInformation 
         isVisible={true} 
         onClose={mockOnClose} 
-        buildingLocation={mockBuildingLocation} 
+        buildingLocation={mockBuildingLocation}
+        setInputDestination={mockSetInputDestination}
       />
     );
     
-    // Find the directions icon (our mock renders the name as text)
+    // Find the directions icon
     const directionsIcon = getByTestId('icon-directions-material');
     
-    // Find the parent TouchableOpacity by traversing up from the icon
-    // Since we can't directly access the parent, we'll use a different approach
-    // We'll get all TouchableOpacity elements inside the modal and find the one containing the directions icon
-    const allTouchables = getByTestId('modal').findAllByType(TouchableOpacity);
-    const directionsButton = allTouchables.find(touchable => 
-      touchable.findByType(Text).props.testID === 'icon-directions-material'
-    );
+    // Press the icon
+    fireEvent.press(directionsIcon);
     
-    fireEvent.press(directionsButton || directionsIcon);
-    expect(console.log).toHaveBeenCalledWith('Button Pressed');
+    // Check that setInputDestination was called with the correct address
+    expect(mockSetInputDestination).toHaveBeenCalledWith(mockBuildingLocation.buildingInfo.address);
+    
+    // Check that onClose was called
+    expect(mockOnClose).toHaveBeenCalled();
+    
+    // Remove the console.log check since it's not actually happening in the component
   });
 
   test('handles missing building location data gracefully', () => {
