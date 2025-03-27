@@ -4,6 +4,7 @@ import { useCoords } from "../data/CoordsContext";
 import { useIndoor } from "../data/IndoorContext";
 import { buildingFloorAssociations } from '../data/buildingFloorAssociations.ts';
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature.ts';
+import { IndoorPointsOfInterest } from './IndoorPointsOfInterest.tsx';
 import { h1Features } from '../data/indoor/Hall/H1.ts';
 import { h2Features } from '../data/indoor/Hall/H2.ts';
 import { h8Features } from '../data/indoor/Hall/H8.ts';
@@ -11,7 +12,10 @@ import { h9Features } from '../data/indoor/Hall/H9.ts';
 import { cc1Features } from '../data/indoor/CC/CC1.ts';
 import { mb1Features } from '../data/indoor/MB/MB1.ts';
 import { mb2Features } from '../data/indoor/MB/MBS2.ts';
-import { IndoorPointsOfInterest } from './IndoorPointsOfInterest.tsx';
+import { ve1Features } from '../data/indoor/VE/VE1.ts';
+import { ve2Features } from '../data/indoor/VE/VE2.ts';
+import { vl1Features } from '../data/indoor/VL/VL1.ts';
+import { vl2Features } from '../data/indoor/VL/VL2.ts';
 
 const featureMap: { [key: string]: any } = {
     h1Features,
@@ -20,7 +24,11 @@ const featureMap: { [key: string]: any } = {
     h9Features,
     cc1Features,
     mb1Features,
-    mb2Features
+    mb2Features,
+    ve1Features,
+    ve2Features,
+    vl1Features,
+    vl2Features,
 };
 
 const floorNameFormat = (floor: string) => {
