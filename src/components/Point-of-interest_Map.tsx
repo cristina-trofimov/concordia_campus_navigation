@@ -57,7 +57,8 @@ const reverseGeocode = async (latitude, longitude) => {
     const data = await response.json();
 
     if (data.features && data.features.length > 0) {
-      const address = data.features[0].place_name; // Get the full address
+         // Get the full address
+      const address = data.features[0].place_name;
       return address;
     } else {
       console.log("No address found for these coordinates");
@@ -135,12 +136,6 @@ const PointOfInterestMap: React.FC<PointOfInterestMapProps> = ({
         if (Array.isArray(coordinates) && coordinates.length === 2) {
           const [longitude, latitude] = coordinates;
 
-          //const iconName = POI_ICONS[selectedPOI] || "map-marker";
-
-        //  const isSelected = selectedPOI &&
-           // selectedPOI.longitude === longitude &&
-          //  selectedPOI.latitude === latitude;
-
           return (
             <PointAnnotation
               key={`${selectedPOI}-${index}`}
@@ -151,7 +146,7 @@ const PointOfInterestMap: React.FC<PointOfInterestMapProps> = ({
               <MaterialCommunityIcons
                 name={currentIcon}
                 size={30}
-                color="#6E1A2A"
+                color="black"
               />
             </PointAnnotation>
           );
