@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, } from "react-native";
 import { useCoords } from "../data/CoordsContext";
 import { DirectionStepsStyle } from "../styles/DirectionsStepsStyle";
 import { MaterialIcons } from "@expo/vector-icons";
