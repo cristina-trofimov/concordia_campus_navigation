@@ -113,7 +113,10 @@ export default function MapComponent({
 
 
         const allPoints = Polyline.decode(route.overview_polyline.points);
-
+        const allDecoded: Coordinate[] = allPoints.map(([lat, lng]: [number, number]) => ({
+          latitude: lat,
+          longitude: lng,
+        }));
 
 
       } catch (error) {
