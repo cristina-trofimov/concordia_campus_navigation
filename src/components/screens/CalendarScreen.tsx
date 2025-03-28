@@ -116,11 +116,15 @@ const CalendarScreen = () => {
       {/* Header */}
       <View style={CalendarStyle.headerContainer}>
         <View style={{ flexDirection: "row" }} >
-          <TouchableOpacity onPress={() => { navigation.navigate("Home") }} >
+          <TouchableOpacity 
+            testID="back-button"
+            onPress={() => { navigation.navigate("Home") }} 
+          >
             <Feather name="arrow-left-circle" size={40} color="black" style={{ marginTop: 5 }} />
           </TouchableOpacity>
           <View style={CalendarStyle.headerButtonsContainer} >
             <TouchableOpacity
+              testID="previous-week-button"
               onPress={() => {
                 calendarRef.current?.goToPrevPage(true);
                 setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() - 7)));
@@ -129,6 +133,7 @@ const CalendarScreen = () => {
               <Feather name="chevron-left" size={28} color="black" />
             </TouchableOpacity>
             <TouchableOpacity
+              testID="next-week-button"
               onPress={() => {
                 calendarRef.current?.goToNextPage(true);
                 setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() + 7)));
@@ -140,12 +145,7 @@ const CalendarScreen = () => {
 
           </View>
         </View>
-        {/* we want to keep the functionality so I will keep the code heer, but it needs to be better placed */}
-        {/* <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
-          <Text style={{ color: "white", fontWeight: "bold" }} >TODAY</Text>
-        </TouchableOpacity> */}
         <RightDrawer setChosenCalendar={setChosenCalendar} />
-
       </View>
 
       {/* Renders the calendar view */}
