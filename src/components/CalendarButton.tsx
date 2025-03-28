@@ -5,13 +5,12 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from "../../App";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { CalendarStyle } from "../styles/CalendarStyle";
-import { getUserInfo, signIn } from "./HandleGoogle";
+import { signIn } from "./HandleGoogle";
 import { fetchUserCalendars } from "./googleCalendarFetching";
 import { Calendar } from "../interfaces/calendar";
 
 const CalendarButton = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  // const [isSignedIn, setIsSignedIn] = useState(false);
   const [calendars, setCalendars] = useState<Calendar[] | undefined>([]);
 
   const goToCalendar = async () => {
@@ -25,18 +24,6 @@ const CalendarButton = () => {
         navigation.navigate("Calendar", {calendars: calendars});
     };
 }
-
-  // const goToCalendar = () => {
-  //   // const userToken = await getUserInfo();
-
-  //   // if (!userToken) {
-  //   //   await signIn();
-  //   // }
-
-  //   // fetch from google calendar here??
-  //   navigation.navigate("Calendar");
-
-  // };
 
   return (
     <View style={CalendarStyle.calendarButtonContainer} >

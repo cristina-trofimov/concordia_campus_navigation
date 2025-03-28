@@ -17,7 +17,7 @@ export const configureGooggleSignIn = () => {
     });
     configureReanimatedLogger({
         level: ReanimatedLogLevel.warn,
-        strict: true, // Disables strict mode
+        strict: false, // Disables strict mode
     });
 }
 

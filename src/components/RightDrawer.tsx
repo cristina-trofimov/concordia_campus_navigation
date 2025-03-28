@@ -2,12 +2,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { TouchableOpacity, Modal, View, Animated, Dimensions, GestureResponderEvent, Button, Text, } from "react-native";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { RightDrawerStyle } from "../styles/RightDrawerStyle";
-import { fetchUserCalendars } from "./googleCalendarFetching";
-import { signIn, signOut } from "./HandleGoogle";
-import { GoogleSigninButton } from "@react-native-google-signin/google-signin";
+import { signOut } from "./HandleGoogle";
 import { Calendar } from "../interfaces/calendar";
-import { useRoute } from "@react-navigation/native";
-import { CalendarScreenProp } from "../../App";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { CalendarScreenProp, RootStackParamList } from "../../App";
+import { StackNavigationProp } from "@react-navigation/stack";
 
 const { width } = Dimensions.get("window");
 
@@ -16,27 +15,13 @@ const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Cale
     const [isSignedIn, setIsSignedIn] = useState(false);
     const route = useRoute<CalendarScreenProp>();
     const calendars = route.params?.calendars || [];
-    // const [calendars, setCalendars] = useState<Calendar[] | undefined>([]);
-
+    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
     const slideAnim = useRef(new Animated.Value(width)).current;
 
-    // const handleSignIn = async () => {
-    //     const token = await signIn();
-    //     if (token) {
-    //         const calendars = await fetchUserCalendars(token);
-    //         if (calendars) {
-    //             setCalendars(calendars.data?.calendars);
-    //         }
-    //         console.log(calendars.data?.calendars);
-    //         setIsSignedIn(true);
-    //     };
-    // }
-
     const handleSignOut = () => {
-        signOut().then(() => setIsSignedIn(false));
+        signOut().then(() => { setIsDrawerVisible(false); navigation.navigate("Home") });
     };
-
 
     const handleOverlayPress = (event: GestureResponderEvent) => {
         if (event.target === event.currentTarget) {
@@ -61,74 +46,61 @@ const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Cale
     }, [isDrawerVisible, slideAnim]);
 
     return (
-        <View style={RightDrawerStyle.container} >
-            <View style={{ flex: 1, alignItems: 'flex-end' }}>
-                {/* Button */}
-                <TouchableOpacity style={RightDrawerStyle.button} onPress={() => { setIsDrawerVisible(!isDrawerVisible); }} >
-                    <Ionicons name="reorder-three-outline" size={40} color="black" />
-                </TouchableOpacity>
+        <View style={{ flex: 1, alignItems: 'flex-end' }}>
+            {/* Button */}
+            <TouchableOpacity style={RightDrawerStyle.button} onPress={() => { setIsDrawerVisible(!isDrawerVisible); }} >
+                <Ionicons name="reorder-three-outline" size={40} color="black" />
+            </TouchableOpacity>
 
-                {/* Drawer */}
-                <Modal
-                    transparent={true}
-                    visible={isDrawerVisible}
-                    animationType="none"
-                    onRequestClose={handleOverlayPress}
-                >
-                    <View style={{ flex: 1 }}>
-                        <TouchableOpacity
-                            style={RightDrawerStyle.overlay}
-                            onPress={handleOverlayPress}
-                            activeOpacity={1}
+            {/* Drawer */}
+            <Modal
+                transparent={true}
+                visible={isDrawerVisible}
+                animationType="none"
+                onRequestClose={handleOverlayPress}
+            >
+                <View style={{ flex: 1 }}>
+                    <TouchableOpacity
+                        style={RightDrawerStyle.overlay}
+                        onPress={handleOverlayPress}
+                        activeOpacity={1}
+                    >
+                        <Animated.View
+                            style={[
+                                RightDrawerStyle.drawer,
+                                {
+                                    transform: [{ translateX: slideAnim }],
+                                    right: 0, // Position the drawer on the right side
+                                }
+                            ]}
                         >
-                            <Animated.View
-                                style={[
-                                    RightDrawerStyle.drawer,
-                                    {
-                                        transform: [{ translateX: slideAnim }],
-                                        right: 0, // Position the drawer on the right side
-                                    }
-                                ]}
-                            >
-                                <TouchableOpacity activeOpacity={1}>
-                                    {/* Content */}
-                                    <View style={RightDrawerStyle.contentContainer} >
-                                        {/* Calendar choice component  */}
-                                        <View>
-                                            {isSignedIn && calendars?.map((calendar) => {
-                                                return (
-                                                    <TouchableOpacity key={calendar.id} onPress={() => setChosenCalendar(calendar)} >
-                                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
-                                                            <Ionicons name="calendar-outline" size={24} color="black" />
-                                                            <Text>{calendar.title}</Text>
-                                                        </View>
-                                                    </TouchableOpacity>
-                                                )
-                                            })
-                                            }
-                                        </View>
-
-                                        <View style={RightDrawerStyle.signInButtonView}>
-                                            {/* {!isSignedIn ? (
-                                                <GoogleSigninButton
-                                                    size={GoogleSigninButton.Size.Standard}
-                                                    color={GoogleSigninButton.Color.Dark}
-                                                    // onPress={handleSignIn}
-                                                />
-                                            ) : ( */}
-                                                <Button title="Sign Out" onPress={handleSignOut} />
-                                            {/* )} */}
-                                        </View>
-
-
-
+                            <TouchableOpacity activeOpacity={1}>
+                                {/* Content */}
+                                <View style={RightDrawerStyle.contentContainer} >
+                                    {/* Calendar choice component  */}
+                                    <View>
+                                        {isSignedIn && calendars?.map((calendar) => {
+                                            return (
+                                                <TouchableOpacity key={calendar.id} onPress={() => setChosenCalendar(calendar)} >
+                                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
+                                                        <Ionicons name="calendar-outline" size={24} color="black" />
+                                                        <Text>{calendar.title}</Text>
+                                                    </View>
+                                                </TouchableOpacity>
+                                            )
+                                        })
+                                        }
                                     </View>
-                                </TouchableOpacity>
-                            </Animated.View>
-                        </TouchableOpacity>
-                    </View>
-                </Modal>
-            </View>
+
+                                    <View style={RightDrawerStyle.signInButtonView}>
+                                        <Button title="Sign Out" onPress={handleSignOut} />
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        </Animated.View>
+                    </TouchableOpacity>
+                </View>
+            </Modal>
         </View>
     );
 };

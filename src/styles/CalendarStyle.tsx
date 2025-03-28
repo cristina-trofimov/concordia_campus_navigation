@@ -9,8 +9,8 @@ export const CalendarStyle = StyleSheet.create({
     },
     headerContainer: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
-      paddingHorizontal: 10,
+      justifyContent: 'space-around',
+      padding: 10,
     },
     calendarButtonContainer: {
       position: 'absolute',
@@ -38,18 +38,14 @@ export const CalendarStyle = StyleSheet.create({
       margin: 10,
     },
     backBTN: {
-      position: "absolute",
-      top: 0,
-      left: 10,
+      flexDirection: "row",
+      justifyContent: "center",
     },
     todayBTN: {
-      top: 0,
-      right: 60,
       height: 36,
       width: 80,
       backgroundColor: "#912338",
       padding: 5,
-      margin: 10,
       flexDirection: "row",
       justifyContent: "center",
       borderRadius: 5,
