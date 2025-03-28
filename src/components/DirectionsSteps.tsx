@@ -64,7 +64,7 @@ const DirectionsSteps = () => {
 
   return (
     <View style={DirectionStepsStyle.container}>
-      <ScrollView>
+      
         {htmlInstructions.length > 0 &&
           htmlInstructions.map((instruction, index) => {
             const iconMappings: { [key: string]: string } = {
@@ -121,7 +121,7 @@ const DirectionsSteps = () => {
               </View>
             );
           })}
-      </ScrollView>
+      
     </View>
   );
 };
