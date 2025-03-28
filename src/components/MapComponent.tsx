@@ -99,18 +99,11 @@ export default function MapComponent({
             }));
 
 
-            if (step.travel_mode === "TRANSIT") {
-              segments.push({
-                mode: "TRANSIT",
-                coordinates: decodedSegment,
-              });
-            } else {
-
               segments.push({
                 mode: step.travel_mode as 'WALKING' | 'TRANSIT' | 'DRIVING' | 'BICYCLING',
                 coordinates: decodedSegment,
               });
-            }
+            
           });
         });
 
