@@ -25,6 +25,7 @@ export const BottomDrawerStyle = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
-
 });

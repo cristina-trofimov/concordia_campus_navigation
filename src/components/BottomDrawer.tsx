@@ -7,6 +7,7 @@ import {
   PanResponderGestureState,
 } from "react-native";
 import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
+import { ScrollView } from "react-native";
 
 const { height } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;
@@ -22,7 +23,6 @@ function BottomDrawer({
   drawerHeight: Readonly<Animated.Value>;
 }) {
   const currentHeightRef = useRef<number>(EXPANDED_HEIGHT);
-
 
   const drawerState = useRef<number>(1);
 
@@ -130,7 +130,9 @@ function BottomDrawer({
       <View {...panResponder.panHandlers} style={BottomDrawerStyle.dragHandle}>
         <View style={BottomDrawerStyle.dragIndicator} />
       </View>
-      <View style={BottomDrawerStyle.contentContainer}>{children}</View>
+      <ScrollView>
+        <View style={BottomDrawerStyle.contentContainer}>{children}</View>
+      </ScrollView>
     </Animated.View>
   );
 }
