@@ -79,7 +79,7 @@ const ShuttleBusTracker: React.FC = () => {
         return null;
     }
 
-    // Filter the Points array to include only buses (IDs starting with "BUS")
+    // Filter the busPoints array to include only buses (IDs starting with "BUS")
     const busPoints = busData.Points.filter((point) => point.ID.startsWith('BUS'));
 
     return (
