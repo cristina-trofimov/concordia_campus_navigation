@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Animated, Dimensions, View } from "react-native";
+import { Animated, Dimensions, ScrollView, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
 import { IndoorsProvider } from "../../data/IndoorContext";
@@ -10,6 +10,7 @@ import { FloorSelector } from "../FloorSelector";
 import SearchBars from "../SearchBars";
 import DirectionsSteps from "../DirectionsSteps";
 import MapComponent from "../MapComponent";
+
 
 const { height } = Dimensions.get("window");
 
@@ -31,8 +32,11 @@ export default function HomeScreen() {
           <FloorSelector />
 
           <BottomDrawer drawerHeight={drawerHeight} >
+            <ScrollView>
             <SearchBars inputDestination={inputDestination} />
-            <DirectionsSteps/>  
+            <DirectionsSteps/>
+            </ScrollView>
+            
           </BottomDrawer>
 
         </View>
@@ -40,4 +44,3 @@ export default function HomeScreen() {
     </CoordsProvider>
   );
 }
- 
