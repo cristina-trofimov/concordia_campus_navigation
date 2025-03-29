@@ -10,6 +10,7 @@ import { FloorSelector } from "../FloorSelector";
 import SearchBars from "../SearchBars";
 import DirectionsSteps from "../DirectionsSteps";
 import MapComponent from "../MapComponent";
+import { RoomSearchBar } from "../RoomSearchBar";
 
 const { height } = Dimensions.get("window");
 
@@ -32,6 +33,7 @@ export default function HomeScreen() {
 
           <BottomDrawer drawerHeight={drawerHeight} >
             <SearchBars inputDestination={inputDestination} />
+            <RoomSearchBar building="H" />
             <DirectionsSteps/>  
           </BottomDrawer>
 

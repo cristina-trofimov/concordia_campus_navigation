@@ -17,7 +17,7 @@ import { ve2Features } from '../data/indoor/VE/VE2.ts';
 import { vl1Features } from '../data/indoor/VL/VL1.ts';
 import { vl2Features } from '../data/indoor/VL/VL2.ts';
 
-const featureMap: { [key: string]: any } = {
+export const featureMap: { [key: string]: any } = {
     h1Features,
     h2Features,
     h8Features,

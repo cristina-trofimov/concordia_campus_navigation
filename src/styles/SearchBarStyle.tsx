@@ -31,4 +31,15 @@ export const SearchBarStyle = StyleSheet.create({
     clearButton: {
       padding: 5,
     },
+    suggestionsContainer: {
+      maxHeight: 150,
+      borderWidth: 1,
+      borderColor: '#ddd',
+      borderRadius: 4,
+      backgroundColor: '#fff',
+    },
+  
+    suggestionsList: {
+      width: '100%',
+    },
   });
