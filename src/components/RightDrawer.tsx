@@ -12,9 +12,8 @@ const { width } = Dimensions.get("window");
 
 const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Calendar) => void}) => {
     const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-    const [isSignedIn, setIsSignedIn] = useState(false);
     const route = useRoute<CalendarScreenProp>();
-    const calendars = route.params?.calendars || [];
+    const calendars = route.params?.calendars;
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
     const slideAnim = useRef(new Animated.Value(width)).current;
@@ -79,7 +78,7 @@ const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Cale
                                 <View style={RightDrawerStyle.contentContainer} >
                                     {/* Calendar choice component  */}
                                     <View>
-                                        {isSignedIn && calendars?.map((calendar) => {
+                                        {calendars?.map((calendar) => {
                                             return (
                                                 <TouchableOpacity key={calendar.id} onPress={() => setChosenCalendar(calendar)} >
                                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >

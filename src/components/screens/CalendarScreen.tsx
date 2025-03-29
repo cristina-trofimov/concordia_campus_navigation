@@ -44,13 +44,17 @@ const CalendarScreen = () => {
     }
   }
 
-  const handleWeekChange = (days) => {
+  const handleWeekChange = (days: number) => {
     // setCurrentDate(new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000));
     const newDate = new Date(currentDate);
     // newDate.setDate(newDate.getTime() + days * 24 * 60 * 60 * 1000);
     newDate.setDate(newDate.getDate() + days);
-    // setCurrentDate(newDate);
-    calendarRef.current?.goToDate({ date: newDate, animatedDate: true });
+    setCurrentDate(newDate);
+    console.log(`*******************CURRENT DATE ${currentDate}`)
+    calendarRef.current?.goToDate({ date: newDate.toISOString(), animatedDate: true, });
+    console.log(`~~~~~~~~~~~~~~~~~~NEW DATE ${newDate}`)
+    console.log(`~~~~~~~~~~~~~~~~~~CURRENT DATE ${currentDate}`)
+
     // calendarRef.current?.goToDate({ date: newDate, animatedDate: true, triggerOnDateChanged: true });
   };
 
@@ -178,14 +182,15 @@ const CalendarScreen = () => {
       <CalendarContainer
         // key={currentDate.toISOString()}
         ref={calendarRef}
+        events={events}
         initialDate={currentDate.toISOString()}
         onDateChanged={(date) => { setCurrentDate(new Date(date)) }}
         allowDragToCreate={true}
         // onDragCreateEventStart={handleDragCreateStart}
         // onDragCreateEventEnd={handleDragCreateEvent}
-        events={events}
         dragStep={15}
         onChange={(dateString) => { currentWeek(new Date(dateString)) }}
+
       >
         <CalendarHeader />
         <CalendarBody renderDraggingEvent={renderDraggingEvent} />

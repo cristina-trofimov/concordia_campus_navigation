@@ -3,7 +3,6 @@ import {
     isErrorWithCode,
     statusCodes,
 } from '@react-native-google-signin/google-signin';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { WEBCLIENTID } from '@env'
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 
@@ -43,8 +42,6 @@ export const signIn = async () => {
         const tokens = await GoogleSignin.getTokens();
         console.log("Sign-in successful. Access token obtained." + JSON.stringify(tokens.accessToken, null, 2));
 
-        // await AsyncStorage.setItem('userInfo', tokens.accessToken);
-
         return tokens.accessToken;
 
 
@@ -75,20 +72,8 @@ export const signIn = async () => {
 export const signOut = async () => {
     try {
         await GoogleSignin.signOut();
-        console.log('User signed out successfully');
-
-        await AsyncStorage.removeItem('userInfo');
-        
+        console.log('User signed out successfully');        
     } catch (error) {
         console.error('Error signing out:', error);
     }
 };
-
-export const getUserInfo = async () => {
-    try {
-    return await AsyncStorage.getItem('userInfo');
-    } catch (error) {
-      console.error('Error getting user token:', error);
-      return null;
-    }
-  };

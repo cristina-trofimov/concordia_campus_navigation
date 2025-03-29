@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { TouchableOpacity, View, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -7,22 +7,19 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { CalendarStyle } from "../styles/CalendarStyle";
 import { signIn } from "./HandleGoogle";
 import { fetchUserCalendars } from "./googleCalendarFetching";
-import { Calendar } from "../interfaces/calendar";
 
 const CalendarButton = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [calendars, setCalendars] = useState<Calendar[] | undefined>([]);
 
   const goToCalendar = async () => {
     const token = await signIn();
     if (token) {
-        const calendars = await fetchUserCalendars(token);
-        if (calendars) {
-            setCalendars(calendars.data?.calendars);
-        }
-        console.log(calendars.data?.calendars);
-        navigation.navigate("Calendar", {calendars: calendars});
-    };
+      const calendars = await fetchUserCalendars(token);
+      if (calendars?.data?.calendars) {
+        const calendarsData = calendars.data.calendars;
+        navigation.navigate("Calendar", { calendars: calendarsData });
+      }
+    }
 }
 
   return (
