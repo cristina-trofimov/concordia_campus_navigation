@@ -19,7 +19,8 @@ export default function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
 
   const [inputDestination, setInputDestination] = useState<string>("");
-
+  const [originCoords, setOriginCoords] = useState(null);
+  const [destinationCoords, setDestinationCoords] = useState(null);
 
 
   return (
@@ -32,9 +33,20 @@ export default function HomeScreen() {
           <FloorSelector />
 
           <BottomDrawer drawerHeight={drawerHeight} >
-            <SearchBars inputDestination={inputDestination} />
-            <RoomSearchBar building="H" />
-            <DirectionsSteps/>  
+            <SearchBars
+              inputDestination={inputDestination}
+              setOriginCoords={setOriginCoords}
+              setDestinationCoords={setDestinationCoords}
+            />
+            <RoomSearchBar
+              location={originCoords}
+              placeholder="origin room"
+            />
+            <RoomSearchBar
+              location={destinationCoords}
+              placeholder="destination room"
+            />
+            <DirectionsSteps />
           </BottomDrawer>
 
         </View>
@@ -42,4 +54,3 @@ export default function HomeScreen() {
     </CoordsProvider>
   );
 }
- 

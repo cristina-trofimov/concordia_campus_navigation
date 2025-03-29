@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, TextInput, FlatList, TouchableOpacity } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { point } from '@turf/helpers';
+import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { SearchBarStyle } from "../styles/SearchBarStyle";
 import { featureMap } from "../components/IndoorMap";
 import { useIndoor } from "../data/IndoorContext";
 import { buildingFloorAssociations } from "../data/buildingFloorAssociations";
+import { fixedBuildingFeatures } from "./BuildingCoordinates";
 
 interface RoomSearchBarProps {
-    building: string;
+    location: any;
     placeholder?: string;
     onSelect?: (room: string, floor: string) => void;
     defaultValue?: string | null;
@@ -22,7 +25,7 @@ interface RoomInfo {
 }
 
 export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
-    building,
+    location,
     placeholder,
     onSelect,
     defaultValue = null,
@@ -30,20 +33,47 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     onClear
 }) => {
     const [query, setQuery] = useState("");
+    const [buildingID, setBuildingID] = useState("");
     const [displayedRoom, setDisplayedRoom] = useState(defaultValue || "");
     const [suggestions, setSuggestions] = useState<RoomInfo[]>([]);
     const [allRooms, setAllRooms] = useState<RoomInfo[]>([]);
     const { setInFloorView, setCurrentFloor, setCurrentFloorAssociations, setIndoorFeatures } = useIndoor();
     const [buildingHasFloorPlans, setBuildingHasFloorPlans] = useState(false);
 
+    const getBuildingIDFromCoords = (coords: { latitude: number, longitude: number }) => {
+        if (!coords) return "";
+    
+        // Create a GeoJSON point from the coordinates
+        const pt = point([coords.longitude, coords.latitude]);
+    
+        // Check each building feature to see if the point is inside
+        for (const building of fixedBuildingFeatures) {
+            // Make sure we have a valid polygon
+            if (building.geometry && building.geometry.type === 'Polygon') {
+                // Check if the point is inside this building's polygon
+                if (booleanPointInPolygon(pt, building.geometry)) {
+                    return building.properties.id;
+                }
+            }
+        }
+    
+        return "";
+    };
+
     // Extract all rooms from the building's floors when the building changes
     useEffect(() => {
-        if (building) {
+        // Convert location to buildingID
+        console.log("Location:", location);
+        const id = getBuildingIDFromCoords(location);
+        setBuildingID(id);
+
+        if (buildingID.length > 0) {
             const buildingFloors = buildingFloorAssociations.filter(
-                association => association.buildingID === building
+                association => association.buildingID === buildingID
             );
 
             buildingFloors.length === 0 ? setBuildingHasFloorPlans(false) : setBuildingHasFloorPlans(true);
+            console.log("Building ID:", buildingID);
 
             const roomsWithFloors: RoomInfo[] = [];
 
@@ -72,7 +102,13 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
 
             setAllRooms(roomsWithFloors);
         }
-    }, [building]);
+        else {
+            setAllRooms([]);
+            setBuildingHasFloorPlans(false);
+            setQuery("");
+            setDisplayedRoom("");
+        }
+    }, [location]);
 
     // Filter rooms based on search query
     const filterSuggestions = (text: string) => {
@@ -97,14 +133,14 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
 
     // Handle selection of a room from suggestions
     const handleSuggestionPress = (room: RoomInfo) => {
-        const displayText = `${building}-${room.ref}`;
+        const displayText = `${room.ref}`;
         setDisplayedRoom(displayText);
         setQuery("");
         setSuggestions([]);
 
         // Find the floor association index
         const floorAssociations = buildingFloorAssociations.filter(
-            association => association.buildingID === building
+            association => association.buildingID === buildingID
         );
 
         const floorIndex = floorAssociations.findIndex(
@@ -144,12 +180,12 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     return (
         <>
             {buildingHasFloorPlans && (
-                <View style={SearchBarStyle.container}>
+                <View style={{ width: "40%" }}>
                     <View style={SearchBarStyle.inputContainer}>
                         <MaterialIcons name="search" size={24} color="#666" style={SearchBarStyle.searchIcon} />
                         <TextInput
                             style={SearchBarStyle.searchInput}
-                            placeholder={placeholder || `Search for a room in ${building}`}
+                            placeholder={placeholder}
                             value={displayedRoom || query}
                             onChangeText={handleInputChange}
                         />
@@ -169,7 +205,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
                                         style={SearchBarStyle.suggestionItem}
                                         onPress={() => handleSuggestionPress(item)}
                                     >
-                                        <Text>{`${building}-${item.ref}`}</Text>
+                                        <Text>{`${item.ref}`}</Text>
                                     </TouchableOpacity>
                                 )}
                                 style={SearchBarStyle.suggestionsList}

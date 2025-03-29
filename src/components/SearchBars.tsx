@@ -13,18 +13,28 @@ import { color } from '@rneui/base';
 
 interface SearchBarProps {
     inputDestination: string;
+    originCoords?: any;
+    destinationCoords?: any;
+    setOriginCoords: React.Dispatch<React.SetStateAction<any>>;
+    setDestinationCoords: React.Dispatch<React.SetStateAction<any>>;
 }
 
 
-const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
-    
-    const { setRouteData, myLocationString, setIsTransit } = useCoords();
+const SearchBars: React.FC<SearchBarProps> = ({
+    inputDestination,
+    originCoords,
+    destinationCoords,
+    setOriginCoords,
+    setDestinationCoords
+}) => {
+
+    const { setRouteData, myLocationString, setIsTransit, myLocationCoords } = useCoords();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState(inputDestination);
     const [time, setTime] = useState('');
     const { inFloorView, setInFloorView } = useIndoor();
-    
+
     useEffect(() => {
         setDestination(inputDestination);
 
@@ -32,36 +42,36 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
         if (inputDestination && !destinationCoords) {
             if (origin) {
                 getDirections(origin, inputDestination, selectedMode)
-                .then(result => {
-                    if (result?.[0]?.legs?.[0]?.end_location) {
-                        const coords = {
-                            latitude: result[0].legs[0].end_location.lat,
-                            longitude: result[0].legs[0].end_location.lng
-                        };
-                        setDestinationCoords(coords);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error getting coordinates for destination:", error);
-                });
+                    .then(result => {
+                        if (result?.[0]?.legs?.[0]?.end_location) {
+                            const coords = {
+                                latitude: result[0].legs[0].end_location.lat,
+                                longitude: result[0].legs[0].end_location.lng
+                            };
+                            setDestinationCoords(coords);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error getting coordinates for destination:", error);
+                    });
             }
         }
     }, [inputDestination]);
 
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {
-        if (myLocationString) {
+        if (myLocationString && myLocationCoords) {
             setOrigin(myLocationString);
+            setOriginCoords({ latitude: myLocationCoords.latitude, longitude: myLocationCoords.longitude });
         }
-    }, [myLocationString]);
+    }, [myLocationString, myLocationCoords]);
 
-    const [originCoords, setOriginCoords] = useState<any>(null);
-    const [destinationCoords, setDestinationCoords] = useState<any>(null);
+
     const transportModes = [
         { mode: "driving", icon: "car-outline", label: "Drive", time: "-", color: "#673AB7" },
-        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "-",color: "#2196F3" },
-        { mode: "walking", icon: "walk-outline", label: "Walk", time: "-",color: "#800000" },
-        { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-" ,color: "#4CAF50"},
+        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "-", color: "#2196F3" },
+        { mode: "walking", icon: "walk-outline", label: "Walk", time: "-", color: "#800000" },
+        { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-", color: "#4CAF50" },
     ];
     const [selectedMode, setSelectedMode] = useState("driving");
     const { isInsideBuilding } = useCoords();
@@ -167,12 +177,12 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
                     </View>
                     {/* Transport Buttons with Time Estimates */}
                     <View style={SearchBarsStyle.transportButtonContainer}>
-                        {transportModes.map(({ mode, icon,color }) => (
+                        {transportModes.map(({ mode, icon, color }) => (
                             <TouchableOpacity
                                 key={mode}
                                 style={SearchBarsStyle.transportButton}
                                 onPress={() => setSelectedMode(mode)}
-                                
+
                             >
                                 <View style={SearchBarsStyle.transportButtonContent}>
                                     <Ionicons
@@ -181,85 +191,85 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
                                         color={selectedMode === mode ? color : "black"}
                                     />
                                     {selectedMode === mode}
-                    
+
                                 </View>
                             </TouchableOpacity>
-                        ))}    
+                        ))}
                     </View>
                     {/* Add this debug logging */}
-                    {selectedMode === "transit" && console.log("mode selected:", selectedMode,  "coords:", origin, destinationCoords)}
+                    {selectedMode === "transit" && console.log("mode selected:", selectedMode, "coords:", origin, destinationCoords)}
 
-                   
+
                     {/* Only render ShuttleBusTransit component when transit mode is selected */}
                     {!!(selectedMode === "transit" && origin && destinationCoords) && (
-                    <ShuttleBusTransit
-                        startLocation={origin}
-                        endLocation={destinationCoords}
-                        onSelect={(info) => {
-                            // Calculate wait time based on current time and departure time
-                            const now = new Date();
-                            const [hours, minutes] = info.nextDepartureTime.split(':').map(Number);
-                            const departureTime = new Date();
-                            departureTime.setHours(hours, minutes, 0, 0);
-                            
-                            // Add 5 min walk time to current time
-                            const arrivalAtStationTime = new Date(now.getTime() + 5 * 60 * 1000);
-                            
-                            // Calculate wait time in minutes
-                            let waitTimeMinutes = Math.max(0, Math.floor((departureTime.getTime() - arrivalAtStationTime.getTime()) / (60 * 1000)));
-                            
-                            // First get directions to the shuttle station
-                            getDirections(origin, info.shuttleStation, "walking")
-                              .then(stationRouteCoords => {
-                                if (stationRouteCoords && stationRouteCoords.length > 0) {
-                                  // Create a modified version of the route data that includes all steps
-                                  const customShuttleRoute = [{
-                                    ...stationRouteCoords[0], // Use the actual route data to the station
-                                    legs: [{
-                                      ...stationRouteCoords[0].legs[0],
-                                      steps: [
-                                        {
-                                            html_instructions: `Walk to ${info.shuttleStation} (Shuttle Bus Stop)`,
-                                            duration: { text: "5 mins" }
-                                        },
-                                        {
-                                          html_instructions: `Wait for ${waitTimeMinutes} min until the shuttle departing at ${info.nextDepartureTime}`,
-                                          duration: { text: `${waitTimeMinutes} mins` }
-                                        },
-                                        {
-                                          html_instructions: `Take the Concordia Shuttle Bus from ${info.startCampusName} to ${info.endCampusName} Campus`,
-                                          duration: { text: "30 mins" }
-                                        },
-                                        {
-                                          html_instructions: `Arrive at your destination`,
-                                          duration: { text: "0 mins" }
+                        <ShuttleBusTransit
+                            startLocation={origin}
+                            endLocation={destinationCoords}
+                            onSelect={(info) => {
+                                // Calculate wait time based on current time and departure time
+                                const now = new Date();
+                                const [hours, minutes] = info.nextDepartureTime.split(':').map(Number);
+                                const departureTime = new Date();
+                                departureTime.setHours(hours, minutes, 0, 0);
+
+                                // Add 5 min walk time to current time
+                                const arrivalAtStationTime = new Date(now.getTime() + 5 * 60 * 1000);
+
+                                // Calculate wait time in minutes
+                                let waitTimeMinutes = Math.max(0, Math.floor((departureTime.getTime() - arrivalAtStationTime.getTime()) / (60 * 1000)));
+
+                                // First get directions to the shuttle station
+                                getDirections(origin, info.shuttleStation, "walking")
+                                    .then(stationRouteCoords => {
+                                        if (stationRouteCoords && stationRouteCoords.length > 0) {
+                                            // Create a modified version of the route data that includes all steps
+                                            const customShuttleRoute = [{
+                                                ...stationRouteCoords[0], // Use the actual route data to the station
+                                                legs: [{
+                                                    ...stationRouteCoords[0].legs[0],
+                                                    steps: [
+                                                        {
+                                                            html_instructions: `Walk to ${info.shuttleStation} (Shuttle Bus Stop)`,
+                                                            duration: { text: "5 mins" }
+                                                        },
+                                                        {
+                                                            html_instructions: `Wait for ${waitTimeMinutes} min until the shuttle departing at ${info.nextDepartureTime}`,
+                                                            duration: { text: `${waitTimeMinutes} mins` }
+                                                        },
+                                                        {
+                                                            html_instructions: `Take the Concordia Shuttle Bus from ${info.startCampusName} to ${info.endCampusName} Campus`,
+                                                            duration: { text: "30 mins" }
+                                                        },
+                                                        {
+                                                            html_instructions: `Arrive at your destination`,
+                                                            duration: { text: "0 mins" }
+                                                        }
+                                                    ],
+                                                    duration: { text: "35 mins" }
+                                                }]
+                                            }];
+
+                                            // Set the route data to our custom route
+                                            setRouteData(customShuttleRoute);
+
+                                            // Set time to include walk + wait + shuttle time
+                                            const walkTimeMinutes = Math.ceil(stationRouteCoords[0].legs[0].duration.value / 60);
+                                            const totalTime = walkTimeMinutes + waitTimeMinutes + 30; // walk + wait + 30 min shuttle
+                                            setTime(totalTime.toString());
+
+                                            // Set isTransit to true
+                                            setIsTransit(true);
+
+                                            console.log("User selected shuttle bus route");
+                                        } else {
+                                            console.warn("Couldn't get directions to shuttle station");
                                         }
-                                      ],
-                                      duration: { text: "35 mins" }
-                                    }]
-                                  }];
-                                  
-                                  // Set the route data to our custom route
-                                  setRouteData(customShuttleRoute);
-                                  
-                                  // Set time to include walk + wait + shuttle time
-                                  const walkTimeMinutes = Math.ceil(stationRouteCoords[0].legs[0].duration.value / 60);
-                                  const totalTime = walkTimeMinutes + waitTimeMinutes + 30; // walk + wait + 30 min shuttle
-                                  setTime(totalTime.toString());
-                                  
-                                  // Set isTransit to true
-                                  setIsTransit(true);
-                                  
-                                  console.log("User selected shuttle bus route");
-                                } else {
-                                  console.warn("Couldn't get directions to shuttle station");
-                                }
-                              })
-                              .catch(error => {
-                                console.error("Error getting directions to shuttle station:", error);
-                              });
-                          }}
-                    />
+                                    })
+                                    .catch(error => {
+                                        console.error("Error getting directions to shuttle station:", error);
+                                    });
+                            }}
+                        />
                     )}
 
                     {/* Total Time, Start Button, and Floor/Outside View Button */}
