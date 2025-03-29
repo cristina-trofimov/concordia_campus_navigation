@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, } from "react-native";
 import { useCoords } from "../data/CoordsContext";
 import { DirectionStepsStyle } from "../styles/DirectionsStepsStyle";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -64,7 +64,7 @@ const DirectionsSteps = () => {
 
   return (
     <View style={DirectionStepsStyle.container}>
-      <ScrollView>
+      
         {htmlInstructions.length > 0 &&
           htmlInstructions.map((instruction, index) => {
             const iconMappings: { [key: string]: string } = {
@@ -121,7 +121,7 @@ const DirectionsSteps = () => {
               </View>
             );
           })}
-      </ScrollView>
+      
     </View>
   );
 };
