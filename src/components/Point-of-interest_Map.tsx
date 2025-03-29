@@ -1,0 +1,162 @@
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator,Image,TouchableOpacity } from 'react-native';
+import { PointAnnotation } from '@rnmapbox/maps';
+import { Text } from "@rneui/themed";
+import * as Location from "expo-location";
+import { Coords } from "../interfaces/Map.ts";
+import { MAPBOX_TOKEN } from "@env";
+
+import axios from 'axios';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
+interface PointOfInterestMapProps {
+  myLocationCoords: { latitude: number; longitude: number } | null;
+  setInputDestination: (inputDestination: string) => void;
+  selectedPOI?: string;
+  radius?: number;
+}
+
+const POI_ICONS = {
+  food_and_drink: "food",
+  food_and_drink_stores: "cart",
+  public_facilities: "town-hall",
+  store_like: "shopping",
+  arts_and_entertainment: "movie",
+};
+
+const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => {
+
+  const TILESET_ID = 'mapbox.mapbox-streets-v8';
+  const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_TOKEN}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.features) {
+      console.warn("No features found in API response.");
+      return [];
+    }
+
+    const filteredPOIs = data.features.filter(feature =>
+          feature.properties.class === selectedPOI
+        );
+
+    return filteredPOIs;
+  } catch (error) {
+    console.error('Error fetching nearby POI:', error);
+    return [];
+  }
+};
+
+const reverseGeocode = async (latitude, longitude) => {
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_TOKEN}`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.features && data.features.length > 0) {
+         // Get the full address
+      const address = data.features[0].place_name;
+      return address;
+    } else {
+      console.log("No address found for these coordinates");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching address:", error);
+    return null;
+  }
+};
+
+const onPoiClick = async (poi, setInputDestination) => {
+  const coordinates = poi.geometry?.coordinates;
+  if (Array.isArray(coordinates) && coordinates.length === 2) {
+    const [longitude, latitude] = coordinates;
+    const address = await reverseGeocode(latitude, longitude);
+    setInputDestination(address || "");
+  }
+};
+
+const PointOfInterestMap: React.FC<PointOfInterestMapProps> = ({
+  myLocationCoords,
+  setInputDestination,
+  selectedPOI,
+  radius = 50
+}) => {
+  const [poi, setPoi] = useState([]);
+  const [currentIcon, setCurrentIcon] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const getLocationAndFetchPois = async () => {
+
+      setPoi([]);
+      setCurrentIcon(null);
+      setIsLoading(true);
+
+
+      if (myLocationCoords && selectedPOI) {
+              try {
+                await new Promise(resolve => setTimeout(resolve, 250));
+                const { latitude, longitude } = myLocationCoords;
+                const nearbyPois = await fetchNearbyPOI(longitude, latitude, radius, selectedPOI);
+
+                setCurrentIcon(POI_ICONS[selectedPOI] || "map-marker");
+                setPoi(nearbyPois);
+              } catch (error) {
+                console.error("Error fetching POIs:", error);
+                setPoi([]);
+              } finally {
+                setIsLoading(false);
+              }
+            } else {
+              setIsLoading(false);
+            }
+          };
+
+          // Debounce to prevent multiple rapid calls
+          const timeoutId = setTimeout(getLocationAndFetchPois, 100);
+
+          // Cleanup function
+          return () => clearTimeout(timeoutId);
+        }, [myLocationCoords, radius, selectedPOI]);
+
+        // If loading, return null or a loading indicator
+        if (isLoading) {
+          return <ActivityIndicator size="large" color="#6E1A2A" />;
+        }
+
+  return (
+    <>
+      {poi.map((poi, index) => {
+        const coordinates = poi.geometry?.coordinates;
+
+        if (Array.isArray(coordinates) && coordinates.length === 2) {
+          const [longitude, latitude] = coordinates;
+
+          return (
+            <PointAnnotation
+              key={`${selectedPOI}-${index}`}
+              id={`poi-${index}`}
+              coordinate={[longitude, latitude]}
+              onSelected={() => onPoiClick(poi, setInputDestination)}
+            >
+              <MaterialCommunityIcons
+                name={currentIcon}
+                size={30}
+                color="black"
+              />
+            </PointAnnotation>
+          );
+        } else {
+          console.error(`Invalid coordinates at index ${index}:`, coordinates);
+          return null;
+        }
+      })}
+    </>
+  );
+};
+
+export default PointOfInterestMap;

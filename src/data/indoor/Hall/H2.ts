@@ -568,7 +568,7 @@ export const h2Features: H2Features[] = [
         "properties": {
             "indoor": "room",
             "level": "2",
-            "ref": "239"
+            "amenity": "cafe",
         },
         "geometry": {
             "type": "Polygon",
@@ -1061,7 +1061,6 @@ export const h2Features: H2Features[] = [
         "type": "Feature",
         "properties": {
             "escalators": "yes",
-            "highway": "steps",
             "level": "2"
         },
         "geometry": {
@@ -1128,7 +1127,6 @@ export const h2Features: H2Features[] = [
         "type": "Feature",
         "properties": {
             "escalators": "yes",
-            "highway": "steps",
             "level": "2"
         },
         "geometry": {
@@ -1480,7 +1478,6 @@ export const h2Features: H2Features[] = [
         "type": "Feature",
         "properties": {
             "escalators": "yes",
-            "highway": "steps",
             "level": "2"
         },
         "geometry": {

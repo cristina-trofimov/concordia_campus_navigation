@@ -7,7 +7,7 @@ import { useIndoor } from "../data/IndoorContext";
 
 export const fixPolygonCoordinates = (coordinates: number[][][]): number[][][] => {
   if (!coordinates || !Array.isArray(coordinates)) {
-    console.warn("Invalid coordinates input:", coordinates);
+    // console.warn("Invalid coordinates input:", coordinates);
     return [];
   }
 
@@ -52,7 +52,7 @@ export const HighlightBuilding = () => {
   useEffect(() => {
     if (swappedUserCoordinates) {
       const building = buildingFeatures.find((feature) => {
-        if (!feature.geometry || !feature.geometry.coordinates) {
+        if (!feature.geometry?.coordinates) {
           console.warn("Invalid feature geometry:", feature);
           return false;
         }
