@@ -32,7 +32,6 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-", color: "#4CAF50" },
     ];
     const [selectedMode, setSelectedMode] = useState("driving");
-    const { isInsideBuilding } = useCoords();
 
     useEffect(() => {
         setDestination(inputDestination);
