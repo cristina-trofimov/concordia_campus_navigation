@@ -14,7 +14,7 @@ interface BuildingInformationProps {
     setInputDestination: (inputDestination: string) => void;
 }
 const stopTimerAndLogEvent = (title: string) => {
-  if ((globalThis as any).isTesting && (globalThis as any).taskTimer) {
+  if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
     // Stop the timer and get the elapsed time
 
     const elapsedTime = (globalThis as any).taskTimer.stop();

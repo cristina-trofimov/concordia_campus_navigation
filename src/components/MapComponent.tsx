@@ -261,7 +261,7 @@ export default function MapComponent({
             coordinate={location.coordinates}
             style={{ zIndex: 1 }}
             onSelected={() => {
-                if ((globalThis as any).isTesting && (globalThis as any).taskTimer) {
+                if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
                         analytics().logEvent('building_pressed', {
                           building_name: location.title,
                           user_id: (globalThis as any).userId,

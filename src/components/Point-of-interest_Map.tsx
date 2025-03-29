@@ -5,6 +5,7 @@ import { Text } from "@rneui/themed";
 import * as Location from "expo-location";
 import { Coords } from "../interfaces/Map.ts";
 import { MAPBOX_TOKEN } from "@env";
+import analytics from '@react-native-firebase/analytics';
 
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -75,6 +76,16 @@ const onPoiClick = async (poi, setInputDestination) => {
   if (Array.isArray(coordinates) && coordinates.length === 2) {
     const [longitude, latitude] = coordinates;
     const address = await reverseGeocode(latitude, longitude);
+     if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+         const elapsed_time = (globalThis as any).taskTimer.stop();
+           analytics().logEvent('Task_5_finished', {
+           POI_address: address,
+           elapsed_time: elapsed_time/1000,
+           user_id: (globalThis as any).userId,
+           });
+           console.log(`Custom Event Logged: POI location chosen: ${address}, and directions were set`);
+           console.log(`Custom Event Logged: Task 5 finished with time:`, elapsed_time/1000);
+     }
     setInputDestination(address || "");
   }
 };

@@ -76,7 +76,7 @@ const logNavigationEvent = async () => {
     }
 
     try {
-        if ((globalThis as any).isTesting && (globalThis as any).taskTimer) {
+        if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
             console.log(destination);
             if(destination === "Uncle Tetsu, Rue Pierce, Montréal, QC, Canada"){
                 if(origin === myLocationString){

@@ -36,7 +36,12 @@ let timerInterval: any = null;
   getElapsedTime: () => {
     if (startTime === 0) return 0;
     return Date.now() - startTime;
-  }
+  },
+  isStarted: () =>{
+    if (startTime === 0) return false;
+    else return true;
+      }
+
 };
 
 const LeftDrawer = () => {
