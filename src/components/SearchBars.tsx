@@ -1,4 +1,3 @@
-// SearchBars.tsx
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import SearchBar from './SearchBar';
@@ -12,18 +11,28 @@ import ShuttleBusTransit from './ShuttleBusTransit';
 import IndoorViewButton from './IndoorViewButton';
 
 
-function SearchBars({ inputDestination }: { inputDestination: string }) {
-
-    const { setRouteData, myLocationString, setIsTransit } = useCoords();
+function SearchBars({ 
+    inputDestination, 
+    originCoords, 
+    setOriginCoords, 
+    destinationCoords, 
+    setDestinationCoords 
+}: { 
+    inputDestination: string;
+    originCoords?: any;
+    setOriginCoords: (coords: any) => void;
+    destinationCoords?: any;
+    setDestinationCoords: (coords: any) => void;
+}) {
+    const { setRouteData, myLocationString, setIsTransit, myLocationCoords } = useCoords();
     const { inFloorView, setInFloorView } = useIndoor();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState(inputDestination);
-
-    const [originCoords, setOriginCoords] = useState<any>(null);
-    const [destinationCoords, setDestinationCoords] = useState<any>(null);
-
     const [time, setTime] = useState('');
+    
+    // Add this to track when we should update routes
+    const [shouldUpdateRoute, setShouldUpdateRoute] = useState(false);
 
     const transportModes = [
         { mode: "driving", icon: "car-outline", label: "Drive", time: "-", color: "#673AB7" },
@@ -36,7 +45,7 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
     useEffect(() => {
         setDestination(inputDestination);
 
-        // Added this because when selecting a building from map as a destination, coordinates is null, tso need to geocode it
+        // Added this because when selecting a building from map as a destination, coordinates is null, so need to geocode it
         if (inputDestination && !destinationCoords) {
             if (origin) {
                 getDirections(origin, inputDestination, selectedMode)
@@ -47,6 +56,8 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                                 longitude: result[0].legs[0].end_location.lng
                             };
                             setDestinationCoords(coords);
+                            // Set flag to update route once we have coordinates
+                            setShouldUpdateRoute(true);
                         }
                     })
                     .catch(error => {
@@ -56,72 +67,55 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         }
     }, [inputDestination]);
 
-    //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
+    //EACH TIME YOU CHANGE LOCATION, THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {
-        if (myLocationString) {
+        if (myLocationString && myLocationCoords) {
             setOrigin(myLocationString);
-            //setOriginCoords({ latitude: myLocationCoords.latitude, longitude: myLocationCoords.longitude });
+            setOriginCoords({ latitude: myLocationCoords.latitude, longitude: myLocationCoords.longitude });
+            // Set flag to update route when origin changes
+            if (destination) {
+                setShouldUpdateRoute(true);
+            }
         }
-    }, [myLocationString]);
+    }, [myLocationString, myLocationCoords]);
 
-
+    // Function to calculate route
+    const calculateRoute = useCallback(async (from: string, to: string, mode: string, fromCoords: any, toCoords: any) => {
+        if (!from || !to) return;
+        
+        try {
+            const fetchedCoords = await getDirections(from, to, mode);
+            if (fetchedCoords && fetchedCoords.length > 0) {
+                setRouteData(fetchedCoords);
+                let durationText = fetchedCoords[0].legs[0].duration.text;
+                durationText = durationText.replace(/hours?/g, 'h').replace(/mins?/g, '');
+                setTime(durationText);
+                
+                // Set isTransit based on selected mode
+                setIsTransit(mode === "transit");
+            } else {
+                console.warn("No coordinates received or empty result from getDirections");
+                setRouteData(null);
+            }
+        } catch (error) {
+            console.error("Error in getDirections:", error);
+            setRouteData(null);
+        }
+    }, [setRouteData, setIsTransit]);
 
     //WHEN ORIGIN SEARCH BAR VALUE CHANGES METHOD HERE TO GETROUTEDATA
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
         setOrigin(selectedOrigin);
         setOriginCoords(coords);
-
-        if (destination && selectedOrigin) {
-            try {
-                //GETS THE COORDS FOR THE PATHLINE
-                const fetchedCoords = await getDirections(selectedOrigin, destination, selectedMode);
-                if (fetchedCoords && fetchedCoords.length > 0) {
-                    setRouteData(fetchedCoords);
-                    setTime(fetchedCoords[0].legs[0].duration.text);
-                    console.log("Origin", time);
-                    //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
-                } else {
-                    console.warn("No coordinates received or empty result from getDirections");
-                    setRouteData(null);
-                }
-            } catch (error) {
-                console.error("Error in getDirections:", error);
-                setRouteData(null);
-            }
-        } else {
-            setRouteData(null);
-        }
-    }, [destination, setRouteData, selectedMode]);
+        setShouldUpdateRoute(true);
+    }, []);
 
     //WHEN DESTINATION SEARCH BAR VALUE CHANGES METHOD HERE TO GETROUTEDATA
     const handleDestinationSelect = useCallback(async (selectedDestination: string, coords: any) => {
         setDestination(selectedDestination);
         setDestinationCoords(coords);
-
-        if (origin && selectedDestination) {
-            try {
-                const fetchedCoords = await getDirections(origin, selectedDestination, selectedMode);
-                if (fetchedCoords && fetchedCoords.length > 0) {
-                    setRouteData(fetchedCoords);
-                    let durationText = fetchedCoords[0].legs[0].duration.text;
-                    durationText = durationText.replace(/hours?/g, 'h').replace(/mins?/g, '');
-                    setTime(durationText)
-                    console.log("Destination", time);
-                    //set isTransit to true
-                    if (selectedMode == "transit") { setIsTransit(true); } else { setIsTransit(false); };
-                    //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
-                } else {
-                    console.warn("No coordinates received or empty result from getDirections");
-                    setRouteData(null);
-                }
-            } catch (error) {
-                console.error("Error in getDirections:", error);
-                setRouteData(null);
-            }
-        } else {
-            setRouteData(null);
-        }
-    }, [origin, setRouteData, selectedMode]);
+        setShouldUpdateRoute(true);
+    }, []);
 
     // WHEN YOU CLICK THE LITTLE X ON THE DESTINATION BAR IT DELETES ALL VALUE
     const handleClearDestination = useCallback(() => {
@@ -129,13 +123,21 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         setDestinationCoords(null);
         setRouteData(null);
         setInFloorView(false);
-    }, [setRouteData]);
+    }, [setRouteData, setInFloorView]);
 
+    // Handle transport mode changes
+    const handleModeChange = useCallback((mode: string) => {
+        setSelectedMode(mode);
+        setShouldUpdateRoute(true);
+    }, []);
+
+    // Separate effect for route calculations
     useEffect(() => {
-        if (origin && destination) {
-            handleDestinationSelect(destination, destinationCoords);
+        if (shouldUpdateRoute && origin && destination && originCoords && destinationCoords) {
+            calculateRoute(origin, destination, selectedMode, originCoords, destinationCoords);
+            setShouldUpdateRoute(false);
         }
-    }, [selectedMode, origin, destination, originCoords, destinationCoords, handleOriginSelect, handleDestinationSelect]);
+    }, [shouldUpdateRoute, origin, destination, originCoords, destinationCoords, selectedMode, calculateRoute]);
 
     return (
         <View style={SearchBarsStyle.container}>
@@ -171,8 +173,7 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                             <TouchableOpacity
                                 key={mode}
                                 style={SearchBarsStyle.transportButton}
-                                onPress={() => setSelectedMode(mode)}
-
+                                onPress={() => handleModeChange(mode)}
                             >
                                 <View style={SearchBarsStyle.transportButtonContent}>
                                     <Ionicons
@@ -181,7 +182,6 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                                         color={selectedMode === mode ? color : "black"}
                                     />
                                     {selectedMode === mode}
-
                                 </View>
                             </TouchableOpacity>
                         ))}
@@ -282,7 +282,6 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                                     console.error("Error creating shuttle route:", error);
                                 });
                             }}
-
                         />
                     )}
 
@@ -292,7 +291,6 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                             <Text style={SearchBarsStyle.timeValue}>
                                 {time}min
                             </Text>
-
                         </View>
                         {/* Buttons Container */}
                         <View style={SearchBarsStyle.buttonsContainer}>
@@ -311,6 +309,5 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         </View>
     );
 };
-
 
 export default SearchBars;

@@ -10,7 +10,7 @@ import { FloorSelector } from "../FloorSelector";
 import SearchBars from "../SearchBars";
 import DirectionsSteps from "../DirectionsSteps";
 import MapComponent from "../MapComponent";
-import { RoomSearchBar } from "../RoomSearchBar";
+import { RoomSearchBars } from "../RoomSearchBars"
 
 
 const { height } = Dimensions.get("window");
@@ -23,7 +23,6 @@ export default function HomeScreen() {
   const [originCoords, setOriginCoords] = useState(null);
   const [destinationCoords, setDestinationCoords] = useState(null);
 
-
   return (
     <CoordsProvider>
       <IndoorsProvider>
@@ -35,20 +34,15 @@ export default function HomeScreen() {
 
           <BottomDrawer drawerHeight={drawerHeight} >
             <ScrollView>
-            <SearchBars
-              inputDestination={inputDestination}
-              setOriginCoords={setOriginCoords}
-              setDestinationCoords={setDestinationCoords}
-            />
-            <RoomSearchBar
-              location={originCoords}
-              placeholder="origin room"
-            />
-            <RoomSearchBar
-              location={destinationCoords}
-              placeholder="destination room"
-            />
-            <DirectionsSteps />
+              <SearchBars
+                inputDestination={inputDestination}
+                originCoords={originCoords}
+                setOriginCoords={setOriginCoords}
+                destinationCoords={destinationCoords}
+                setDestinationCoords={setDestinationCoords}
+              />
+              <RoomSearchBars originCoords={originCoords} destinationCoords={destinationCoords} />
+              <DirectionsSteps />
             </ScrollView>
           </BottomDrawer>
 

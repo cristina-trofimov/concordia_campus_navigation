@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { point } from '@turf/helpers';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
@@ -42,10 +42,10 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
 
     const getBuildingIDFromCoords = (coords: { latitude: number, longitude: number }) => {
         if (!coords) return "";
-    
+
         // Create a GeoJSON point from the coordinates
         const pt = point([coords.longitude, coords.latitude]);
-    
+
         // Check each building feature to see if the point is inside
         for (const building of fixedBuildingFeatures) {
             // Make sure we have a valid polygon
@@ -56,24 +56,22 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
                 }
             }
         }
-    
+
         return "";
     };
 
     // Extract all rooms from the building's floors when the building changes
     useEffect(() => {
         // Convert location to buildingID
-        console.log("Location:", location);
         const id = getBuildingIDFromCoords(location);
         setBuildingID(id);
 
-        if (buildingID.length > 0) {
+        if (id.length > 0) {
             const buildingFloors = buildingFloorAssociations.filter(
-                association => association.buildingID === buildingID
+                association => association.buildingID === id
             );
 
             buildingFloors.length === 0 ? setBuildingHasFloorPlans(false) : setBuildingHasFloorPlans(true);
-            console.log("Building ID:", buildingID);
 
             const roomsWithFloors: RoomInfo[] = [];
 
@@ -131,7 +129,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
         filterSuggestions(text);
     };
 
-    // Handle selection of a room from suggestions
+    // TO-DO: once pressed, put pin on the map
     const handleSuggestionPress = (room: RoomInfo) => {
         const displayText = `${room.ref}`;
         setDisplayedRoom(displayText);
@@ -179,7 +177,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
 
     return (
         <>
-            {buildingHasFloorPlans && (
+            {buildingFloorAssociations.some(association => association.buildingID === getBuildingIDFromCoords(location)) && (
                 <View style={{ width: "40%" }}>
                     <View style={SearchBarStyle.inputContainer}>
                         <MaterialIcons name="search" size={24} color="#666" style={SearchBarStyle.searchIcon} />
@@ -197,24 +195,17 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
                     </View>
                     {suggestions.length > 0 && (
                         <View style={SearchBarStyle.suggestionsContainer}>
-                            <FlatList
-                                data={suggestions}
-                                keyExtractor={(item, index) => `${item.ref}-${index}`}
-                                renderItem={({ item }) => (
+                            <ScrollView style={SearchBarStyle.suggestionsList}>
+                                {suggestions.map((item, index) => (
                                     <TouchableOpacity
+                                        key={`${item.ref}-${index}`}
                                         style={SearchBarStyle.suggestionItem}
                                         onPress={() => handleSuggestionPress(item)}
                                     >
                                         <Text>{`${item.ref}`}</Text>
                                     </TouchableOpacity>
-                                )}
-                                style={SearchBarStyle.suggestionsList}
-                                nestedScrollEnabled={true}
-                                maxToRenderPerBatch={10}
-                                initialNumToRender={10}
-                                windowSize={5}
-                                keyboardShouldPersistTaps="handled"
-                            />
+                                ))}
+                            </ScrollView>
                         </View>
                     )}
                 </View>

@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, FlatList, TouchableOpacity, ScrollView } from "react-native";
 import axios from "axios";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import { Prediction,SearchBarProps } from "../interfaces/SearchBar";
+import { Prediction, SearchBarProps } from "../interfaces/SearchBar";
 import { SearchBarStyle } from "../styles/SearchBarStyle";
 import { GOOGLE_PLACES_API_KEY } from "@env";
 
@@ -111,18 +111,20 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
         )}
       </View>
       {suggestions.length > 0 && (
-        <FlatList
-          data={suggestions}
-          keyExtractor={(item) => item.place_id}
-          renderItem={({ item }) => (
+        <ScrollView
+          style={{ maxHeight: 200 }} // Set a reasonable max height
+          nestedScrollEnabled={true}
+        >
+          {suggestions.map((item) => (
             <TouchableOpacity
+              key={item.place_id}
               style={SearchBarStyle.suggestionItem}
               onPress={() => handleSuggestionPress(item)}
             >
               <Text>{item.description}</Text>
             </TouchableOpacity>
-          )}
-        />
+          ))}
+        </ScrollView>
       )}
     </View>
   );
