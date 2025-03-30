@@ -22,7 +22,7 @@ import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
 import { HighlightIndoorMap } from './IndoorMap.tsx';
 import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
-
+import IndoorDirectionsSteps from "./indoorRouting_view.tsx";
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function MapComponent({
@@ -308,6 +308,7 @@ export default function MapComponent({
         ))}
         {/* Add ShuttleBusMarkers component */}
         <ShuttleBusTracker />
+        <IndoorDirectionsSteps startNodeId="room_101" endNodeId="room_120" />
       </MapView>
 
       <Animated.View
