@@ -8,6 +8,7 @@ import { featureMap } from "../components/IndoorMap";
 import { useIndoor } from "../data/IndoorContext";
 import { buildingFloorAssociations } from "../data/buildingFloorAssociations";
 import { fixedBuildingFeatures } from "./BuildingCoordinates";
+import { useCoords } from "../data/CoordsContext";
 
 interface RoomSearchBarProps {
     location: any;
@@ -37,8 +38,8 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     const [displayedRoom, setDisplayedRoom] = useState(defaultValue || "");
     const [suggestions, setSuggestions] = useState<RoomInfo[]>([]);
     const [allRooms, setAllRooms] = useState<RoomInfo[]>([]);
-    const { setInFloorView, setCurrentFloor, setCurrentFloorAssociations, setIndoorFeatures } = useIndoor();
-    const [buildingHasFloorPlans, setBuildingHasFloorPlans] = useState(false);
+    const { setCurrentFloor, setCurrentFloorAssociations, setIndoorFeatures } = useIndoor();
+    const { highlightedBuilding } = useCoords();
 
     const getBuildingIDFromCoords = (coords: { latitude: number, longitude: number }) => {
         if (!coords) return "";
@@ -71,8 +72,6 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
                 association => association.buildingID === id
             );
 
-            buildingFloors.length === 0 ? setBuildingHasFloorPlans(false) : setBuildingHasFloorPlans(true);
-
             const roomsWithFloors: RoomInfo[] = [];
 
             buildingFloors.forEach(floorAssociation => {
@@ -102,7 +101,6 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
         }
         else {
             setAllRooms([]);
-            setBuildingHasFloorPlans(false);
             setQuery("");
             setDisplayedRoom("");
         }
@@ -146,22 +144,12 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
         );
 
         if (floorIndex !== -1) {
-            // Set current floor associations
-            setCurrentFloorAssociations(floorAssociations);
-
-            // Set the selected floor's features
-            const features = featureMap[room.component];
-            if (features) {
-                setIndoorFeatures(features);
-
+            // only change to that floor if inside the building
+            console.log("highlistedBuilding:", highlightedBuilding);
+            console.log("highlistedBuilding id:", highlightedBuilding.id);
+            if (highlightedBuilding.id === buildingID) {
                 setCurrentFloor(room.floor);
-                setInFloorView(true);
             }
-        }
-
-        // Call the onSelect callback if provided
-        if (onSelect) {
-            onSelect(room.ref, room.floor);
         }
     };
 

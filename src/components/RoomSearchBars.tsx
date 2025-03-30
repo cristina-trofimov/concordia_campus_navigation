@@ -1,13 +1,9 @@
 import { View } from "react-native";
 import { RoomSearchBar } from "./RoomSearchBar";
+import { useCoords } from "../data/CoordsContext";
 
-export function RoomSearchBars({ 
-    originCoords, 
-    destinationCoords, 
-}: { 
-    originCoords: any;
-    destinationCoords: any;
-}) {
+export const RoomSearchBars = () => {
+  const { originCoords, destinationCoords } = useCoords();
 
     return (
         <>

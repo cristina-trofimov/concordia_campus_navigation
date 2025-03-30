@@ -72,12 +72,8 @@ export const useIndoorFeatures = () => {
     return { selectIndoorFeatures };
 };
 
-export function HighlightIndoorMap({
-    destinationCoords,
-}: {
-    destinationCoords: any;
-}) {
-    const { highlightedBuilding, isInsideBuilding } = useCoords();
+export const HighlightIndoorMap = () => {
+    const { highlightedBuilding, isInsideBuilding, destinationCoords } = useCoords();
     const { setBuildingHasFloors, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations, setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures } = useIndoor();
     const { selectIndoorFeatures } = useIndoorFeatures();
 

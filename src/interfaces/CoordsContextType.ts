@@ -11,4 +11,8 @@ export interface CoordsContextType {
     setHighlightedBuilding: (building: any) => void;
     myLocationCoords: { latitude: number; longitude: number } | null;
     setMyLocationCoords: (location: { latitude: number; longitude: number }) => void;
+    originCoords: any;
+    setOriginCoords: (originCoords: any) => void;
+    destinationCoords: any;
+    setDestinationCoords: (destinationCoords: any) => void;
 }

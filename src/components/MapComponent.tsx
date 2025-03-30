@@ -28,11 +28,9 @@ Mapbox.setAccessToken(MAPBOX_TOKEN);
 export default function MapComponent({
   drawerHeight,
   setInputDestination,
-  destinationCoords,
 }: {
   readonly drawerHeight: Animated.Value;
   setInputDestination: (inputDestination: string) => void;
-  destinationCoords: any;
 }) {
   const {
     routeData: routeCoordinates,
@@ -239,7 +237,7 @@ export default function MapComponent({
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
         <HighlightBuilding />
-        <HighlightIndoorMap destinationCoords={destinationCoords}/>
+        <HighlightIndoorMap/>
         <Camera
           ref={(ref) => {
             cameraRef.current = ref;
