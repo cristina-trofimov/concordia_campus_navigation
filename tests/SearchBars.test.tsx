@@ -122,6 +122,7 @@ jest.mock('@expo/vector-icons', () => {
     };
 });
 
+
 // Now import the component to be tested - after all mocks are set up
 import SearchBars from '../src/components/SearchBars';
 import getDirections from '../src/components/Route';
@@ -215,6 +216,212 @@ describe('SearchBars Component', () => {
             destinationBar = searchBars.find(bar => bar.props.placeholder === 'Destination');
             expect(destinationBar.props.defaultValue).toBe('Initial Destination');
         });
+    });
+
+    // it('updates transport mode when a different mode is selected', () => {
+    //     const { getAllByTestId, getByText } = render(<SearchBars inputDestination="Test Destination" />);
+
+    //     // First, simulate selecting an origin to make transport modes appear
+    //     const searchBars = getAllByTestId('search-bar');
+    //     const originBar = searchBars.find(bar => bar.props.placeholder === 'Origin');
+    //     originBar.props.onSelectHandler();
+
+    //     // Now find and click a different transport mode button
+    //     const transitButton = getByText('Public Transport');
+    //     fireEvent.press(transitButton);
+
+    //     // Check that getDirections was called with the new transport mode
+    //     expect(getDirections).toHaveBeenCalledWith(
+    //         'Sample Origin',
+    //         'Test Destination',
+    //         'transit'
+    //     );
+    // });
+
+    // it('displays ShuttleBusTransit component when transit mode is selected', async () => {
+    //     const { getAllByTestId, getByText, getByTestId } = render(<SearchBars inputDestination="Test Destination" />);
+
+    //     // Select origin to enable transport modes
+    //     const searchBars = getAllByTestId('search-bar');
+    //     const originBar = searchBars.find(bar => bar.props.placeholder === 'Origin');
+    //     originBar.props.onSelectHandler();
+
+    //     // Select transit mode
+    //     const transitButton = getByText('Public Transport');
+    //     fireEvent.press(transitButton);
+
+    //     // Check that ShuttleBusTransit component appears
+    //     await waitFor(() => {
+    //         expect(getByTestId('shuttle-transit')).toBeTruthy();
+    //     });
+    // });
+
+    // it('processes shuttle bus selection and creates a multi-leg route', async () => {
+    //     const { getAllByTestId, getByText, getByTestId } = render(<SearchBars inputDestination="Test Destination" />);
+
+    //     // Setup for shuttle bus test
+    //     const searchBars = getAllByTestId('search-bar');
+    //     const originBar = searchBars.find(bar => bar.props.placeholder === 'Origin');
+    //     originBar.props.onSelectHandler();
+
+    //     // Select transit mode
+    //     const transitButton = getByText('Public Transport');
+    //     fireEvent.press(transitButton);
+
+    //     // Find and interact with shuttle component
+    //     await waitFor(() => {
+    //         const shuttleComponent = getByTestId('shuttle-transit');
+    //         shuttleComponent.props.onSelectHandler();
+    //     });
+
+    //     // Verify that multiple calls to getDirections were made for the shuttle route
+    //     await waitFor(() => {
+    //         // Should be called at least 3 times for the three segments of the route
+    //         expect(getDirections).toHaveBeenCalledTimes(3);
+    //     });
+    // });
+
+    // it('updates the current time estimation when a destination is selected', async () => {
+    //     const { getAllByTestId, getByText } = render(<SearchBars inputDestination="" />);
+
+    //     // Select destination
+    //     const searchBars = getAllByTestId('search-bar');
+    //     const destinationBar = searchBars.find(bar => bar.props.placeholder === 'Destination');
+    //     destinationBar.props.onSelectHandler();
+
+    //     // Then select origin
+    //     const updatedSearchBars = getAllByTestId('search-bar');
+    //     const originBar = updatedSearchBars.find(bar => bar.props.placeholder === 'Origin');
+    //     originBar.props.onSelectHandler();
+
+    //     // Check that time estimation is displayed
+    //     await waitFor(() => {
+    //         expect(getByText('15min')).toBeTruthy();
+    //     });
+    // });
+
+    it('shows IndoorViewButton when both origin and destination are selected', async () => {
+        const { getAllByTestId, getByTestId } = render(<SearchBars inputDestination="Test Destination" />);
+
+        // Select origin
+        const searchBars = getAllByTestId('search-bar');
+        const originBar = searchBars.find(bar => bar.props.placeholder === 'Origin');
+        originBar.props.onSelectHandler();
+
+        // Check that IndoorViewButton is displayed
+        await waitFor(() => {
+            expect(getByTestId('indoor-view-button')).toBeTruthy();
+        });
+    });
+
+    it('handles my current location correctly when set as origin', async () => {
+        const { getAllByTestId } = render(<SearchBars inputDestination="Test Destination" />);
+
+        // Our mock returns 'My Current Location' for myLocationString
+        // Let's simulate this updating the origin
+        const mockUseEffect = jest.spyOn(React, 'useEffect');
+
+        // Trigger a re-render
+        act(() => {
+            // Force the useEffect that watches myLocationString to run
+            mockUseEffect.mock.calls.forEach(call => call[0]());
+        });
+
+        // Find origin searchbar and check its value
+        const searchBars = getAllByTestId('search-bar');
+        const originBar = searchBars.find(bar => bar.props.placeholder === 'Origin');
+
+        expect(originBar.props.defaultValue).toBe('My Current Location');
+    });
+
+    // it('resets route data when destination is cleared', async () => {
+    //     // Mock for setRouteData to track calls
+    //     const setRouteDataMock = jest.fn();
+        
+
+    //     const { getAllByTestId } = render(<SearchBars inputDestination="Test Destination" />);
+
+    //     // Select origin to generate route
+    //     const initialSearchBars = getAllByTestId('search-bar');
+    //     const originBar = initialSearchBars.find(bar => bar.props.placeholder === 'Origin');
+    //     originBar.props.onSelectHandler();
+
+    //     // Clear destination
+    //     const destinationBar = initialSearchBars.find(bar => bar.props.placeholder === 'Destination');
+    //     destinationBar.props.onClearHandler();
+
+    //     // Verify setRouteData was called with null
+    //     await waitFor(() => {
+    //         expect(setRouteDataMock).toHaveBeenCalledWith(null);
+    //     });
+    // });
+
+    it('handles start button press', async () => {
+        const { getAllByTestId, getByText } = render(<SearchBars inputDestination="Test Destination" />);
+
+        // Select origin to enable start button
+        const searchBars = getAllByTestId('search-bar');
+        const originBar = searchBars.find(bar => bar.props.placeholder === 'Origin');
+        originBar.props.onSelectHandler();
+
+        // Find and press start button
+        const startButton = getByText('Start');
+        fireEvent.press(startButton);
+
+        // No specific assertion needed as the Start button doesn't have functionality in the mock
+        // This test just ensures the button renders and can be pressed without errors
+        expect(startButton).toBeTruthy();
+    });
+
+    it('updates when myLocationString changes', async () => {
+        // Setup with a custom mock for useCoords
+        const customUseCoordsMock = {
+            myLocationString: 'Initial Location',
+            setRouteData: jest.fn(),
+            setIsTransit: jest.fn(),
+        };
+
+
+        const { rerender, getAllByTestId } = render(<SearchBars inputDestination="Test Destination" />);
+
+        // Update myLocationString
+        customUseCoordsMock.myLocationString = 'My Current Location';
+
+        // Rerender with the updated context
+        rerender(<SearchBars inputDestination="Test Destination" />);
+
+        // Check that origin was updated
+        await waitFor(() => {
+            const searchBars = getAllByTestId('search-bar');
+            const originBar = searchBars.find(bar => bar.props.placeholder === 'Origin');
+            expect(originBar.props.defaultValue).toBe('My Current Location');
+        });
+    });
+
+    it('handles errors during route fetching', async () => {
+        // Mock getDirections to throw an error
+        getDirections.mockImplementationOnce(() => {
+            throw new Error('Route fetch failed');
+        });
+
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+
+        const { getAllByTestId } = render(<SearchBars inputDestination="Test Destination" />);
+
+        // Select origin to trigger route fetch
+        const searchBars = getAllByTestId('search-bar');
+        const originBar = searchBars.find(bar => bar.props.placeholder === 'Origin');
+        originBar.props.onSelectHandler();
+
+        // Check that error was logged
+        await waitFor(() => {
+            expect(consoleSpy).toHaveBeenCalledWith(
+                "Error in getDirections:",
+                expect.any(Error)
+            );
+        });
+
+        consoleSpy.mockRestore();
     });
 
     // Additional tests as needed...
