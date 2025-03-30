@@ -14,22 +14,19 @@ export function RoomSearchBars({
         {destinationCoords && (
             <View style={{
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               paddingHorizontal: 10,
               marginVertical: 5,
+              gap: 15,
             }}>
-              <View>
-                <RoomSearchBar
-                  location={originCoords}
-                  placeholder="origin room"
-                />
-              </View>
-              <View>
-                <RoomSearchBar
-                  location={destinationCoords}
-                  placeholder="destination room"
-                />
-              </View>
+              <RoomSearchBar
+                location={originCoords}
+                placeholder="origin room"
+              />
+              <RoomSearchBar
+                location={destinationCoords}
+                placeholder="destination room"
+              />
             </View>
           )}
         </>
