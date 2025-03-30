@@ -9,22 +9,30 @@ import { Ionicons } from "@expo/vector-icons";
 import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 import ShuttleBusTransit from './ShuttleBusTransit';
-import { color } from '@rneui/base';
-
-interface SearchBarProps {
-    inputDestination: string;
-}
+import IndoorViewButton from './IndoorViewButton';
 
 
-const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
-    
+function SearchBars({ inputDestination }: { inputDestination: string }) {
+
     const { setRouteData, myLocationString, setIsTransit } = useCoords();
+    const { inFloorView, setInFloorView } = useIndoor();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState(inputDestination);
+
+    const [originCoords, setOriginCoords] = useState<any>(null);
+    const [destinationCoords, setDestinationCoords] = useState<any>(null);
+
     const [time, setTime] = useState('');
-    const { inFloorView, setInFloorView } = useIndoor();
-    
+
+    const transportModes = [
+        { mode: "driving", icon: "car-outline", label: "Drive", time: "-", color: "#673AB7" },
+        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "-", color: "#2196F3" },
+        { mode: "walking", icon: "walk-outline", label: "Walk", time: "-", color: "#800000" },
+        { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-", color: "#4CAF50" },
+    ];
+    const [selectedMode, setSelectedMode] = useState("driving");
+
     useEffect(() => {
         setDestination(inputDestination);
 
@@ -32,18 +40,18 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
         if (inputDestination && !destinationCoords) {
             if (origin) {
                 getDirections(origin, inputDestination, selectedMode)
-                .then(result => {
-                    if (result?.[0]?.legs?.[0]?.end_location) {
-                        const coords = {
-                            latitude: result[0].legs[0].end_location.lat,
-                            longitude: result[0].legs[0].end_location.lng
-                        };
-                        setDestinationCoords(coords);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error getting coordinates for destination:", error);
-                });
+                    .then(result => {
+                        if (result?.[0]?.legs?.[0]?.end_location) {
+                            const coords = {
+                                latitude: result[0].legs[0].end_location.lat,
+                                longitude: result[0].legs[0].end_location.lng
+                            };
+                            setDestinationCoords(coords);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error getting coordinates for destination:", error);
+                    });
             }
         }
     }, [inputDestination]);
@@ -55,16 +63,7 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
         }
     }, [myLocationString]);
 
-    const [originCoords, setOriginCoords] = useState<any>(null);
-    const [destinationCoords, setDestinationCoords] = useState<any>(null);
-    const transportModes = [
-        { mode: "driving", icon: "car-outline", label: "Drive", time: "-", color: "#673AB7" },
-        { mode: "transit", icon: "bus-outline", label: "Public Transport", time: "-",color: "#2196F3" },
-        { mode: "walking", icon: "walk-outline", label: "Walk", time: "-",color: "#800000" },
-        { mode: "bicycling", icon: "bicycle-outline", label: "Bicycle", time: "-" ,color: "#4CAF50"},
-    ];
-    const [selectedMode, setSelectedMode] = useState("driving");
-    const { isInsideBuilding } = useCoords();
+
 
     //WHEN ORIGIN SEARCH BAR VALUE CHANGES METHOD HERE TO GETROUTEDATA
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
@@ -167,12 +166,12 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
                     </View>
                     {/* Transport Buttons with Time Estimates */}
                     <View style={SearchBarsStyle.transportButtonContainer}>
-                        {transportModes.map(({ mode, icon,color }) => (
+                        {transportModes.map(({ mode, icon, color }) => (
                             <TouchableOpacity
                                 key={mode}
                                 style={SearchBarsStyle.transportButton}
                                 onPress={() => setSelectedMode(mode)}
-                                
+
                             >
                                 <View style={SearchBarsStyle.transportButtonContent}>
                                     <Ionicons
@@ -181,109 +180,109 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
                                         color={selectedMode === mode ? color : "black"}
                                     />
                                     {selectedMode === mode}
-                    
+
                                 </View>
                             </TouchableOpacity>
-                        ))}    
+                        ))}
                     </View>
-                   
+
                     {/* Only render ShuttleBusTransit component when transit mode is selected */}
                     {!!(selectedMode === "transit" && origin && destinationCoords) && (
-                    <ShuttleBusTransit
-                        startLocation={origin}
-                        endLocation={destinationCoords}
-                        onSelect={(info) => {
-                            Promise.all([
-                                getDirections(origin, info.startShuttleStation, "walking"),
-                                getDirections(info.endShuttleStation, destination, "walking"),
-                                getDirections(info.startShuttleStation, info.endShuttleStation, "driving")
-                            ]).then(([stationRouteCoords, endRouteCoords, shuttleRouteCoords]) => {
-                                if (!stationRouteCoords?.length || !endRouteCoords?.length || !shuttleRouteCoords?.length) {
-                                    console.error("Missing route data");
-                                    return;
-                                }
-                              
-                                // Create deep copy of the first route segment
-                                const routeCopy = JSON.parse(JSON.stringify(stationRouteCoords[0]));
-                              
-                                // Calculate times
-                                const now = new Date();
-                                const [hours, minutes] = info.nextDepartureTime.split(':').map(Number);
-                                const departureTime = new Date();
-                                departureTime.setHours(hours, minutes, 0, 0);
-                                const arrivalAtStationTime = new Date(now.getTime() + routeCopy.legs[0].duration.value * 1000);
-                                const waitTimeMinutes = Math.max(0, Math.floor((departureTime.getTime() - arrivalAtStationTime.getTime()) / (60 * 1000)));
-                                const walkToStationMinutes = Math.ceil(routeCopy.legs[0].duration.value / 60);
-                                const walkFromStationMinutes = Math.ceil(endRouteCoords[0].legs[0].duration.value / 60);
-                              
-                                // Create template step object for custom steps
-                                const templateStep = routeCopy.legs[0].steps[0] || {};
-                              
-                                // Create all steps with hidden instructions for route visualization
-                                const allHiddenSteps = [
-                                    // Walking to station steps
-                                    ...routeCopy.legs[0].steps.map((step: { html_instructions: string; }) => {
-                                        step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
-                                        return step;
-                                    }),
-                                
-                                    // Shuttle route steps (marked for dashed line)
-                                    ...shuttleRouteCoords[0].legs[0].steps.map((step: { html_instructions: string; is_shuttle_route: boolean; }) => {
-                                        step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
-                                        return step;
-                                    }),
-                                
-                                    // Walking from station steps
-                                    ...endRouteCoords[0].legs[0].steps.map((step: { html_instructions: string; }) => {
-                                        step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
-                                        return step;
-                                    })
-                                ];
-                              
-                                // Create visible custom instruction steps
-                                const visibleSteps = [
-                                {
-                                    ...templateStep,
-                                    html_instructions: `Walk to ${info.startShuttleStation} (Shuttle Bus Stop)`,
-                                    duration: routeCopy.legs[0].duration,
-                                    distance: routeCopy.legs[0].distance
-                                },
-                                {
-                                    ...templateStep,
-                                    html_instructions: `Wait for ${waitTimeMinutes} min until the shuttle departing at ${info.nextDepartureTime}`,
-                                    duration: { text: `${waitTimeMinutes} mins`, value: waitTimeMinutes * 60 },
-                                    distance: { text: "", value: 0 }
-                                },
-                                {
-                                    ...templateStep,
-                                    html_instructions: `Take the Concordia Shuttle Bus from ${info.startCampusName} to ${info.endCampusName} Campus`,
-                                    duration: { text: "30 mins", value: 1800 },
-                                    distance: { text: "8.3 km", value: 8300 }
-                                },
-                                {
-                                    ...templateStep,
-                                    html_instructions: `Walk from ${info.endShuttleStation} to your destination`,
-                                    duration: endRouteCoords[0].legs[0].duration,
-                                    distance: endRouteCoords[0].legs[0].distance
-                                }
-                            ];
-                              
-                            // Update the complete route
-                            routeCopy.legs[0].steps = [...allHiddenSteps, ...visibleSteps];
+                        <ShuttleBusTransit
+                            startLocation={origin}
+                            endLocation={destinationCoords}
+                            onSelect={(info) => {
+                                Promise.all([
+                                    getDirections(origin, info.startShuttleStation, "walking"),
+                                    getDirections(info.endShuttleStation, destination, "walking"),
+                                    getDirections(info.startShuttleStation, info.endShuttleStation, "driving")
+                                ]).then(([stationRouteCoords, endRouteCoords, shuttleRouteCoords]) => {
+                                    if (!stationRouteCoords?.length || !endRouteCoords?.length || !shuttleRouteCoords?.length) {
+                                        console.error("Missing route data");
+                                        return;
+                                    }
 
-                            // Update the UI
-                            setRouteData([routeCopy]);
+                                    // Create deep copy of the first route segment
+                                    const routeCopy = JSON.parse(JSON.stringify(stationRouteCoords[0]));
 
-                            setTime((walkToStationMinutes + waitTimeMinutes + 30 + walkFromStationMinutes).toString());
+                                    // Calculate times
+                                    const now = new Date();
+                                    const [hours, minutes] = info.nextDepartureTime.split(':').map(Number);
+                                    const departureTime = new Date();
+                                    departureTime.setHours(hours, minutes, 0, 0);
+                                    const arrivalAtStationTime = new Date(now.getTime() + routeCopy.legs[0].duration.value * 1000);
+                                    const waitTimeMinutes = Math.max(0, Math.floor((departureTime.getTime() - arrivalAtStationTime.getTime()) / (60 * 1000)));
+                                    const walkToStationMinutes = Math.ceil(routeCopy.legs[0].duration.value / 60);
+                                    const walkFromStationMinutes = Math.ceil(endRouteCoords[0].legs[0].duration.value / 60);
 
-                            setIsTransit(true);
+                                    // Create template step object for custom steps
+                                    const templateStep = routeCopy.legs[0].steps[0] || {};
 
-                            }).catch(error => {
-                              console.error("Error creating shuttle route:", error);
-                            });
-                          }}
-  
-               />
+                                    // Create all steps with hidden instructions for route visualization
+                                    const allHiddenSteps = [
+                                        // Walking to station steps
+                                        ...routeCopy.legs[0].steps.map((step: { html_instructions: string; }) => {
+                                            step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
+                                            return step;
+                                        }),
+
+                                        // Shuttle route steps (marked for dashed line)
+                                        ...shuttleRouteCoords[0].legs[0].steps.map((step: { html_instructions: string; is_shuttle_route: boolean; }) => {
+                                            step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
+                                            return step;
+                                        }),
+
+                                        // Walking from station steps
+                                        ...endRouteCoords[0].legs[0].steps.map((step: { html_instructions: string; }) => {
+                                            step.html_instructions = "HIDDEN_STEP_DO_NOT_DISPLAY";
+                                            return step;
+                                        })
+                                    ];
+
+                                    // Create visible custom instruction steps
+                                    const visibleSteps = [
+                                        {
+                                            ...templateStep,
+                                            html_instructions: `Walk to ${info.startShuttleStation} (Shuttle Bus Stop)`,
+                                            duration: routeCopy.legs[0].duration,
+                                            distance: routeCopy.legs[0].distance
+                                        },
+                                        {
+                                            ...templateStep,
+                                            html_instructions: `Wait for ${waitTimeMinutes} min until the shuttle departing at ${info.nextDepartureTime}`,
+                                            duration: { text: `${waitTimeMinutes} mins`, value: waitTimeMinutes * 60 },
+                                            distance: { text: "", value: 0 }
+                                        },
+                                        {
+                                            ...templateStep,
+                                            html_instructions: `Take the Concordia Shuttle Bus from ${info.startCampusName} to ${info.endCampusName} Campus`,
+                                            duration: { text: "30 mins", value: 1800 },
+                                            distance: { text: "8.3 km", value: 8300 }
+                                        },
+                                        {
+                                            ...templateStep,
+                                            html_instructions: `Walk from ${info.endShuttleStation} to your destination`,
+                                            duration: endRouteCoords[0].legs[0].duration,
+                                            distance: endRouteCoords[0].legs[0].distance
+                                        }
+                                    ];
+
+                                    // Update the complete route
+                                    routeCopy.legs[0].steps = [...allHiddenSteps, ...visibleSteps];
+
+                                    // Update the UI
+                                    setRouteData([routeCopy]);
+
+                                    setTime((walkToStationMinutes + waitTimeMinutes + 30 + walkFromStationMinutes).toString());
+
+                                    setIsTransit(true);
+
+                                }).catch(error => {
+                                    console.error("Error creating shuttle route:", error);
+                                });
+                            }}
+
+                        />
                     )}
 
                     {/* Total Time, Start Button, and Floor/Outside View Button */}
@@ -303,44 +302,7 @@ const SearchBars: React.FC<SearchBarProps> = ({ inputDestination }) => {
                                 </View>
                             </TouchableOpacity>
 
-                            {!inFloorView && (
-                                <TouchableOpacity
-                                    style={[
-                                        SearchBarsStyle.button,
-                                        {
-                                            backgroundColor: isInsideBuilding ? "white" : "#ddd",
-                                            borderColor: isInsideBuilding ? "#912338" : "grey",
-                                            opacity: isInsideBuilding ? 1 : 0.5
-                                        }
-                                    ]}
-                                    disabled={!isInsideBuilding} // Disable button when user is outside
-                                    onPress={() => setInFloorView(true)}
-                                >
-                                    <View style={SearchBarsStyle.buttonContent}>
-                                        <Entypo name="location" size={20} color={isInsideBuilding ? "#912338" : "grey"} />
-                                        <Text style={[SearchBarsStyle.buttonText, { color: isInsideBuilding ? "#912338" : "grey" }]}>Floor View</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )}
-
-                            {inFloorView && (
-                                <TouchableOpacity
-                                    style={[
-                                        SearchBarsStyle.button,
-                                        {
-                                            backgroundColor: "white",
-                                            borderColor: "#912338",
-                                            opacity: 1
-                                        }
-                                    ]}
-                                    onPress={() => setInFloorView(false)}
-                                >
-                                    <View style={SearchBarsStyle.buttonContent}>
-                                        <Entypo name="tree" size={20} color="#912338" />
-                                        <Text style={[SearchBarsStyle.buttonText, { color: "#912338" }]}>Outside View</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )}
+                            <IndoorViewButton inFloorView={inFloorView} />
                         </View>
                     </View>
                 </>
