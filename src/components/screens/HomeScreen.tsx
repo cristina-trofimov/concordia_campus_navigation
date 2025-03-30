@@ -29,7 +29,7 @@ export default function HomeScreen() {
         <View style={HomeStyle.container}>
           <CalendarButton />
           <LeftDrawer />
-          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} />
+          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} destinationCoords={destinationCoords}/>
           <FloorSelector />
 
           <BottomDrawer drawerHeight={drawerHeight} >
