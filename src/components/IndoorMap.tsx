@@ -16,6 +16,7 @@ import { ve1Features } from '../data/indoor/VE/VE1.ts';
 import { ve2Features } from '../data/indoor/VE/VE2.ts';
 import { vl1Features } from '../data/indoor/VL/VL1.ts';
 import { vl2Features } from '../data/indoor/VL/VL2.ts';
+import { RoomInfo } from '../interfaces/RoomInfo.ts';
 
 export const featureMap: { [key: string]: any } = {
     h1Features,
@@ -73,9 +74,19 @@ export const useIndoorFeatures = () => {
 };
 
 export const HighlightIndoorMap = () => {
-    const { highlightedBuilding, isInsideBuilding, destinationCoords } = useCoords();
-    const { setBuildingHasFloors, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations, setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures } = useIndoor();
+    const { highlightedBuilding, isInsideBuilding, destinationCoords, myLocationCoords } = useCoords();
+    const { setBuildingHasFloors, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations, setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures, originRoom, destinationRoom, currentFloor } = useIndoor();
     const { selectIndoorFeatures } = useIndoorFeatures();
+
+    // Check if we should show the room pin
+    const shouldShowRoomPin = (room: RoomInfo | null) => {
+        if (!room || !room.coordinates || !currentFloor) {
+            return false;
+        }
+        
+        // Check if current floor matches the floor of the selected room
+        return currentFloor === floorNameFormat(room.floor);
+    };
 
     useEffect(() => {
         setInFloorView(false);
@@ -108,7 +119,7 @@ export const HighlightIndoorMap = () => {
         else {
             setInFloorView(false);
         }
-    }, [destinationCoords]);
+    }, [destinationCoords, myLocationCoords]);
 
     return (
         <>
@@ -125,7 +136,8 @@ export const HighlightIndoorMap = () => {
                         style={{
                             fillColor: '#912338',
                             fillOutlineColor: 'black',
-                            fillOpacity: ['case',
+                            fillOpacity: [
+                                'case',
                                 ['==', ['get', 'indoor'], 'corridor'], 0.2,
                                 0.5,
                             ],
@@ -151,8 +163,68 @@ export const HighlightIndoorMap = () => {
                         }}
                     />
                 </Mapbox.ShapeSource>
-            )}
 
+                
+            )}
+    
+            {/* Origin Room Pin */}
+            {shouldShowRoomPin(originRoom) && originRoom?.coordinates && inFloorView && (
+                <Mapbox.ShapeSource
+                    id="origin-room-pin"
+                    shape={{
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: originRoom.coordinates
+                        },
+                        properties: {
+                            roomRef: originRoom.ref,
+                            type: 'origin'
+                        }
+                    }}
+                >
+                    {/* Origin Circle/Pin */}
+                    <Mapbox.CircleLayer
+                        id="origin-pin-circle"
+                        style={{
+                            circleRadius: 8,
+                            circleColor: '#4697C9',
+                            circleStrokeWidth: 2,
+                            circleStrokeColor: '#FFFFFF',
+                        }}
+                    />
+                </Mapbox.ShapeSource>
+            )}
+            
+            {/* Destination Room Pin */}
+            {shouldShowRoomPin(destinationRoom) && destinationRoom?.coordinates && inFloorView && (
+                <Mapbox.ShapeSource
+                    id="destination-room-pin"
+                    shape={{
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: destinationRoom.coordinates
+                        },
+                        properties: {
+                            roomRef: destinationRoom.ref,
+                            type: 'destination'
+                        }
+                    }}
+                >
+                    {/* Destination Circle/Pin */}
+                    <Mapbox.CircleLayer
+                        id="destination-pin-circle"
+                        style={{
+                            circleRadius: 8,
+                            circleColor: 'red',
+                            circleStrokeWidth: 2,
+                            circleStrokeColor: '#FFFFFF',
+                        }}
+                    />
+                </Mapbox.ShapeSource>
+            )}
+    
             <IndoorPointsOfInterest />
         </>
     );

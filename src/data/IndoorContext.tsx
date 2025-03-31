@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useMemo } from 'react';
 import { IndoorContextType } from '../interfaces/IndoorContextType';
 import { BuildingFloorAssociation } from '../interfaces/buildingFloorAssociation';
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature.ts';
+import { RoomInfo } from "../interfaces/RoomInfo"
 
 export const IndoorContext = createContext<IndoorContextType>({
     buildingHasFloors: false,
@@ -16,6 +17,10 @@ export const IndoorContext = createContext<IndoorContextType>({
     setCurrentFloorAssociations: () => { },
     indoorFeatures: [],
     setIndoorFeatures: () => { },
+    originRoom: null,
+    setOriginRoom: () => { },
+    destinationRoom: null,
+    setDestinationRoom: () => { },
 });
 
 export const IndoorsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -25,6 +30,8 @@ export const IndoorsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [floorList, setFloorList] = useState<string[]>([]);
     const [currentFloorAssociations, setCurrentFloorAssociations] = useState<BuildingFloorAssociation[]>([]);
     const [indoorFeatures, setIndoorFeatures] = useState<IndoorFeatureCollection[]>([]);
+    const [originRoom, setOriginRoom] = useState<RoomInfo | null>(null);
+    const [destinationRoom, setDestinationRoom] = useState<RoomInfo | null>(null);
 
     const contextValue = useMemo(() => ({
         buildingHasFloors,
@@ -39,7 +46,11 @@ export const IndoorsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setCurrentFloorAssociations,
         indoorFeatures,
         setIndoorFeatures,
-      }), [buildingHasFloors, inFloorView, currentFloor, floorList, currentFloorAssociations, indoorFeatures]);
+        originRoom,
+        setOriginRoom,
+        destinationRoom,
+        setDestinationRoom
+      }), [buildingHasFloors, inFloorView, currentFloor, floorList, currentFloorAssociations, indoorFeatures, originRoom, destinationRoom]);
     
       return (
         <IndoorContext.Provider value={contextValue}>

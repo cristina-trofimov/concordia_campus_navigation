@@ -15,7 +15,7 @@ import IndoorViewButton from './IndoorViewButton';
 function SearchBars({ inputDestination }: { inputDestination: string }) {
 
     const { setRouteData, myLocationString, setIsTransit, originCoords, setOriginCoords, destinationCoords, setDestinationCoords } = useCoords();
-    const { inFloorView, setInFloorView } = useIndoor();
+    const { inFloorView, setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState(inputDestination);
@@ -125,6 +125,8 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         setDestinationCoords(null);
         setRouteData(null);
         setInFloorView(false);
+        setOriginRoom(null);
+        setDestinationRoom(null);
     }, [setRouteData]);
 
     useEffect(() => {

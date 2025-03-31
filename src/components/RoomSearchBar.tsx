@@ -9,25 +9,23 @@ import { buildingFloorAssociations } from "../data/buildingFloorAssociations";
 import { fixedBuildingFeatures } from "./BuildingCoordinates";
 import { useCoords } from "../data/CoordsContext";
 import { useFloorSelection } from "./FloorSelector";
+import { RoomInfo } from "../interfaces/RoomInfo"
+import { useIndoor } from "../data/IndoorContext";
 
 interface RoomSearchBarProps {
     location: any;
     placeholder?: string;
+    searchType: 'origin' | 'destination';
     onSelect?: (room: string, floor: string) => void;
     defaultValue?: string | null;
     showClearButton?: boolean;
     onClear?: () => void;
 }
 
-interface RoomInfo {
-    ref: string;
-    floor: string;
-    component: string;
-}
-
 export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     location,
     placeholder,
+    searchType,
     onSelect,
     defaultValue = null,
     showClearButton = false,
@@ -38,6 +36,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     const [displayedRoom, setDisplayedRoom] = useState(defaultValue || "");
     const [suggestions, setSuggestions] = useState<RoomInfo[]>([]);
     const [allRooms, setAllRooms] = useState<RoomInfo[]>([]);
+    const { setOriginRoom, setDestinationRoom } = useIndoor();
     const { highlightedBuilding } = useCoords();
     const { handleSelectFloor } = useFloorSelection();
 
@@ -127,7 +126,31 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
         filterSuggestions(text);
     };
 
-    // TO-DO: once pressed, put pin on the map
+    // Calculate center point of a room polygon
+    const calculateRoomCenter = (room: RoomInfo): [number, number] | undefined => {
+        const floorFeatures = featureMap[room.component];
+        const roomFeature = floorFeatures.find((feature: any) => 
+            feature.properties.ref === room.ref && 
+            feature.properties.indoor === "room"
+        );
+
+        if (roomFeature && roomFeature.geometry.type === "Polygon") {
+            // Get coordinates of the polygon
+            const coordinates = roomFeature.geometry.coordinates[0];
+            
+            // Calculate center point
+            let sumX = 0, sumY = 0;
+            coordinates.forEach((coord: [number, number]) => {
+                sumX += coord[0];
+                sumY += coord[1];
+            });
+            
+            return [sumX / coordinates.length, sumY / coordinates.length];
+        }
+        
+        return undefined;
+    };
+
     const handleSuggestionPress = (room: RoomInfo) => {
         const displayText = `${room.ref}`;
         setDisplayedRoom(displayText);
@@ -143,6 +166,25 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
             association => association.floor === room.floor
         );
 
+        // Calculate room center and set selected room
+        const center = calculateRoomCenter(room);
+
+        if (searchType === 'origin') {
+            setOriginRoom({
+                ref: room.ref,
+                floor: room.floor,
+                component: room.component,
+                coordinates: center
+            });
+        } else {
+            setDestinationRoom({
+                ref: room.ref,
+                floor: room.floor,
+                component: room.component,
+                coordinates: center
+            });
+        }
+
         if (floorIndex !== -1) {
             // only change to that floor if inside the building
             if (highlightedBuilding.properties.id === buildingID) {
@@ -156,6 +198,14 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
         setDisplayedRoom("");
         setQuery("");
         setSuggestions([]);
+
+        // Clear the appropriate room
+        if (searchType === 'origin') {
+            setOriginRoom(null);
+        } else {
+            setDestinationRoom(null);
+        }
+        
         if (onClear) {
             onClear();
         }
