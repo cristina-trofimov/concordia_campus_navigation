@@ -18,7 +18,6 @@ interface RoomSearchBarProps {
     searchType: 'origin' | 'destination';
     onSelect?: (room: string, floor: string) => void;
     defaultValue?: string | null;
-    showClearButton?: boolean;
     onClear?: () => void;
 }
 
@@ -28,7 +27,6 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     searchType,
     onSelect,
     defaultValue = null,
-    showClearButton = false,
     onClear
 }) => {
     const [query, setQuery] = useState("");
@@ -205,7 +203,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
         } else {
             setDestinationRoom(null);
         }
-        
+
         if (onClear) {
             onClear();
         }
@@ -223,7 +221,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
                             value={displayedRoom || query}
                             onChangeText={handleInputChange}
                         />
-                        {Boolean(showClearButton && displayedRoom) && (
+                        {Boolean(displayedRoom) && (
                             <TouchableOpacity onPress={handleClear} style={SearchBarStyle.clearButton}>
                                 <MaterialIcons name="close" size={20} color="#666" />
                             </TouchableOpacity>
