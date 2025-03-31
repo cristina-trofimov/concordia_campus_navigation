@@ -4,11 +4,11 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { point } from '@turf/helpers';
 import booleanPointInPolygon from '@turf/boolean-point-in-polygon';
 import { SearchBarStyle } from "../styles/SearchBarStyle";
-import { featureMap } from "../components/IndoorMap";
-import { useIndoor } from "../data/IndoorContext";
+import { featureMap, floorNameFormat } from "../components/IndoorMap";
 import { buildingFloorAssociations } from "../data/buildingFloorAssociations";
 import { fixedBuildingFeatures } from "./BuildingCoordinates";
 import { useCoords } from "../data/CoordsContext";
+import { useFloorSelection } from "./FloorSelector";
 
 interface RoomSearchBarProps {
     location: any;
@@ -38,8 +38,8 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     const [displayedRoom, setDisplayedRoom] = useState(defaultValue || "");
     const [suggestions, setSuggestions] = useState<RoomInfo[]>([]);
     const [allRooms, setAllRooms] = useState<RoomInfo[]>([]);
-    const { setCurrentFloor, setCurrentFloorAssociations, setIndoorFeatures } = useIndoor();
     const { highlightedBuilding } = useCoords();
+    const { handleSelectFloor } = useFloorSelection();
 
     const getBuildingIDFromCoords = (coords: { latitude: number, longitude: number }) => {
         if (!coords) return "";
@@ -145,12 +145,10 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
 
         if (floorIndex !== -1) {
             // only change to that floor if inside the building
-            console.log("highlistedBuilding:", highlightedBuilding);
-            console.log("highlistedBuilding id:", highlightedBuilding.id);
-            if (highlightedBuilding.id === buildingID) {
-                setCurrentFloor(room.floor);
+            if (highlightedBuilding.properties.id === buildingID) {
+                handleSelectFloor(floorNameFormat(room.floor));
             }
-        }
+        };
     };
 
     // Handle clearing the search

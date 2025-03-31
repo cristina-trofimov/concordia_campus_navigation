@@ -22,14 +22,14 @@ export default function HomeScreen() {
   const [inputDestination, setInputDestination] = useState<string>("");
 
 
-  
+
   return (
     <CoordsProvider>
       <IndoorsProvider>
         <View style={HomeStyle.container}>
           <CalendarButton />
           <LeftDrawer />
-          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination}/>
+          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} />
           <FloorSelector />
 
           <BottomDrawer drawerHeight={drawerHeight} >

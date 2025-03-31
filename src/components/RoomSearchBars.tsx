@@ -3,7 +3,7 @@ import { RoomSearchBar } from "./RoomSearchBar";
 import { useCoords } from "../data/CoordsContext";
 
 export const RoomSearchBars = () => {
-  const { originCoords, destinationCoords } = useCoords();
+  const { originCoords, destinationCoords, myLocationCoords } = useCoords();
 
     return (
         <>
@@ -16,7 +16,7 @@ export const RoomSearchBars = () => {
               gap: 15,
             }}>
               <RoomSearchBar
-                location={originCoords}
+                location={originCoords ? originCoords : myLocationCoords}
                 placeholder="origin room"
               />
               <RoomSearchBar

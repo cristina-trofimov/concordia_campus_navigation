@@ -237,7 +237,7 @@ export default function MapComponent({
         onDidFinishLoadingMap={() => setMapLoaded(true)}
       >
         <HighlightBuilding />
-        <HighlightIndoorMap/>
+        <HighlightIndoorMap />
         <Camera
           ref={(ref) => {
             cameraRef.current = ref;

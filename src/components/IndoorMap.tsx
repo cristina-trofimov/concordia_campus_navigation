@@ -31,7 +31,7 @@ export const featureMap: { [key: string]: any } = {
     vl2Features,
 };
 
-const floorNameFormat = (floor: string) => {
+export const floorNameFormat = (floor: string) => {
     let suffix;
 
     switch (floor) {
