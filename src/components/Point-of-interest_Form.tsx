@@ -73,6 +73,7 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
 
       {/* POI Picker */}
       <Picker
+        testID="poi-picker"
         selectedValue={selectedPOI || "none"}
         onValueChange={(itemValue) => handlePOIChange(itemValue)}
         style={PoiFormStyles.picker}
@@ -87,6 +88,7 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
       {/* Radius Picker */}
       <Text style={PoiFormStyles.title}>Search Radius</Text>a
       <Picker
+        testID="radius-picker"
         selectedValue={selectedRadius || 50}
         onValueChange={(value) => handleRadiusChange(value)}
         style={PoiFormStyles.picker}
