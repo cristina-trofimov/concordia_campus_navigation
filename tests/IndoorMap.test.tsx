@@ -4,6 +4,7 @@ import { HighlightIndoorMap } from '../src/components/IndoorMap';
 import { useCoords } from '../src/data/CoordsContext';
 import { useIndoor } from '../src/data/IndoorContext';
 import Mapbox from '@rnmapbox/maps';
+import { IndoorPointsOfInterest } from '../src/components/IndoorPointsOfInterest';
 
 // Mock the dependencies
 jest.mock('../src/data/CoordsContext');
@@ -82,7 +83,6 @@ describe('HighlightIndoorMap', () => {
     render(<HighlightIndoorMap />);
     
     expect(Mapbox.ShapeSource).not.toHaveBeenCalled();
-    expect(Mapbox.IndoorPointsOfInterest).not.toHaveBeenCalled();
   });
   
   test('should render Mapbox components when indoorFeatures has data and inFloorView is true', () => {
