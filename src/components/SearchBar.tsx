@@ -112,7 +112,7 @@ const SearchBarComponent: React.FC<SearchBarProps> = ({
       </View>
       {suggestions.length > 0 && (
         <ScrollView
-          style={{ maxHeight: 200 }} // Set a reasonable max height
+          style={{ maxHeight: 200 }}
           nestedScrollEnabled={true}
         >
           {suggestions.map((item) => (

@@ -16,7 +16,6 @@ interface RoomSearchBarProps {
     location: any;
     placeholder?: string;
     searchType: 'origin' | 'destination';
-    onSelect?: (room: string, floor: string) => void;
     defaultValue?: string | null;
     onClear?: () => void;
 }
@@ -25,7 +24,6 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     location,
     placeholder,
     searchType,
-    onSelect,
     defaultValue = null,
     onClear
 }) => {
