@@ -43,7 +43,6 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                                 latitude: result[0].legs[0].end_location.lat,
                                 longitude: result[0].legs[0].end_location.lng
                             };
-                            setDestinationCoords(coords);
                         }
                     })
                     .catch(error => {
@@ -52,6 +51,11 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
             }
         }
     }, [inputDestination]);
+
+
+    // Need this to ensure destinationCoords gets updated
+    useEffect(() => {
+    }, [destinationCoords]);
 
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {

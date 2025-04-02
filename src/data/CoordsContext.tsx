@@ -27,8 +27,8 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [isTransit, setIsTransit] = useState<boolean>(false);
     const [highlightedBuilding, setHighlightedBuilding] = useState<any>(null);
     const [myLocationCoords, setMyLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
-    const [originCoords, setOriginCoords] = useState<any>(null);
-    const [destinationCoords, setDestinationCoords] = useState<any>(null);
+    const [originCoords, setOriginCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [destinationCoords, setDestinationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
 
     const contextValue = useMemo(() => ({
         routeData,
