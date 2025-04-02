@@ -4,6 +4,7 @@ import { FloorSelector } from '../src/components/FloorSelector';
 import { useIndoor } from '../src/data/IndoorContext';
 import { useIndoorFeatures } from '../src/components/IndoorMap';
 
+// hopla
 // Mock the hooks
 jest.mock('../src/data/IndoorContext', () => ({
   useIndoor: jest.fn(),
