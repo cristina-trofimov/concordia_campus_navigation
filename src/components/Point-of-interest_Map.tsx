@@ -4,24 +4,20 @@ import { PointAnnotation } from '@rnmapbox/maps';
 import { Text } from "@rneui/themed";
 import * as Location from "expo-location";
 import { Coords } from "../interfaces/Map.ts";
-import { MAPBOX_TOKEN as ENV_MAPBOX_TOKEN } from "@env";
+import { MAPBOX_TOKEN} from "@env";
 
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-
-let MAPBOX_TOKEN;
+// Fallback mechanism for tests
+let MAPBOX_ACCESS_TOKEN = MAPBOX_TOKEN;
 try {
-  const env = require('@env');
-  MAPBOX_TOKEN = env.MAPBOX_TOKEN;
+  if (!MAPBOX_ACCESS_TOKEN) {
+    // Only use fallback if import didn't work
+    MAPBOX_ACCESS_TOKEN = 'mock-token-for-tests';
+  }
 } catch (e) {
-  // Fallback for test environments
-  MAPBOX_TOKEN = 'mock-token-for-tests';
-}
-interface PointOfInterestMapProps {
-  myLocationCoords: { latitude: number; longitude: number } | null;
-  setInputDestination: (inputDestination: string) => void;
-  selectedPOI?: string;
-  radius?: number;
+  MAPBOX_ACCESS_TOKEN = 'mock-token-for-tests';
+  console.warn('Using mock Mapbox token for tests');
 }
 
 const POI_ICONS = {
@@ -33,8 +29,9 @@ const POI_ICONS = {
 };
 
 export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => {
+    console.log(MAPBOX_TOKEN);
   const TILESET_ID = 'mapbox.mapbox-streets-v8';
-  const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_TOKEN}`;
+  const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
   try {
     const response = await fetch(url);
