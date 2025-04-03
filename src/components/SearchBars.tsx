@@ -14,14 +14,11 @@ import IndoorViewButton from './IndoorViewButton';
 
 function SearchBars({ inputDestination }: { inputDestination: string }) {
 
-    const { setRouteData, myLocationString, setIsTransit } = useCoords();
-    const { inFloorView, setInFloorView } = useIndoor();
+    const { setRouteData, myLocationString, setIsTransit, originCoords, setOriginCoords, destinationCoords, setDestinationCoords } = useCoords();
+    const { inFloorView, setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState(inputDestination);
-
-    const [originCoords, setOriginCoords] = useState<any>(null);
-    const [destinationCoords, setDestinationCoords] = useState<any>(null);
 
     const [time, setTime] = useState('');
 
@@ -46,7 +43,6 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                                 latitude: result[0].legs[0].end_location.lat,
                                 longitude: result[0].legs[0].end_location.lng
                             };
-                            setDestinationCoords(coords);
                         }
                     })
                     .catch(error => {
@@ -56,14 +52,16 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         }
     }, [inputDestination]);
 
+    // Need this to ensure destinationCoords gets updated
+    useEffect(() => {
+    }, [destinationCoords]);
+
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {
         if (myLocationString) {
             setOrigin(myLocationString);
         }
     }, [myLocationString]);
-
-
 
     //WHEN ORIGIN SEARCH BAR VALUE CHANGES METHOD HERE TO GETROUTEDATA
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
@@ -128,6 +126,8 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         setDestinationCoords(null);
         setRouteData(null);
         setInFloorView(false);
+        setOriginRoom(null);
+        setDestinationRoom(null);
     }, [setRouteData]);
 
     useEffect(() => {
