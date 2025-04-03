@@ -53,8 +53,8 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
     }, [inputDestination]);
 
     // Need this to ensure destinationCoords gets updated
-    useEffect(() => {
-    }, [destinationCoords]);
+    // useEffect(() => {
+    // }, [destinationCoords]);
 
     //EACH TIME YOU CHANGE LOCATION , THE ORIGIN DESTINATION BAR VALUE CHANGES
     useEffect(() => {
