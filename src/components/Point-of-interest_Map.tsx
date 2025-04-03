@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, } from 'react-native';
+import { View, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import { PointAnnotation } from '@rnmapbox/maps';
+import { Text } from "@rneui/themed";
+import * as Location from "expo-location";
+import { Coords } from "../interfaces/Map.ts";
+import { MAPBOX_TOKEN as ENV_MAPBOX_TOKEN } from "@env";
 
+import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-let MAPBOX_TOKEN: string;
+let MAPBOX_TOKEN;
 try {
   const env = require('@env');
   MAPBOX_TOKEN = env.MAPBOX_TOKEN;
@@ -14,8 +19,8 @@ try {
   MAPBOX_TOKEN = 'mock-token-for-tests';
 }
 interface PointOfInterestMapProps {
-  myLocationCoords: { latitude: number; longitude: number } | null;
-  setInputDestination: (inputDestination: string) => void;
+  myLocationCoords: { latitude; longitude } | null;
+  setInputDestination: (inputDestination) => void;
   selectedPOI?: string;
   radius?: number;
 }
@@ -28,7 +33,7 @@ const POI_ICONS = {
   arts_and_entertainment: "movie",
 };
 
-export const fetchNearbyPOI = async (longitude: number, latitude: number, selectedPOI: string, radius = 25) => {
+export const fetchNearbyPOI = async (longitude, latitude, selectedPOI, radius = 25) => {
   const TILESET_ID = 'mapbox.mapbox-streets-v8';
   const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_TOKEN}`;
 
@@ -42,7 +47,7 @@ export const fetchNearbyPOI = async (longitude: number, latitude: number, select
     }
 
     // Fix: Check if feature.properties exists before accessing class
-    const filteredPOIs = data.features.filter((feature: { properties: { class: string; }; }) =>
+    const filteredPOIs = data.features.filter(feature =>
       feature.properties && feature.properties.class === selectedPOI
     );
 
@@ -53,7 +58,7 @@ export const fetchNearbyPOI = async (longitude: number, latitude: number, select
   }
 };
 
-export const reverseGeocode = async (latitude: number, longitude: number) => {
+export const reverseGeocode = async (latitude, longitude) => {
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_TOKEN}`;
 
   try {
