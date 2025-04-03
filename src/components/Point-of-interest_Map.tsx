@@ -74,6 +74,8 @@ export const onPoiClick = async (poi, setInputDestination) => {
   const coordinates = poi.geometry?.coordinates;
   if (Array.isArray(coordinates) && coordinates.length === 2) {
     const [longitude, latitude] = coordinates;
+    // Note: In mapbox, coordinates are [longitude, latitude]
+    // But the reverseGeocode function expects (latitude, longitude)
     const address = await reverseGeocode(latitude, longitude);
     // Fix: Make sure we don't set empty string if address is null
     setInputDestination(address || "Unknown location");
