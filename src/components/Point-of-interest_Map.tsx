@@ -1,20 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator, } from 'react-native';
 import { PointAnnotation } from '@rnmapbox/maps';
-import { Text } from "@rneui/themed";
-import * as Location from "expo-location";
-import { Coords } from "../interfaces/Map.ts";
-import { MAPBOX_TOKEN as ENV_MAPBOX_TOKEN } from "@env";
 
-import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-let MAPBOX_TOKEN;
+let MAPBOX_TOKEN: string;
 try {
   const env = require('@env');
   MAPBOX_TOKEN = env.MAPBOX_TOKEN;
 } catch (e) {
   // Fallback for test environments
+  console.log(e);
   MAPBOX_TOKEN = 'mock-token-for-tests';
 }
 interface PointOfInterestMapProps {
@@ -32,7 +28,7 @@ const POI_ICONS = {
   arts_and_entertainment: "movie",
 };
 
-export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => {
+export const fetchNearbyPOI = async (longitude: number, latitude: number, selectedPOI: string, radius = 25) => {
   const TILESET_ID = 'mapbox.mapbox-streets-v8';
   const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_TOKEN}`;
 
@@ -46,7 +42,7 @@ export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedP
     }
 
     // Fix: Check if feature.properties exists before accessing class
-    const filteredPOIs = data.features.filter(feature =>
+    const filteredPOIs = data.features.filter((feature: { properties: { class: string; }; }) =>
       feature.properties && feature.properties.class === selectedPOI
     );
 
@@ -57,7 +53,7 @@ export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedP
   }
 };
 
-export const reverseGeocode = async (latitude, longitude) => {
+export const reverseGeocode = async (latitude: number, longitude: number) => {
   const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_TOKEN}`;
 
   try {
@@ -86,7 +82,7 @@ export const onPoiClick = async (poi, setInputDestination) => {
     // But the reverseGeocode function expects (latitude, longitude)
     const address = await reverseGeocode(latitude, longitude);
     // Fix: Make sure we don't set empty string if address is null
-    setInputDestination(address || "Unknown location");
+    setInputDestination(address ?? "Unknown location");
   }
 };
 
@@ -113,7 +109,7 @@ const PointOfInterestMap: React.FC<PointOfInterestMapProps> = ({
           const { latitude, longitude } = myLocationCoords;
           const nearbyPois = await fetchNearbyPOI(longitude, latitude, radius, selectedPOI);
 
-          setCurrentIcon(POI_ICONS[selectedPOI] || "map-marker");
+          setCurrentIcon(POI_ICONS[selectedPOI] ?? "map-marker");
           setPoi(nearbyPois);
         } catch (error) {
           console.error("Error fetching POIs:", error);
