@@ -4,21 +4,26 @@ import { useIndoor } from "../data/IndoorContext";
 import { FloorSelectorStyle } from "../styles/FloorSelectorStyle";
 import { useIndoorFeatures } from "../components/IndoorMap";
 
-export const FloorSelector = () => {
-    const { currentFloor, setCurrentFloor, inFloorView, floorList } = useIndoor();
+export const useFloorSelection = () => {
+    const { setCurrentFloor, floorList } = useIndoor();
     const { selectIndoorFeatures } = useIndoorFeatures();
-    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
     const handleSelectFloor = (floor: string) => {
         setCurrentFloor(floor);
-        setIsDropdownVisible(false);
 
         const index = floorList.indexOf(floor);
-
-        if (index !== null) {
+        if (index !== -1) {
             selectIndoorFeatures(index);
         }
     };
+
+    return { handleSelectFloor };
+};
+
+export const FloorSelector = () => {
+    const { currentFloor, inFloorView, floorList } = useIndoor();
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+    const { handleSelectFloor } = useFloorSelection();
 
     return (
         <>
@@ -34,7 +39,7 @@ export const FloorSelector = () => {
                         </Text>
                         <Text style={FloorSelectorStyle.arrowIcon}>▼</Text>
                     </TouchableOpacity>
-    
+
                     {/* Dropdown Options */}
                     {isDropdownVisible && (
                         <View style={FloorSelectorStyle.dropdownOptions}>
@@ -42,7 +47,10 @@ export const FloorSelector = () => {
                                 <TouchableOpacity
                                     key={index}
                                     style={FloorSelectorStyle.option}
-                                    onPress={() => handleSelectFloor(floor) }
+                                    onPress={() => {
+                                        handleSelectFloor(floor);
+                                        setIsDropdownVisible(false);
+                                    }}
                                 >
                                     <Text style={FloorSelectorStyle.optionText}>{floor}</Text>
                                 </TouchableOpacity>

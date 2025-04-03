@@ -14,6 +14,10 @@ export const CoordsContext = createContext<CoordsContextType>({
     setHighlightedBuilding: () => { },
     myLocationCoords: null,
     setMyLocationCoords: () => { },
+    originCoords: null,
+    setOriginCoords: () => { },
+    destinationCoords: null,
+    setDestinationCoords: () => { },
 });
 
 export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -23,6 +27,8 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [isTransit, setIsTransit] = useState<boolean>(false);
     const [highlightedBuilding, setHighlightedBuilding] = useState<any>(null);
     const [myLocationCoords, setMyLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [originCoords, setOriginCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [destinationCoords, setDestinationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
 
     const contextValue = useMemo(() => ({
         routeData,
@@ -37,7 +43,11 @@ export const CoordsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setHighlightedBuilding,
         myLocationCoords,
         setMyLocationCoords,
-      }), [routeData, isInsideBuilding, myLocationString, isTransit, highlightedBuilding, myLocationCoords]);
+        originCoords,
+        setOriginCoords,
+        destinationCoords,
+        setDestinationCoords
+      }), [routeData, isInsideBuilding, myLocationString, isTransit, highlightedBuilding, myLocationCoords, originCoords, destinationCoords]);
     
       return (
         <CoordsContext.Provider value={contextValue}>

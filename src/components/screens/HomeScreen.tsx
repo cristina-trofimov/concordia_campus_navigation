@@ -11,6 +11,7 @@ import SearchBars from "../SearchBars";
 import DirectionsSteps from "../DirectionsSteps";
 import MapComponent from "../MapComponent";
 import PointOfInterestSelector from "../Point-of-interest_Form";
+import { RoomSearchBars } from "../RoomSearchBars"
 
 const { height } = Dimensions.get("window");
 
@@ -34,14 +35,15 @@ export default function HomeScreen() {
 
           <BottomDrawer drawerHeight={drawerHeight} >
             <ScrollView>
-            <SearchBars inputDestination={inputDestination} />
-            <PointOfInterestSelector
-                         pointsOfInterest={selectedPOI}
-                         radius={radius}
-                         onPOIChange={setSelectedPOI}
-                         onRadiusChange={setRadius}
-                       />
-            <DirectionsSteps/>
+              <SearchBars inputDestination={inputDestination} />
+              <RoomSearchBars />
+              <PointOfInterestSelector
+                pointsOfInterest={selectedPOI}
+                radius={radius}
+                onPOIChange={setSelectedPOI}
+                onRadiusChange={setRadius}
+              />
+              <DirectionsSteps />
             </ScrollView>
 
           </BottomDrawer>
@@ -51,4 +53,3 @@ export default function HomeScreen() {
     </CoordsProvider>
   );
 }
- 
