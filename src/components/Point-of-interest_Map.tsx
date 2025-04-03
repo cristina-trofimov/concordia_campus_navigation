@@ -9,9 +9,10 @@ import { MAPBOX_TOKEN} from "@env";
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 // Fallback mechanism for tests
-let MAPBOX_ACCESS_TOKEN = MAPBOX_TOKEN;
+let MAPBOX_ACCESS_TOKEN;
 try {
-  if (!MAPBOX_ACCESS_TOKEN) {
+  MAPBOX_ACCESS_TOKEN = MAPBOX_TOKEN;
+  if (MAPBOX_ACCESS_TOKEN === 'mock-mapbox-token') {
     // Only use fallback if import didn't work
     MAPBOX_ACCESS_TOKEN = 'mock-token-for-tests';
   }
@@ -29,7 +30,6 @@ const POI_ICONS = {
 };
 
 export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => {
-    console.log(MAPBOX_TOKEN);
   const TILESET_ID = 'mapbox.mapbox-streets-v8';
   const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
