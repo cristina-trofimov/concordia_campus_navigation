@@ -9,8 +9,14 @@ import { MAPBOX_TOKEN as ENV_MAPBOX_TOKEN } from "@env";
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-const MAPBOX_TOKEN = ENV_MAPBOX_TOKEN || 'mock-token-for-tests';
-
+let MAPBOX_TOKEN;
+try {
+  const env = require('@env');
+  MAPBOX_TOKEN = env.MAPBOX_TOKEN;
+} catch (e) {
+  // Fallback for test environments
+  MAPBOX_TOKEN = 'mock-token-for-tests';
+}
 interface PointOfInterestMapProps {
   myLocationCoords: { latitude: number; longitude: number } | null;
   setInputDestination: (inputDestination: string) => void;
