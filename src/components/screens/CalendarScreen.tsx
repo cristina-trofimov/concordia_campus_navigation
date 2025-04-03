@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Button, Modal, TextInput, TouchableOpacity, } from "react-native";
-import { CalendarBody, CalendarContainer, CalendarHeader, DraggingEvent, DraggingEventProps, EventItem, CalendarKitHandle, } from "@howljs/calendar-kit";
-import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../../../App";
+import { CalendarBody, CalendarContainer, CalendarHeader, EventItem, CalendarKitHandle, } from "@howljs/calendar-kit";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { CalendarScreenProp, RootStackParamList } from "../../../App";
 import { StackNavigationProp } from '@react-navigation/stack';
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -10,8 +10,8 @@ import { CalendarStyle } from "../../styles/CalendarStyle";
 import RightDrawer from "../RightDrawer";
 import { Calendar } from "../../interfaces/calendar";
 import { fetchCalendarEventsByCalendarId } from "../googleCalendarFetching";
-import { signIn } from "../HandleGoogle";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const theme = {
   calendarBackground: '#f0f0f0',
@@ -22,58 +22,50 @@ const theme = {
 const CalendarScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [events, setEvents] = useState<EventItem[]>([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const calendarRef = useRef<CalendarKitHandle>(null);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [chosenCalendar, setChosenCalendar] = useState<Calendar | null>(null);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
+
   const currentWeek = (currentDate: Date) => {
     const months = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "June", "July", "Aug.", "Sept.", "Oct.", "Nov.", "Dec."];
-    const today = currentDate || new Date();
-    const dayOfWeek = today.getDay(); // 0 = Sun, 1 = Mon, etc
-    const firstDay = new Date(today);
-    firstDay.setDate(today.getDate() - dayOfWeek + ( dayOfWeek === 0 ? -6 : 1 )) // First day is monday
+    const date = currentDate || new Date();
+    const dayOfWeek = date.getDay(); // 0 = Sun, 1 = Mon, etc
+    const firstDay = new Date(date);
+    firstDay.setDate(date.getDate() - dayOfWeek + ( dayOfWeek === 0 ? -6 : 1 )) // First day is monday
     const lastDay = new Date(firstDay);
     lastDay.setDate(firstDay.getDate() + 6);
   
     if (firstDay.getDate() > lastDay.getDate()) {
-      return `${months[today.getMonth()]} ${firstDay.getDate()} - ${months[lastDay.getMonth()]} ${lastDay.getDate()}, ${today.getFullYear()}`;
+      return `${months[date.getMonth()]} ${firstDay.getDate()} - ${months[lastDay.getMonth()]} ${lastDay.getDate()}, ${date.getFullYear()}`;
     } else {
-      return `${months[today.getMonth()]} ${firstDay.getDate()} - ${lastDay.getDate()}, ${today.getFullYear()}`;
+      return `${months[date.getMonth()]} ${firstDay.getDate()} - ${lastDay.getDate()}, ${date.getFullYear()}`;
     }
   }
 
   const handleWeekChange = (days: number) => {
-    // setCurrentDate(new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000));
     const newDate = new Date(currentDate);
-    // newDate.setDate(newDate.getTime() + days * 24 * 60 * 60 * 1000);
     newDate.setDate(newDate.getDate() + days);
     setCurrentDate(newDate);
-    console.log(`*******************CURRENT DATE ${currentDate}`)
-    calendarRef.current?.goToDate({ date: newDate.toISOString(), animatedDate: true, });
-    console.log(`~~~~~~~~~~~~~~~~~~NEW DATE ${newDate}`)
-    console.log(`~~~~~~~~~~~~~~~~~~CURRENT DATE ${currentDate}`)
-
-    // calendarRef.current?.goToDate({ date: newDate, animatedDate: true, triggerOnDateChanged: true });
-  };
-
-  const handleSaveEvent = () => {
-    if (editingEvent) {
-      setEvents((prevEvents) =>
-        prevEvents.map((e) => (e.id === editingEvent.id ? editingEvent : e))
-      );
-    }
-    setModalVisible(false);
+    // days < 0 ? calendarRef.current?.goToPrevPage(true, true) : calendarRef.current?.goToNextPage(true, true)
+    // calendarRef.current?.goToDate({ date: newDate, animatedDate: true });
   };
 
   useEffect(() => {
+    console.log("Updated current date:", currentDate);
+}, [currentDate]);
+
+  const route = useRoute<CalendarScreenProp>();
+  const accessToken = route.params?.accessToken;
+
+  useEffect(() => {
     const fetchEvents = async () => {
-      if (chosenCalendar) {
-        const accessToken = await signIn();
-        if (accessToken) {
+        if (chosenCalendar && accessToken) {
           const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
           const modifiedEvents = events.data?.events.map((event) => {
+            // console.log(`CALENDAR EVENT\N\N${event}`);
             return {
               id: event.id,
               title: event.title,
@@ -84,46 +76,25 @@ const CalendarScreen = () => {
           })
           setEvents(modifiedEvents || []);
         }
-
       }
-
-    }
     fetchEvents();
 
   }, [chosenCalendar]);
 
-
-  const renderDraggingEvent = useCallback((props: DraggingEventProps) => {
-    return (
-      <DraggingEvent
-        {...props}
-        TopEdgeComponent={
-          <View
-            style={{
-              height: 10,
-              width: '100%',
-              backgroundColor: 'red',
-              position: 'absolute',
-            }}
-          />
-        }
-        BottomEdgeComponent={
-          <View
-            style={{
-              height: 10,
-              width: '100%',
-              backgroundColor: 'red',
-              bottom: 0,
-              position: 'absolute',
-            }}
-          />
-        }
-      />
-    );
+  useEffect(() => {
+    const loadCalendar = async () => {
+      try {
+        const storedValue = await AsyncStorage.getItem("chosenCalendar");
+        setChosenCalendar(storedValue ? JSON.parse(storedValue) : null);
+      } catch (error) {
+        console.error('Failed to load calendar:', error);
+        setChosenCalendar(null);
+      }
+    };
+  
+    loadCalendar();
   }, []);
 
-  useEffect(() => {
-  }, [modalVisible]);
 
   return (
     <View style={CalendarStyle.container}>
@@ -136,8 +107,8 @@ const CalendarScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* we want to keep the functionality so I will keep the code heer, but it needs to be better placed */}
-        <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} >
+        {/* <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} > */}
+        <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => setCurrentDate(new Date()) } >
           <MaterialIcons name="today" size={24} color="white" />
           <Text style={{ color: "white", fontWeight: "bold", margin: 2.5 }} >TODAY</Text>
         </TouchableOpacity>
@@ -146,54 +117,43 @@ const CalendarScreen = () => {
       </View>
 
       <View style={CalendarStyle.headerCalendarButtonsContainer} >
-        <TouchableOpacity
-          onPress={ () => {
-            handleWeekChange(-7)
-            // console.log(`~~~****~~~~~~~~~Old Current Date: ${currentDate}`);
-            
-            // setCurrentDate(new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000));
-            
-            // console.log(`~~~~****~~~~~~~~New Current Date: ${currentDate}`);
-
-            // calendarRef.current?.goToDate({ date: currentDate, animatedDate: true });
-
-            // calendarRef.current?.goToPrevPage(true, false);
-            
-          // onPress={() => {
-          //   calendarRef.current?.goToPrevPage(true);
-          //   setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() - 7)));
-          }}
-        >
+        <TouchableOpacity onPress={ () => {handleWeekChange(-7)}} >
           <Feather name="chevron-left" size={30} color="black" />
         </TouchableOpacity>
 
         <Text style={{ paddingLeft: 10, marginTop: 5 }} >{currentWeek(currentDate)}</Text>
 
-        <TouchableOpacity
-          onPress={() => {
-            calendarRef.current?.goToNextPage(true);
-          }}
-        >
+        <TouchableOpacity onPress={ () => {handleWeekChange(7)}} >
           <Feather name="chevron-right" size={30} color="black" />
         </TouchableOpacity>
       </View>
 
       {/* Renders the calendar view */}
       <CalendarContainer
-        // key={currentDate.toISOString()}
+        key={currentDate.toISOString()}
         ref={calendarRef}
         events={events}
         initialDate={currentDate.toISOString()}
-        onDateChanged={(date) => { setCurrentDate(new Date(date)) }}
-        allowDragToCreate={true}
-        // onDragCreateEventStart={handleDragCreateStart}
-        // onDragCreateEventEnd={handleDragCreateEvent}
-        dragStep={15}
-        onChange={(dateString) => { currentWeek(new Date(dateString)) }}
+        // onDateChanged={(date) => {
+        //   console.log("onDateChanged triggered with:", date);
+        //   const newDate = new Date(date);
+        //   console.log("New date:", newDate.toISOString(), "Current date:", currentDate.toISOString());
+        //   if (newDate.toISOString() !== currentDate.toISOString()) {
+        //       setCurrentDate(new Date(date));
+        //       console.log("State updated with:", newDate.toISOString());
+        //   } else {
+        //       console.log("State not updated as dates are identical.");
+        //   }
+        // }}
 
+        // onChange={(dateString) => { 
+        //   console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!onChange called\nDateString: ${dateString}\ncurrentDate: ${currentDate}`); 
+        //   setCurrentDate(new Date(dateString)) 
+        //   // calendarRef.current?.goToDate({ date: currentDate, animatedDate: false })
+        // }}
       >
         <CalendarHeader />
-        <CalendarBody renderDraggingEvent={renderDraggingEvent} />
+        <CalendarBody />
       </CalendarContainer>
 
       {/* Modal to edit an event */}
@@ -223,7 +183,6 @@ const CalendarScreen = () => {
             <View onTouchEnd={() => { setModalVisible(false); }} >
               <Button title="Cancel 2" onPress={() => { setModalVisible(false); console.log('Modal content touched') }} />
             </View>
-            <Button title="Save" onPress={() => { handleSaveEvent(); }} />
             <Button title="Cancel 3" onPress={() => { setModalVisible(false); }} />
           </View>
         </View>

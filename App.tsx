@@ -8,19 +8,20 @@ import analytics from '@react-native-firebase/analytics';
 import crashlytics from '@react-native-firebase/crashlytics';
 import { Calendar } from "./src/interfaces/calendar";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 (globalThis as any).isTesting = false; // when doing usability testing
 
 export type RootStackParamList = {
   Home: undefined;
-  Calendar: { calendars: Calendar[] } | undefined;
+  Calendar: {
+    accessToken?: string | null;
+    calendars?: Calendar[];
+  } | undefined;
 };
 
 export type CalendarScreenProp = RouteProp<RootStackParamList, "Calendar">;
 
-export interface CalendarScreenProps {
-  route: CalendarScreenProp;
-}
+export interface CalendarScreenProps { route: CalendarScreenProp; }
 
 const theme = createTheme({
   lightColors: {

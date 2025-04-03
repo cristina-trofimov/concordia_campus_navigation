@@ -4,6 +4,7 @@ import {
     statusCodes,
 } from '@react-native-google-signin/google-signin';
 import { WEBCLIENTID } from '@env'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 
 
@@ -25,12 +26,10 @@ export const signIn = async () => {
 
         configureGooggleSignIn();
 
-        const currentUser = await GoogleSignin.getCurrentUser();
-        if (currentUser) {
-            console.log("Already signed in user:", JSON.stringify(currentUser, null, 2));
-
-            const tokens = await GoogleSignin.getTokens();
-            return tokens.accessToken;
+        const alreadySignedIn = await AsyncStorage.getItem("accessToken");
+        if (alreadySignedIn) {
+            console.log("User already signed in");
+            return alreadySignedIn;
         }
 
 
@@ -41,6 +40,8 @@ export const signIn = async () => {
 
         const tokens = await GoogleSignin.getTokens();
         console.log("Sign-in successful. Access token obtained." + JSON.stringify(tokens.accessToken, null, 2));
+
+        await AsyncStorage.setItem( 'accessToken', tokens.accessToken, );
 
         return tokens.accessToken;
 
@@ -72,6 +73,8 @@ export const signIn = async () => {
 export const signOut = async () => {
     try {
         await GoogleSignin.signOut();
+        await AsyncStorage.removeItem("accessToken")
+        await AsyncStorage.removeItem("chosenCalendar")
         console.log('User signed out successfully');        
     } catch (error) {
         console.error('Error signing out:', error);

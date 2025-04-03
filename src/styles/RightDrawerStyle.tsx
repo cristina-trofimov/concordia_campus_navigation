@@ -18,7 +18,7 @@ export const RightDrawerStyle = StyleSheet.create({
         flex: 1,
         backgroundColor: "rgba(0, 0, 0, 0.5)",
         justifyContent: "flex-start",
-        alignItems: "flex-end", // Change from flex-start to flex-end
+        alignItems: "flex-end",
     },
     drawer: {
         width: "70%",

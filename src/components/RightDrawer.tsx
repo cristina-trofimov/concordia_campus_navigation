@@ -7,6 +7,7 @@ import { Calendar } from "../interfaces/calendar";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { CalendarScreenProp, RootStackParamList } from "../../App";
 import { StackNavigationProp } from "@react-navigation/stack";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get("window");
 
@@ -69,7 +70,7 @@ const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Cale
                                 RightDrawerStyle.drawer,
                                 {
                                     transform: [{ translateX: slideAnim }],
-                                    right: 0, // Position the drawer on the right side
+                                    right: 0,
                                 }
                             ]}
                         >
@@ -80,7 +81,7 @@ const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Cale
                                     <View>
                                         {calendars?.map((calendar) => {
                                             return (
-                                                <TouchableOpacity key={calendar.id} onPress={() => setChosenCalendar(calendar)} >
+                                                <TouchableOpacity key={calendar.id} onPress={() => { setChosenCalendar(calendar); AsyncStorage.setItem("chosenCalendar", JSON.stringify(calendar)) }} >
                                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
                                                         <Ionicons name="calendar-outline" size={24} color="black" />
                                                         <Text>{calendar.title}</Text>
@@ -92,7 +93,7 @@ const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Cale
                                     </View>
 
                                     <View style={RightDrawerStyle.signInButtonView}>
-                                        <Button title="Sign Out" onPress={handleSignOut} />
+                                        <Button color={"#912338"} title="Sign Out" onPress={handleSignOut} />
                                     </View>
                                 </View>
                             </TouchableOpacity>
