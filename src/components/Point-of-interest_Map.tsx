@@ -4,18 +4,15 @@ import { PointAnnotation } from '@rnmapbox/maps';
 import { Text } from "@rneui/themed";
 import * as Location from "expo-location";
 import { Coords } from "../interfaces/Map.ts";
-import { MAPBOX_TOKEN} from "@env";
+import { TokenManager } from "../data/TokenManager.ts";
 
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-const getMapboxToken = () => {
-  try {
-    return MAPBOX_TOKEN || 'mock-token-for-tests';
-  } catch (e) {
-    return 'mock-token-for-tests';
-  }
-};
-const MAPBOX_ACCESS_TOKEN = getMapboxToken();
+// Create a token manager system that works with both real and test environments
+
+
+// Set up the token once at the beginning
+const MAPBOX_ACCESS_TOKEN = TokenManager.getMapboxToken();
 
 const POI_ICONS = {
   food_and_drink: "food",
@@ -51,7 +48,7 @@ export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedP
 };
 
 export const reverseGeocode = async (latitude, longitude) => {
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_TOKEN}`;
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}`;
 
   try {
     const response = await fetch(url);
