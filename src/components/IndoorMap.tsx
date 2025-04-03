@@ -5,6 +5,7 @@ import { useIndoor } from "../data/IndoorContext";
 import { buildingFloorAssociations } from '../data/buildingFloorAssociations.ts';
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature.ts';
 import { IndoorPointsOfInterest } from './IndoorPointsOfInterest.tsx';
+import { RoomInfo } from '../interfaces/RoomInfo.ts';
 import { h1Features } from '../data/indoor/Hall/H1.ts';
 import { h2Features } from '../data/indoor/Hall/H2.ts';
 import { h8Features } from '../data/indoor/Hall/H8.ts';
@@ -17,7 +18,7 @@ import { ve2Features } from '../data/indoor/VE/VE2.ts';
 import { vl1Features } from '../data/indoor/VL/VL1.ts';
 import { vl2Features } from '../data/indoor/VL/VL2.ts';
 
-const featureMap: { [key: string]: any } = {
+export const featureMap: { [key: string]: any } = {
     h1Features,
     h2Features,
     h8Features,
@@ -31,7 +32,7 @@ const featureMap: { [key: string]: any } = {
     vl2Features,
 };
 
-const floorNameFormat = (floor: string) => {
+export const floorNameFormat = (floor: string) => {
     let suffix;
 
     switch (floor) {
@@ -73,9 +74,19 @@ export const useIndoorFeatures = () => {
 };
 
 export const HighlightIndoorMap = () => {
-    const { highlightedBuilding } = useCoords();
-    const { setBuildingHasFloors, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations, setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures } = useIndoor();
+    const { highlightedBuilding, isInsideBuilding, destinationCoords, myLocationCoords } = useCoords();
+    const { setBuildingHasFloors, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations, setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures, originRoom, destinationRoom, currentFloor } = useIndoor();
     const { selectIndoorFeatures } = useIndoorFeatures();
+
+    // Check if we should show the room pin
+    const shouldShowRoomPin = (room: RoomInfo | null) => {
+        if (!room || !room.coordinates || !currentFloor) {
+            return false;
+        }
+
+        // Check if current floor matches the floor of the selected room
+        return currentFloor === floorNameFormat(room.floor);
+    };
 
     useEffect(() => {
         setInFloorView(false);
@@ -101,6 +112,15 @@ export const HighlightIndoorMap = () => {
         }
     }, [currentFloorAssociations]);
 
+    useEffect(() => {
+        if (destinationCoords && isInsideBuilding) {
+            setInFloorView(true);
+        }
+        else {
+            setInFloorView(false);
+        }
+    }, [destinationCoords, myLocationCoords]);
+
     return (
         <>
             {indoorFeatures.length > 0 && inFloorView && (
@@ -116,7 +136,8 @@ export const HighlightIndoorMap = () => {
                         style={{
                             fillColor: '#912338',
                             fillOutlineColor: 'black',
-                            fillOpacity: ['case',
+                            fillOpacity: [
+                                'case',
                                 ['==', ['get', 'indoor'], 'corridor'], 0.2,
                                 0.5,
                             ],
@@ -139,6 +160,64 @@ export const HighlightIndoorMap = () => {
                             textAnchor: 'center',
                             textJustify: 'center',
                             textAllowOverlap: true,
+                        }}
+                    />
+                </Mapbox.ShapeSource>
+            )}
+
+            {/* Origin Room Pin */}
+            {shouldShowRoomPin(originRoom) && originRoom?.coordinates && inFloorView && (
+                <Mapbox.ShapeSource
+                    id="origin-room-pin"
+                    shape={{
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: originRoom.coordinates
+                        },
+                        properties: {
+                            roomRef: originRoom.ref,
+                            type: 'origin'
+                        }
+                    }}
+                >
+                    {/* Origin Circle/Pin */}
+                    <Mapbox.CircleLayer
+                        id="origin-pin-circle"
+                        style={{
+                            circleRadius: 8,
+                            circleColor: '#4697C9',
+                            circleStrokeWidth: 2,
+                            circleStrokeColor: '#FFFFFF',
+                        }}
+                    />
+                </Mapbox.ShapeSource>
+            )}
+
+            {/* Destination Room Pin */}
+            {shouldShowRoomPin(destinationRoom) && destinationRoom?.coordinates && inFloorView && (
+                <Mapbox.ShapeSource
+                    id="destination-room-pin"
+                    shape={{
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Point',
+                            coordinates: destinationRoom.coordinates
+                        },
+                        properties: {
+                            roomRef: destinationRoom.ref,
+                            type: 'destination'
+                        }
+                    }}
+                >
+                    {/* Destination Circle/Pin */}
+                    <Mapbox.CircleLayer
+                        id="destination-pin-circle"
+                        style={{
+                            circleRadius: 8,
+                            circleColor: 'red',
+                            circleStrokeWidth: 2,
+                            circleStrokeColor: '#FFFFFF',
                         }}
                     />
                 </Mapbox.ShapeSource>

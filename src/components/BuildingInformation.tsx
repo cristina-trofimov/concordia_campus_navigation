@@ -4,6 +4,7 @@ import Modal from 'react-native-modal';
 import { Icon } from 'react-native-elements';
 import BuildingLocation from '../interfaces/buildingLocation';
 import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
+import { useCoords } from '../data/CoordsContext';
 
 interface BuildingInformationProps {
     isVisible: boolean;
@@ -13,9 +14,9 @@ interface BuildingInformationProps {
 }
 
 const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation, setInputDestination }) => {
-    const { title, description, buildingInfo } = buildingLocation || {};
+    const { title, description, buildingInfo, coordinates } = buildingLocation || {};
     const { photo, address, departments, services } = buildingInfo || {};
-
+    const {setDestinationCoords} = useCoords();
 
     return (
         <Modal isVisible={isVisible} onBackdropPress={onClose} onBackButtonPress={onClose}>
@@ -28,6 +29,10 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                                 style={BuildingInfoStyle.actionButton}
                                 onPress={() => {
                                     setInputDestination(address ?? "");
+                                    if (coordinates) {
+                                        const [longitude, latitude] = coordinates;
+                                        setDestinationCoords({ latitude, longitude });
+                                    }
                                     onClose();
                                 }}
                             >
