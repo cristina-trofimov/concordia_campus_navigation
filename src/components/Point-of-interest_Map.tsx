@@ -8,14 +8,14 @@ import { MAPBOX_TOKEN} from "@env";
 
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-// Fallback mechanism for tests
-let MAPBOX_ACCESS_TOKEN;
-try {
-  MAPBOX_ACCESS_TOKEN = MAPBOX_TOKEN;
-} catch (e) {
-  MAPBOX_ACCESS_TOKEN = 'mock-token-for-tests';
-  console.warn('Using mock Mapbox token for tests');
-}
+const getMapboxToken = () => {
+  try {
+    return MAPBOX_TOKEN || 'mock-token-for-tests';
+  } catch (e) {
+    return 'mock-token-for-tests';
+  }
+};
+const MAPBOX_ACCESS_TOKEN = getMapboxToken();
 
 const POI_ICONS = {
   food_and_drink: "food",
