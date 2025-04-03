@@ -4,10 +4,12 @@ import { PointAnnotation } from '@rnmapbox/maps';
 import { Text } from "@rneui/themed";
 import * as Location from "expo-location";
 import { Coords } from "../interfaces/Map.ts";
-import { MAPBOX_TOKEN } from "@env";
+import { MAPBOX_TOKEN as ENV_MAPBOX_TOKEN } from "@env";
 
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
+const MAPBOX_TOKEN = ENV_MAPBOX_TOKEN || 'mock-token-for-tests';
 
 interface PointOfInterestMapProps {
   myLocationCoords: { latitude: number; longitude: number } | null;
