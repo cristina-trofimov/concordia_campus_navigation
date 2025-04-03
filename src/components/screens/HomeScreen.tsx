@@ -10,7 +10,7 @@ import { FloorSelector } from "../FloorSelector";
 import SearchBars from "../SearchBars";
 import DirectionsSteps from "../DirectionsSteps";
 import MapComponent from "../MapComponent";
-
+import PointOfInterestSelector from "../Point-of-interest_Form";
 
 const { height } = Dimensions.get("window");
 
@@ -19,7 +19,8 @@ export default function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
 
   const [inputDestination, setInputDestination] = useState<string>("");
-
+  const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
+  const [radius, setRadius] = useState<number | null>(null);
 
 
   return (
@@ -28,15 +29,21 @@ export default function HomeScreen() {
         <View style={HomeStyle.container}>
           <CalendarButton />
           <LeftDrawer />
-          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} />
+          <MapComponent drawerHeight={drawerHeight} setInputDestination={setInputDestination} selectedPOI={selectedPOI} radius={radius} />
           <FloorSelector />
 
           <BottomDrawer drawerHeight={drawerHeight} >
             <ScrollView>
             <SearchBars inputDestination={inputDestination} />
+            <PointOfInterestSelector
+                         pointsOfInterest={selectedPOI}
+                         radius={radius}
+                         onPOIChange={setSelectedPOI}
+                         onRadiusChange={setRadius}
+                       />
             <DirectionsSteps/>
             </ScrollView>
-            
+
           </BottomDrawer>
 
         </View>
@@ -44,3 +51,4 @@ export default function HomeScreen() {
     </CoordsProvider>
   );
 }
+ 

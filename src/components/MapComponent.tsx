@@ -20,6 +20,7 @@ import { HighlightBuilding } from "./BuildingCoordinates.tsx";
 import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
+import PointOfInterestMap from "./Point-of-interest_Map.tsx";
 import { HighlightIndoorMap } from './IndoorMap.tsx';
 import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
 
@@ -28,9 +29,13 @@ Mapbox.setAccessToken(MAPBOX_TOKEN);
 export default function MapComponent({
   drawerHeight,
   setInputDestination,
+  selectedPOI,
+  radius,
 }: {
-  readonly drawerHeight: Animated.Value;
-  setInputDestination: (inputDestination: string) => void;
+    readonly drawerHeight: Animated.Value;
+    setInputDestination: (inputDestination: string) => void;
+    selectedPOI?: string | null;
+    radius?: number | null;
 }) {
   const {
     routeData: routeCoordinates,
@@ -76,7 +81,6 @@ export default function MapComponent({
       setmyLocationString(locationString);
     }
   }, [myLocationCoords, setmyLocationString]);
-
 
   useEffect(() => {
     if (routeCoordinates && routeCoordinates.length > 0) {
@@ -308,6 +312,12 @@ export default function MapComponent({
         ))}
         {/* Add ShuttleBusMarkers component */}
         <ShuttleBusTracker />
+        <PointOfInterestMap
+        myLocationCoords={myLocationCoords}
+        setInputDestination={setInputDestination}
+        selectedPOI={selectedPOI}
+        radius={radius}/>
+
       </MapView>
 
       <Animated.View
