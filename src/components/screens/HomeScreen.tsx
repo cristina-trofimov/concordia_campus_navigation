@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Animated, Dimensions, View } from "react-native";
+import { Animated, Dimensions, ScrollView, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
 import { IndoorsProvider } from "../../data/IndoorContext";
@@ -33,6 +33,7 @@ export default function HomeScreen() {
           <FloorSelector />
 
           <BottomDrawer drawerHeight={drawerHeight} >
+            <ScrollView>
             <SearchBars inputDestination={inputDestination} />
             <PointOfInterestSelector
                          pointsOfInterest={selectedPOI}
@@ -41,6 +42,8 @@ export default function HomeScreen() {
                          onRadiusChange={setRadius}
                        />
             <DirectionsSteps/>
+            </ScrollView>
+
           </BottomDrawer>
 
         </View>
@@ -48,3 +51,4 @@ export default function HomeScreen() {
     </CoordsProvider>
   );
 }
+ 
