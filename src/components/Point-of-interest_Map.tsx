@@ -12,10 +12,6 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 let MAPBOX_ACCESS_TOKEN;
 try {
   MAPBOX_ACCESS_TOKEN = MAPBOX_TOKEN;
-  if (MAPBOX_ACCESS_TOKEN === 'mock-mapbox-token') {
-    // Only use fallback if import didn't work
-    MAPBOX_ACCESS_TOKEN = 'mock-token-for-tests';
-  }
 } catch (e) {
   MAPBOX_ACCESS_TOKEN = 'mock-token-for-tests';
   console.warn('Using mock Mapbox token for tests');
