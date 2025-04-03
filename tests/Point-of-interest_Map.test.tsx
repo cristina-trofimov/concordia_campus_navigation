@@ -1,6 +1,6 @@
 jest.mock('@env', () => ({
   MAPBOX_TOKEN: 'mock-mapbox-token',
-}));
+}), { virtual: true });
 
 jest.mock('@rnmapbox/maps', () => ({
 
