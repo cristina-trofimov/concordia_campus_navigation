@@ -40,16 +40,18 @@ jobs:
         run: |
           echo "### Jest Test Results" >> $GITHUB_STEP_SUMMARY
           echo "| Test Suite | Passed | Failed | Skipped | Time (s) |" >> $GITHUB_STEP_SUMMARY
-          echo "|------------|--------|--------|---------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "|------------|--------|--------|---------|----------|" >> $GITHUB_STEP_SUMMARY
           cat jest-results.json | jq -r '
-            .testResults[] | 
-            select(.name != null) | 
+            .testResults[] |
+            select(.name != null) |
             "| \(.name | capture("(?<file>[^/]+$)").file) | \(
-              (.assertionResults | map(select(.status=="passed")) | length) // 0
-            ) | \(
-              (.assertionResults | map(select(.status=="failed")) | length) // 0
-            ) | \(
-              (.assertionResults | map(select(.status=="pending")) | length) // 0
-            ) | \(
-              ((.assertionResults | map(.duration // 0) | add) / 1000) 
-            ) |"' >> $GITHUB_STEP_SUMMARY
+               (.assertionResults | map(select(.status=="passed")) | length) // 0
+             ) | \(
+               (.assertionResults | map(select(.status=="failed")) | length) // 0
+             ) | \(
+               (.assertionResults | map(select(.status=="pending")) | length) // 0
+             ) | \(
+               (((.assertionResults | map(.duration // 0) | add) // 0) / 1000)
+             ) |"'
+             >> $GITHUB_STEP_SUMMARY
+
