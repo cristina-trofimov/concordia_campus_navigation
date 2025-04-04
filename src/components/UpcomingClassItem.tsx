@@ -7,48 +7,88 @@ import {
 } from "react-native";
 import React, { Component } from "react";
 import { Image } from "@rneui/base";
+import { CalendarEvent } from "../interfaces/CalendraEvent";
 
 interface UpcomingClassItemProps {
-  courseName: string;
-  startTime: string;
-  endTime: string;
-  building: string;
-  room: string;
-  location: string;
+  calendarEvent: CalendarEvent;
 }
 
-export default class UpcomingClassItem extends Component<UpcomingClassItemProps> {
-  static defaultProps = {
-    courseName: "",
-    startTime: "",
-    endTime: "",
-    building: "",
-    room: "",
-    location: "",
-  };
+interface ClassItemState {
+  currentTime: number;
+}
+
+export default class UpcomingClassItem extends Component<
+  UpcomingClassItemProps,
+  ClassItemState
+> {
+  private courseIcon = require("../resources/images/book-icon.png");
+  private intervalID: NodeJS.Timeout | null = null;
+
+  constructor(props: UpcomingClassItemProps) {
+    super(props);
+    this.state = {
+      currentTime: this.getCurrentTimeInMinutes(),
+    };
+  }
+
+  componentDidMount(): void {
+    this.setState({ currentTime: this.getCurrentTimeInMinutes() });
+    this.setItemInterval();
+  }
+
+  componentWillUnmount(): void {
+    this.clearItemInterval();
+  }
+
+  setItemInterval() {
+    this.intervalID = setInterval(() => {
+      this.setState({ currentTime: this.getCurrentTimeInMinutes() });
+    }, 20000);
+  }
+
+  clearItemInterval() {
+    if (this.intervalID) {
+      clearInterval(this.intervalID);
+    }
+  }
 
   private convertToMinutes = (time: String): number => {
     const [hours, minutes] = time.split(":").map(Number);
     return hours * 60 + minutes;
   };
 
-  private determineStatusColor = (
-    startTime: String,
-    endTime: String
-  ): String => {
-    const startTimeInMinutes = this.convertToMinutes(startTime);
-    const endTimeInMinutes = this.convertToMinutes(endTime);
+  private getCurrentTimeInMinutes = (): number => {
     const now = new Date();
-    const nowInMinutes = this.convertToMinutes(now.get)
-
-    if (nowInMinutes >= startTimeInMinutes)
+    const nowHours = now.getHours();
+    const nowMinutes = now.getMinutes();
+    return nowHours * 60 + nowMinutes;
   };
 
-  private courseIcon = require("../resources/images/book-icon.png");
+  private isClassInProgress = (
+    startTime: String,
+    endTime: String
+  ): { statusColor: string; statusText: string } => {
+    const startTimeInMinutes = this.convertToMinutes(startTime);
+    const endTimeInMinutes = this.convertToMinutes(endTime);
+    const nowInMinutes = this.state.currentTime;
+
+    if (nowInMinutes >= startTimeInMinutes && nowInMinutes < endTimeInMinutes) {
+      return { statusColor: "#00BF63", statusText: "In progress" };
+    } else if (nowInMinutes >= endTimeInMinutes) {
+      return { statusColor: "#c1121f", statusText: "Ended" };
+    } else {
+      return { statusColor: "#FFBD59", statusText: "Upcoming" };
+    }
+  };
 
   render() {
-    const { courseName, startTime, endTime, building, room, location } =
-      this.props;
+    const { title, startTime, endTime, location, description } =
+      this.props.calendarEvent;
+
+    const { statusColor, statusText } = this.isClassInProgress(
+      startTime,
+      endTime
+    );
 
     return (
       <View style={[styles.container]}>
@@ -57,27 +97,20 @@ export default class UpcomingClassItem extends Component<UpcomingClassItemProps>
         </View>
         <View style={[styles.content]}>
           <View style={[styles.courseNameAndStatusContainer]}>
-            <Text style={[styles.courseName]}>{courseName}</Text>
-            <Text>{this.determineStatusColor("wer", "qwer")}</Text>
+            <Text style={[styles.courseName]}>{title}</Text>
             <View style={[styles.status]}>
-              <View style={[styles.statusCircle]}></View>
-              <Text style={[styles.statusText]}>In progress</Text>
+              <View
+                style={[styles.statusCircle, { backgroundColor: statusColor }]}
+              ></View>
+              <Text style={[styles.statusText]}>{statusText}</Text>
             </View>
           </View>
 
           <Text style={[styles.startEndTime]}>
             {`${startTime} - ${endTime}`}
           </Text>
-          <Text style={[styles.building]}>
-            {building} {room}
-          </Text>
-          <Text
-            style={[styles.location]}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {location}
-          </Text>
+          <Text style={[styles.building]}>{location}</Text>
+          <Text>Room {description}</Text>
         </View>
       </View>
     );
@@ -103,7 +136,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   courseNameAndStatusContainer: {
-    // backgroundColor: "lightblue",
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -116,7 +148,6 @@ const styles = StyleSheet.create({
     height: 9,
     borderRadius: 9,
     marginEnd: 8,
-    backgroundColor: "#00BF63",
   },
   statusText: {
     fontSize: 15,
