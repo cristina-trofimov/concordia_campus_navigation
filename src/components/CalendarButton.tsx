@@ -6,7 +6,7 @@ import { RootStackParamList } from "../../App";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { CalendarStyle } from "../styles/CalendarStyle";
 import { signIn } from "./HandleGoogle";
-import { fetchUserCalendars } from "./googleCalendarFetching";
+import { fetchUserCalendars } from "./googleCalendarFetching.ts";
 
 const CalendarButton = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
