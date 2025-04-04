@@ -20,13 +20,15 @@ const CalendarButton = () => {
         navigation.navigate("Calendar", { accessToken: token, calendars: calendarsData });
       }
     }
-}
+    // navigation.navigate("Calendar", { accessToken: token });
+
+  }
 
   return (
     <View testID="calendar-button" style={CalendarStyle.calendarButtonContainer} >
       <TouchableOpacity style={CalendarStyle.calBtn} onPress={goToCalendar}>
         <FontAwesome testID="calendar-icon" name="calendar" size={26} color="white" style={CalendarStyle.calButtonImg} />
-    </TouchableOpacity>
+      </TouchableOpacity>
     </View>
   );
 };
