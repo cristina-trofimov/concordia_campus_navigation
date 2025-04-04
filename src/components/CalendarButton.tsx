@@ -23,9 +23,9 @@ const CalendarButton = () => {
 }
 
   return (
-    <View style={CalendarStyle.calendarButtonContainer} >
+    <View testID="calendar-button" style={CalendarStyle.calendarButtonContainer} >
       <TouchableOpacity style={CalendarStyle.calBtn} onPress={goToCalendar}>
-      <FontAwesome name="calendar" size={26} color="white" style={CalendarStyle.calButtonImg} />
+        <FontAwesome testID="calendar-icon" name="calendar" size={26} color="white" style={CalendarStyle.calButtonImg} />
     </TouchableOpacity>
     </View>
   );
