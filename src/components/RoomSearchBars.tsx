@@ -2,7 +2,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import { RoomSearchBar } from "./RoomSearchBar";
 import { useCoords } from "../data/CoordsContext";
 import { useIndoor } from "../data/IndoorContext";
-import { getDirectionText } from "./IndoorInstruction";
+import { getIndoorDirectionText } from "./IndoorInstruction";
 import { useState } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
@@ -72,7 +72,7 @@ export const RoomSearchBars = () => {
             paddingHorizontal: 10,
             marginBottom: 5,
           }}>
-            {getDirectionText(originRoom.floor, destinationRoom.floor, selectedTransport)}
+            {getIndoorDirectionText(originRoom.floor, destinationRoom.floor, selectedTransport)}
           </Text>
         </>
       )}

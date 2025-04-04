@@ -1,4 +1,4 @@
-export const getDirectionText = (
+export const getIndoorDirectionText = (
     originFloor: string,
     destinationFloor: string,
     transportMethod: string
@@ -23,4 +23,4 @@ export const getDirectionText = (
         
 };
 
-export default getDirectionText;
+export default getIndoorDirectionText;

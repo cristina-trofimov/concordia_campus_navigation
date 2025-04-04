@@ -9,8 +9,7 @@ const DirectionsSteps = () => {
   const { routeData: routeCoordinates, isTransit } = useCoords();
   const { originRoom, destinationRoom } = useIndoor()
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
-  console.log("originRoom", originRoom);
-  console.log("destinationRoom", destinationRoom);
+
 
 
   const formatSteps = (step: any): any => {
