@@ -86,7 +86,7 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
       </Picker>
 
       {/* Radius Picker */}
-      <Text style={PoiFormStyles.title}>Search Radius</Text>a
+      <Text style={PoiFormStyles.title}>Search Radius</Text>
       <Picker
         testID="radius-picker"
         selectedValue={selectedRadius ?? 50}

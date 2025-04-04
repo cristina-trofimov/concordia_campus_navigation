@@ -4,26 +4,15 @@ import { PointAnnotation } from '@rnmapbox/maps';
 import { Text } from "@rneui/themed";
 import * as Location from "expo-location";
 import { Coords } from "../interfaces/Map.ts";
-import { MAPBOX_TOKEN as ENV_MAPBOX_TOKEN } from "@env";
+import { TokenManager } from "../data/TokenManager.ts";
 
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+// Create a token manager system that works with both real and test environments
 
-let MAPBOX_TOKEN;
-try {
-  const env = require('@env');
-  MAPBOX_TOKEN = env.MAPBOX_TOKEN;
-} catch (e) {
-  // Fallback for test environments
-  console.log(e);
-  MAPBOX_TOKEN = 'mock-token-for-tests';
-}
-interface PointOfInterestMapProps {
-  myLocationCoords: { latitude; longitude } | null;
-  setInputDestination: (inputDestination) => void;
-  selectedPOI?: string;
-  radius?: number;
-}
+
+// Set up the token once at the beginning
+const MAPBOX_ACCESS_TOKEN = TokenManager.getMapboxToken();
 
 const POI_ICONS = {
   food_and_drink: "food",
@@ -35,7 +24,7 @@ const POI_ICONS = {
 
 export const fetchNearbyPOI = async (longitude, latitude, selectedPOI, radius = 25) => {
   const TILESET_ID = 'mapbox.mapbox-streets-v8';
-  const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_TOKEN}`;
+  const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
   try {
     const response = await fetch(url);
@@ -59,7 +48,7 @@ export const fetchNearbyPOI = async (longitude, latitude, selectedPOI, radius = 
 };
 
 export const reverseGeocode = async (latitude, longitude) => {
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_TOKEN}`;
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}`;
 
   try {
     const response = await fetch(url);
