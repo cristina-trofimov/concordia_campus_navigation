@@ -10,6 +10,8 @@ export const BottomDrawerStyle = StyleSheet.create({
     width: width,
     position: "absolute",
     bottom: 0,
+    justifyContent: "center",
+    alignItems: "center",
   },
   dragHandle: {
     width: width,
@@ -22,9 +24,6 @@ export const BottomDrawerStyle = StyleSheet.create({
     backgroundColor: "#8F8F8F",
     borderRadius: 3,
     marginBottom: 10,
-  },
-  contentContainer: {
-    flex: 1,
   },
 
 });
