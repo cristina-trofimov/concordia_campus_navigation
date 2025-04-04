@@ -49,8 +49,6 @@ const CalendarScreen = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() + days);
     setCurrentDate(newDate);
-    // days < 0 ? calendarRef.current?.goToPrevPage(true, true) : calendarRef.current?.goToNextPage(true, true)
-    // calendarRef.current?.goToDate({ date: newDate, animatedDate: true });
   };
 
   useEffect(() => {
@@ -65,7 +63,6 @@ const CalendarScreen = () => {
         if (chosenCalendar && accessToken) {
           const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
           const modifiedEvents = events.data?.events.map((event) => {
-            // console.log(`CALENDAR EVENT\N\N${event}`);
             return {
               id: event.id,
               title: event.title,
@@ -107,7 +104,6 @@ const CalendarScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => calendarRef.current?.goToDate({ date: new Date() })} > */}
         <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => setCurrentDate(new Date()) } >
           <MaterialIcons name="today" size={24} color="white" />
           <Text style={{ color: "white", fontWeight: "bold", margin: 2.5 }} >TODAY</Text>
@@ -134,23 +130,6 @@ const CalendarScreen = () => {
         ref={calendarRef}
         events={events}
         initialDate={currentDate.toISOString()}
-        // onDateChanged={(date) => {
-        //   console.log("onDateChanged triggered with:", date);
-        //   const newDate = new Date(date);
-        //   console.log("New date:", newDate.toISOString(), "Current date:", currentDate.toISOString());
-        //   if (newDate.toISOString() !== currentDate.toISOString()) {
-        //       setCurrentDate(new Date(date));
-        //       console.log("State updated with:", newDate.toISOString());
-        //   } else {
-        //       console.log("State not updated as dates are identical.");
-        //   }
-        // }}
-
-        // onChange={(dateString) => { 
-        //   console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!onChange called\nDateString: ${dateString}\ncurrentDate: ${currentDate}`); 
-        //   setCurrentDate(new Date(dateString)) 
-        //   // calendarRef.current?.goToDate({ date: currentDate, animatedDate: false })
-        // }}
       >
         <CalendarHeader />
         <CalendarBody />
