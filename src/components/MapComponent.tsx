@@ -6,7 +6,7 @@ import {
   Animated,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
-import Mapbox, { Camera, MapView, PointAnnotation, ShapeSource, LineLayer } from "@rnmapbox/maps";
+import Mapbox, { Camera, MapView, PointAnnotation } from "@rnmapbox/maps";
 import { Text } from "@rneui/themed";
 import { locations } from "../data/buildingLocation.ts";
 import * as Location from "expo-location";
@@ -20,6 +20,7 @@ import { HighlightBuilding } from "./BuildingCoordinates.tsx";
 import BuildingInformation from "./BuildingInformation.tsx";
 import BuildingLocation from "../interfaces/buildingLocation.ts";
 import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
+import PointOfInterestMap from "./Point-of-interest_Map.tsx";
 import { HighlightIndoorMap } from './IndoorMap.tsx';
 import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
 
@@ -28,9 +29,13 @@ Mapbox.setAccessToken(MAPBOX_TOKEN);
 export default function MapComponent({
   drawerHeight,
   setInputDestination,
+  selectedPOI,
+  radius,
 }: {
-  readonly drawerHeight: Animated.Value;
-  setInputDestination: (inputDestination: string) => void;
+    readonly drawerHeight: Animated.Value;
+    setInputDestination: (inputDestination: string) => void;
+    selectedPOI?: string | null;
+    radius?: number | null;
 }) {
   const {
     routeData: routeCoordinates,
@@ -57,6 +62,7 @@ export default function MapComponent({
   const [isOverlayVisible, setIsOverlayVisible] = useState(false);
   const [selectedBuilding, setSelectedBuilding] = useState<BuildingLocation | null>(null);
   const [routeSegments, setRouteSegments] = useState<RouteSegment[]>([]);
+  
 
   const openOverlay = (building: BuildingLocation) => {
     setSelectedBuilding(building);
@@ -75,7 +81,6 @@ export default function MapComponent({
       setmyLocationString(locationString);
     }
   }, [myLocationCoords, setmyLocationString]);
-
 
   useEffect(() => {
     if (routeCoordinates && routeCoordinates.length > 0) {
@@ -99,18 +104,11 @@ export default function MapComponent({
             }));
 
 
-            if (step.travel_mode === "TRANSIT") {
-              segments.push({
-                mode: "TRANSIT",
-                coordinates: decodedSegment
-              });
-            } else {
-
               segments.push({
                 mode: step.travel_mode as 'WALKING' | 'TRANSIT' | 'DRIVING' | 'BICYCLING',
-                coordinates: decodedSegment
+                coordinates: decodedSegment,
               });
-            }
+            
           });
         });
 
@@ -118,11 +116,6 @@ export default function MapComponent({
         setRouteSegments(segments);
 
 
-        const allPoints = Polyline.decode(route.overview_polyline.points);
-        const allDecoded: Coordinate[] = allPoints.map(([lat, lng]: [number, number]) => ({
-          latitude: lat,
-          longitude: lng,
-        }));
 
 
       } catch (error) {
@@ -179,7 +172,16 @@ export default function MapComponent({
   useEffect(() => {
     setForceUpdate((prev) => prev + 1);
   }, [myLocationCoords]);
-
+  
+  const getLineColor = (mode: any) => {
+    switch (mode) {
+        case "WALKING": return "#800000";
+        case "DRIVING": return "#673AB7";
+        case "TRANSIT": return "#2196F3";
+        case "BICYCLING": return "#4CAF50";
+        default: return "#000000"; // Default Black
+    }
+};
   const _getLocation = async () => {
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -277,7 +279,7 @@ export default function MapComponent({
           </PointAnnotation>
         )}
 
-        {routeSegments && routeSegments.map((segment, index) => (
+        {routeSegments?.map((segment, index) => (
           <Mapbox.ShapeSource
             key={`segment-${index}`}
             id={`routeSource-${index}`}
@@ -301,20 +303,21 @@ export default function MapComponent({
             <Mapbox.LineLayer
               id={`routeLine-${index}`}
               style={{
-                lineColor:
-                  segment.mode === "WALKING" ? '#800000' :
-                    segment.mode === "DRIVING" ? '#673AB7' :
-                      segment.mode === "TRANSIT" ? '#2196F3' :
-                        segment.mode === "BICYCLING" ? '#4CAF50' :
-                          '#000000', // Default Black
+                lineColor: getLineColor(segment.mode),
                 lineWidth: 3,
-
+                lineDasharray: segment.mode === "WALKING" ? [2, 2] : [1, 0], // Dashed for walking, solid for others
               }}
             />
           </Mapbox.ShapeSource>
         ))}
         {/* Add ShuttleBusMarkers component */}
         <ShuttleBusTracker />
+        <PointOfInterestMap
+        myLocationCoords={myLocationCoords}
+        setInputDestination={setInputDestination}
+        selectedPOI={selectedPOI}
+        radius={radius}/>
+
       </MapView>
 
       <Animated.View

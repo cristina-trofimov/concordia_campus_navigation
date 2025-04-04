@@ -1,4 +1,7 @@
 // Mock all dependencies before imports
+
+jest.mock('@expo/vector-icons/MaterialCommunityIcons', () => 'MaterialCommunityIcons');
+
 jest.mock('@rnmapbox/maps', () => {
   const React = require('react');
   return {

@@ -20,7 +20,7 @@ const ShuttleBusTracker: React.FC = () => {
         {
             id: 'LOY_STOP',
             name: 'Loyola Campus Shuttle Stop',
-            coordinate: [-73.6398, 45.4580], // Approximate coordinates for Loyola stop
+            coordinate: [-73.639277, 45.457888], // Approximate coordinates for Loyola stop
             campus: 'LOY'
         }
     ];
@@ -79,7 +79,7 @@ const ShuttleBusTracker: React.FC = () => {
         return null;
     }
 
-    // Filter the Points array to include only buses (IDs starting with "BUS")
+    // Filter the busPoints array to include only buses (IDs starting with "BUS")
     const busPoints = busData.Points.filter((point) => point.ID.startsWith('BUS'));
 
     return (
