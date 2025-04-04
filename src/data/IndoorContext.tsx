@@ -3,24 +3,32 @@ import { IndoorContextType } from '../interfaces/IndoorContextType';
 import { BuildingFloorAssociation } from '../interfaces/buildingFloorAssociation';
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature.ts';
 import { RoomInfo } from "../interfaces/RoomInfo"
+import { Feature, LineString } from 'geojson';
 
 export const IndoorContext = createContext<IndoorContextType>({
-    buildingHasFloors: false,
-    setBuildingHasFloors: () => { },
-    inFloorView: false,
-    setInFloorView: () => { },
-    currentFloor: null,
-    setCurrentFloor: () => { },
-    floorList: [],
-    setFloorList: () => { },
-    currentFloorAssociations: [],
-    setCurrentFloorAssociations: () => { },
-    indoorFeatures: [],
-    setIndoorFeatures: () => { },
-    originRoom: null,
-    setOriginRoom: () => { },
-    destinationRoom: null,
-    setDestinationRoom: () => { },
+  buildingHasFloors: false,
+  setBuildingHasFloors: () => { },
+  inFloorView: false,
+  setInFloorView: () => { },
+  currentFloor: null,
+  setCurrentFloor: () => { },
+  floorList: [],
+  setFloorList: () => { },
+  currentFloorAssociations: [],
+  setCurrentFloorAssociations: () => { },
+  indoorFeatures: [],
+  setIndoorFeatures: () => { },
+  originRoom: null,
+  setOriginRoom: () => { },
+  destinationRoom: null,
+  setDestinationRoom: () => { },
+  pathFeatures: [],
+  setPathFeatures: () => { },
+  isRoutingActive: false,
+  setIsRoutingActive: () => { },
+  clearRoute: function (): void {
+    throw new Error('Function not implemented.');
+  }
 });
 
 export const IndoorsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -32,6 +40,15 @@ export const IndoorsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [indoorFeatures, setIndoorFeatures] = useState<IndoorFeatureCollection[]>([]);
     const [originRoom, setOriginRoom] = useState<RoomInfo | null>(null);
     const [destinationRoom, setDestinationRoom] = useState<RoomInfo | null>(null);
+    const [pathFeatures, setPathFeatures] = useState<Feature<LineString>[]>([]);
+    const [isRoutingActive, setIsRoutingActive] = useState(false);
+
+    const clearRoute = () => {
+      setOriginRoom(null);
+      setDestinationRoom(null);
+      setPathFeatures([]);
+      setIsRoutingActive(false);
+    };
 
     const contextValue = useMemo(() => ({
         buildingHasFloors,
@@ -49,8 +66,13 @@ export const IndoorsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         originRoom,
         setOriginRoom,
         destinationRoom,
-        setDestinationRoom
-      }), [buildingHasFloors, inFloorView, currentFloor, floorList, currentFloorAssociations, indoorFeatures, originRoom, destinationRoom]);
+        setDestinationRoom,
+        pathFeatures,
+        setPathFeatures,
+        isRoutingActive,
+        setIsRoutingActive,
+        clearRoute
+      }), [buildingHasFloors, inFloorView, currentFloor, floorList, currentFloorAssociations, indoorFeatures, originRoom, destinationRoom, pathFeatures, isRoutingActive]);
     
       return (
         <IndoorContext.Provider value={contextValue}>

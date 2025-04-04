@@ -1,5 +1,6 @@
 import { BuildingFloorAssociation } from "./buildingFloorAssociation";
 import { RoomInfo } from "../interfaces/RoomInfo"
+import { Feature, LineString } from "geojson";
 
 export interface IndoorContextType {
     buildingHasFloors: boolean;
@@ -18,4 +19,9 @@ export interface IndoorContextType {
     setOriginRoom: (room: RoomInfo | null) => void;
     destinationRoom: RoomInfo | null;
     setDestinationRoom: (room: RoomInfo | null) => void;
+    pathFeatures: Feature<LineString>[];
+    setPathFeatures: (features: Feature<LineString>[]) => void;
+    isRoutingActive: boolean;
+    setIsRoutingActive: (active: boolean) => void;
+    clearRoute: () => void;
 }
