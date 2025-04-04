@@ -5,7 +5,7 @@ const { width } = Dimensions.get("window");
 export const UpcomingClassItemStyle = StyleSheet.create({
   container: {
     height: Dimensions.get("window").height * 0.13,
-    width: Dimensions.get("window").width * 0.9,
+    width: Dimensions.get("window").width,
     flexDirection: "row",
     padding: 10,
     borderBottomWidth: 2,

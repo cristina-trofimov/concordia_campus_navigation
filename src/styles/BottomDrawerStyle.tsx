@@ -10,8 +10,6 @@ export const BottomDrawerStyle = StyleSheet.create({
     width: width,
     position: "absolute",
     bottom: 0,
-    justifyContent: "center",
-    alignItems: "center",
   },
   dragHandle: {
     width: width,
