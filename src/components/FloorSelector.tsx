@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useIndoor } from "../data/IndoorContext";
+import { useCoords } from "../data/CoordsContext";
 import { FloorSelectorStyle } from "../styles/FloorSelectorStyle";
 import { useIndoorFeatures } from "../components/IndoorMap";
 
@@ -21,7 +22,8 @@ export const useFloorSelection = () => {
 };
 
 export const FloorSelector = () => {
-    const { currentFloor, inFloorView, floorList } = useIndoor();
+    const { currentFloor, inFloorView, floorList, setInFloorView } = useIndoor();
+    const { destinationCoords } = useCoords();
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const { handleSelectFloor } = useFloorSelection();
 
@@ -29,6 +31,18 @@ export const FloorSelector = () => {
         <>
             {inFloorView && (
                 <View style={FloorSelectorStyle.container}>
+                    {/* Back Button */}
+                    {!destinationCoords && (
+                        <TouchableOpacity
+                            style={FloorSelectorStyle.backButton}
+                            onPress={() => {
+                                setInFloorView(false);
+                            }}
+                        >
+                            <Text style={FloorSelectorStyle.backButtonText}>←</Text>
+                        </TouchableOpacity>
+                    )}
+
                     {/* Dropdown Trigger */}
                     <TouchableOpacity
                         style={FloorSelectorStyle.dropdownTrigger}

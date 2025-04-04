@@ -301,8 +301,6 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                                     <Text style={[SearchBarsStyle.buttonText, { color: "white" }]}>Start</Text>
                                 </View>
                             </TouchableOpacity>
-
-                            <IndoorViewButton inFloorView={inFloorView} />
                         </View>
                     </View>
                 </>

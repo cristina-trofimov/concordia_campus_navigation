@@ -4,10 +4,11 @@ import { useCoords } from '../data/CoordsContext';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { IndoorViewButtonStyle } from '../styles/IndoorViewButtonStyle';
+import { changeCurrentFloorAssociations } from './IndoorMap';
 
-function IndoorViewButton({ inFloorView }: { inFloorView: boolean }) {
+function IndoorViewButton({ inFloorView, buildingId }: { inFloorView: boolean, buildingId: string }) {
 
-    const { setInFloorView } = useIndoor();
+    const { setInFloorView, setCurrentFloorAssociations } = useIndoor();
     const { isInsideBuilding } = useCoords();
     const entypoBuildingColour = isInsideBuilding ? "#912338" : "grey"; 
     const borderColourInsideBuilding = isInsideBuilding ? "#912338" : "grey";
@@ -26,11 +27,13 @@ function IndoorViewButton({ inFloorView }: { inFloorView: boolean }) {
                         opacity: inFloorView ? 1 : opacityInsideBuilding
                     }
                 ]}
-                onPress={() => setInFloorView(!inFloorView)}
+                onPress={() => {
+                    setInFloorView(!inFloorView);
+                    setCurrentFloorAssociations(changeCurrentFloorAssociations(buildingId));
+                }}
             >
                 <View style={IndoorViewButtonStyle.buttonContent}>
                     <Entypo name={inFloorView ? "tree" : "location"} size={20} color={inFloorView ? "#912338" : entypoBuildingColour} />
-                    <Text style={[IndoorViewButtonStyle.buttonText, { color: "#912338" }]}>{inFloorView ? "Outside View" : "Floor View"}</Text>
                 </View>
             </TouchableOpacity>
 

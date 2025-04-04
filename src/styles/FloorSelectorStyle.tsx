@@ -6,6 +6,8 @@ export const FloorSelectorStyle = StyleSheet.create({
         top: '3%',
         zIndex: 1000,
         width: 150,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     dropdownTrigger: {
         flexDirection: 'row',
@@ -33,7 +35,7 @@ export const FloorSelectorStyle = StyleSheet.create({
         borderRadius: 5,
         borderWidth: 1,
         borderColor: '#cccccc',
-        width: '100%', 
+        width: '100%',
     },
     option: {
         padding: 10,
@@ -42,5 +44,15 @@ export const FloorSelectorStyle = StyleSheet.create({
     },
     optionText: {
         fontSize: 16,
+    },
+    backButton: {
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 8,
+    },
+    backButtonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 })
