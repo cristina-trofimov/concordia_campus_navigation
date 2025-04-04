@@ -1,20 +1,27 @@
-import React, { useState, useEffect  } from "react";
-import { AppRegistry } from 'react-native';
+import React, { useEffect  } from "react";
 import { createTheme } from "@rneui/themed";
 import HomeScreen from './src/components/screens/HomeScreen';
 import CalendarScreen from "./src/components/screens/CalendarScreen";
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 import crashlytics from '@react-native-firebase/crashlytics';
+import { Calendar } from "./src/interfaces/calendar";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 (globalThis as any).isTesting = false; // when doing usability testing
+
 export type RootStackParamList = {
   Home: undefined;
-  Calendar: undefined;
+  Calendar: {
+    accessToken?: string | null;
+    calendars?: Calendar[];
+  } | undefined;
 };
+
+export type CalendarScreenProp = RouteProp<RootStackParamList, "Calendar">;
+
+export interface CalendarScreenProps { route: CalendarScreenProp; }
 
 const theme = createTheme({
   lightColors: {
@@ -48,4 +55,5 @@ useEffect(() => {
       
     </NavigationContainer>
   );
-}
+};
+

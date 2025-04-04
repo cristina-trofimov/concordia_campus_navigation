@@ -1,17 +1,8 @@
 import { StyleSheet } from 'react-native';
 
 export const RightDrawerStyle = StyleSheet.create({
-    container: {
-        position: 'absolute',
-        top: 15,
-        right: 0, // Change from left: 0 to right: 0
-        alignItems: 'center',
-    },
     button: {
-        position: "absolute",
-        top: 0,
-        right: 10, // Change from left: 10 to right: 10
-        height: 40,
+        height: 36,
         width: 40,
         backgroundColor: "rgba(255, 255, 255, 1)",
         borderRadius: 5,
@@ -27,7 +18,7 @@ export const RightDrawerStyle = StyleSheet.create({
         flex: 1,
         backgroundColor: "rgba(0, 0, 0, 0.5)",
         justifyContent: "flex-start",
-        alignItems: "flex-end", // Change from flex-start to flex-end
+        alignItems: "flex-end",
     },
     drawer: {
         width: "70%",
