@@ -10,6 +10,7 @@ import RightDrawer from "../RightDrawer";
 import { Calendar } from "../../interfaces/calendar";
 import { fetchCalendarEventsByCalendarId } from "../googleCalendarFetching";
 import { signIn } from "../signin";
+import { useClassEvents } from "../../data/ClassEventsContext";
 
 const theme = {
   calendarBackground: '#f0f0f0',
@@ -42,6 +43,7 @@ const CalendarScreen = () => {
   const calendarRef = useRef<CalendarKitHandle>(null);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [chosenCalendar, setChosenCalendar] = useState<Calendar | null>(null);
+  const {classEvents, setClassEvents} = useClassEvents();
 
 
   const handleSaveEvent = () => {
@@ -55,10 +57,21 @@ const CalendarScreen = () => {
 
   useEffect(() => {
     const fetchEvents = async () => {
+
+      console.log("FETCHING EVENTS...");
       if (chosenCalendar) {
+        console.log("CHOSEN CALEDAR " + chosenCalendar.title);
         const accessToken = await signIn();
         if (accessToken) {
+
+          console.log("ACCESS TOKEN " + accessToken);
+
           const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
+
+          if (events.data?.events) {
+            setClassEvents(events.data?.events || []);
+          }
+
           const modifiedEvents = events.data?.events.map((event) => {
             return {
               id: event.id,

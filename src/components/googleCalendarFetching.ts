@@ -179,6 +179,9 @@ export const fetchCalendarEventsByCalendarId = async (
             calendarId: calendarId
         }));
 
+
+        // setClassEvents(events);
+
         return {
             type: 'success',
             data: {
