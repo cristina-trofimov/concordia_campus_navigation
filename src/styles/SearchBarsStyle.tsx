@@ -25,7 +25,7 @@ export const SearchBarsStyle = StyleSheet.create({
     selectedTransportButton: {
         alignItems: "center",
         padding: 5,
-        backgroundColor: "rgba(145, 35, 56, 0.3)", // RGB with opacity
+        backgroundColor: "rgba(145, 35, 56, 0.3)",
     },
     instructionContainer: {
         padding: 10,
@@ -64,10 +64,12 @@ export const SearchBarsStyle = StyleSheet.create({
     timeContainer: {
         alignItems: "center",
         marginRight: 10,
+        backgroundColor:'green'
     },
     timeValue: {
         fontSize: 18,
         fontWeight: "bold",
+            backgroundColor:'purple'
     },
     timeUnit: {
         fontSize: 14,
