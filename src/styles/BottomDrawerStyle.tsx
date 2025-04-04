@@ -23,8 +23,5 @@ export const BottomDrawerStyle = StyleSheet.create({
     borderRadius: 3,
     marginBottom: 10,
   },
-  contentContainer: {
-    flex: 1,
-  },
 
 });
