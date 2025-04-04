@@ -131,7 +131,8 @@ function BottomDrawer({
         <View style={BottomDrawerStyle.dragIndicator} />
       </View>
       <ScrollView>
-        <View style={BottomDrawerStyle.contentContainer}>{children}</View>
+        {children}
+        {/* <View style={BottomDrawerStyle.contentContainer}></View> */}
       </ScrollView>
     </Animated.View>
   );

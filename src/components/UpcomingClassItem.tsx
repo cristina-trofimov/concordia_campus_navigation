@@ -8,6 +8,8 @@ import {
 import React, { Component } from "react";
 import { Image } from "@rneui/base";
 import { CalendarEvent } from "../interfaces/CalendraEvent";
+import { UpcomingClassItemStyle } from "../styles/UpcomingClassItemStyle";
+import { Pressable } from "react-native";
 
 interface UpcomingClassItemProps {
   calendarEvent: CalendarEvent;
@@ -91,83 +93,53 @@ export default class UpcomingClassItem extends Component<
     );
 
     return (
-      <View style={[styles.container]}>
-        <View style={[styles.imgBox]}>
+      <Pressable
+        onPress={() => console.log(`Clicked on: ${title}`)}
+        disabled={statusText === "Ended"} // Disable if class has ended
+        style={({ pressed }) => [
+          UpcomingClassItemStyle.container,
+          {
+            backgroundColor: pressed ? "rgba(0, 0, 0, 0.2)" : "white",
+
+            opacity: statusText === "Ended" ? 0.5 : 1, // Make it look visually disabled
+          },
+        ]}
+      >
+        <View style={[UpcomingClassItemStyle.imgBox]}>
           <Image source={this.courseIcon} style={{ width: 30, height: 30 }} />
         </View>
-        <View style={[styles.content]}>
-          <View style={[styles.courseNameAndStatusContainer]}>
-            <Text style={[styles.courseName]}>{title}</Text>
-            <View style={[styles.status]}>
+        <View style={[UpcomingClassItemStyle.content]}>
+          <View style={[UpcomingClassItemStyle.courseNameAndStatusContainer]}>
+            <Text
+              style={[
+                UpcomingClassItemStyle.courseName,
+                statusText === "Ended" && {
+                  textDecorationLine: "line-through",
+                },
+              ]}
+            >
+              {title}
+            </Text>
+            <View style={[UpcomingClassItemStyle.status]}>
               <View
-                style={[styles.statusCircle, { backgroundColor: statusColor }]}
+                style={[
+                  UpcomingClassItemStyle.statusCircle,
+                  { backgroundColor: statusColor },
+                ]}
               ></View>
-              <Text style={[styles.statusText]}>{statusText}</Text>
+              <Text style={[UpcomingClassItemStyle.statusText]}>
+                {statusText}
+              </Text>
             </View>
           </View>
 
-          <Text style={[styles.startEndTime]}>
+          <Text style={[UpcomingClassItemStyle.startEndTime]}>
             {`${startTime} - ${endTime}`}
           </Text>
-          <Text style={[styles.building]}>{location}</Text>
+          <Text style={[UpcomingClassItemStyle.building]}>{location}</Text>
           <Text>Room {description}</Text>
         </View>
-      </View>
+      </Pressable>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    height: Dimensions.get("window").height * 0.13,
-    width: Dimensions.get("window").width * 0.9,
-    flexDirection: "row",
-    padding: 10,
-    borderBottomWidth: 2,
-    borderBottomColor: "#D9D9D9",
-  },
-  imgBox: {
-    justifyContent: "center",
-  },
-  content: {
-    flex: 1,
-    flexDirection: "column",
-    paddingLeft: 15,
-    justifyContent: "center",
-  },
-  courseNameAndStatusContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  status: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  statusCircle: {
-    width: 9,
-    height: 9,
-    borderRadius: 9,
-    marginEnd: 8,
-  },
-  statusText: {
-    fontSize: 15,
-    color: "#737373",
-  },
-  courseName: {
-    fontSize: 19,
-    fontWeight: "900",
-  },
-  startEndTime: {
-    fontSize: 16,
-    fontWeight: "900",
-  },
-  building: {
-    fontSize: 16,
-    fontWeight: "900",
-    color: "#545454",
-  },
-  location: {
-    fontSize: 14,
-    fontWeight: "400",
-  },
-});
