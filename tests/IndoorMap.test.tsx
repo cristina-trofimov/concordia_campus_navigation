@@ -3,396 +3,332 @@
  */
 
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { CoordsProvider, useCoords } from '../src/data/CoordsContext';
-import { IndoorsProvider, useIndoor } from '../src/data/IndoorContext';
-import { BuildingFloorAssociation } from '../src/interfaces/buildingFloorAssociation';
+import { HighlightIndoorMap, useIndoorFeatures } from '../src/components/IndoorMap';
+import { useCoords } from '../src/data/CoordsContext';
+import { useIndoor } from '../src/data/IndoorContext';
 
-// Test component for CoordsContext
-const TestCoordsComponent = () => {
-  const {
-    routeData, 
-    setRouteData,
-    isInsideBuilding, 
-    setIsInsideBuilding,
-    myLocationString, 
-    setmyLocationString,
-    isTransit, 
-    setIsTransit,
-    highlightedBuilding, 
-    setHighlightedBuilding,
-    myLocationCoords, 
-    setMyLocationCoords
-  } = useCoords();
-
-  return (
-    <div>
-      <button data-testid="set-route-data" onClick={() => setRouteData({ test: 'route' })}>Set Route Data</button>
-      <button data-testid="set-inside-building" onClick={() => setIsInsideBuilding(true)}>Set Inside Building</button>
-      <button data-testid="set-location-string" onClick={() => setmyLocationString("Hall Building")}>Set Location String</button>
-      <button data-testid="set-is-transit" onClick={() => setIsTransit(true)}>Set Is Transit</button>
-      <button data-testid="set-highlighted-building" onClick={() => setHighlightedBuilding({ properties: { id: 'hall' } })}>Set Highlighted Building</button>
-      <button data-testid="set-location-coords" onClick={() => setMyLocationCoords({ latitude: 45.497, longitude: -73.578 })}>Set Location Coords</button>
-      
-      <div data-testid="route-data">{JSON.stringify(routeData)}</div>
-      <div data-testid="is-inside-building">{isInsideBuilding.toString()}</div>
-      <div data-testid="location-string">{myLocationString}</div>
-      <div data-testid="is-transit">{isTransit.toString()}</div>
-      <div data-testid="highlighted-building">{JSON.stringify(highlightedBuilding)}</div>
-      <div data-testid="location-coords">{JSON.stringify(myLocationCoords)}</div>
-    </div>
-  );
-};
-
-// Test component for IndoorContext
-const TestIndoorComponent = () => {
-  const {
-    buildingHasFloors,
-    setBuildingHasFloors,
-    inFloorView,
-    setInFloorView,
-    currentFloor,
-    setCurrentFloor,
-    floorList,
-    setFloorList,
-    currentFloorAssociations,
-    setCurrentFloorAssociations,
-    indoorFeatures,
-    setIndoorFeatures
-  } = useIndoor();
-
-  return (
-    <div>
-      <button data-testid="set-building-has-floors" onClick={() => setBuildingHasFloors(true)}>Set Building Has Floors</button>
-      <button data-testid="set-in-floor-view" onClick={() => setInFloorView(true)}>Set In Floor View</button>
-      <button data-testid="set-current-floor" onClick={() => setCurrentFloor("1st Floor")}>Set Current Floor</button>
-      <button data-testid="set-floor-list" onClick={() => setFloorList(["1st Floor", "2nd Floor"])}>Set Floor List</button>
-      <button 
-        data-testid="set-floor-associations" 
-        onClick={() => setCurrentFloorAssociations([{ buildingID: 'hall', floor: '1', component: 'h1Features' }])}>
-        Set Floor Associations
-      </button>
-      <button 
-        data-testid="set-indoor-features" 
-        onClick={() => setIndoorFeatures([{ type: 'Feature', properties: { ref: 'H-101' } }])}>
-        Set Indoor Features
-      </button>
-      
-      <div data-testid="building-has-floors">{buildingHasFloors.toString()}</div>
-      <div data-testid="in-floor-view">{inFloorView.toString()}</div>
-      <div data-testid="current-floor">{currentFloor || 'null'}</div>
-      <div data-testid="floor-list">{JSON.stringify(floorList)}</div>
-      <div data-testid="floor-associations">{JSON.stringify(currentFloorAssociations)}</div>
-      <div data-testid="indoor-features">{JSON.stringify(indoorFeatures)}</div>
-    </div>
-  );
-};
-
-describe('CoordsContext', () => {
-  test('provides default values', () => {
-    render(
-      <CoordsProvider>
-        <TestCoordsComponent />
-      </CoordsProvider>
-    );
-    
-    expect(screen.getByTestId('route-data')).toHaveTextContent('null');
-    expect(screen.getByTestId('is-inside-building')).toHaveTextContent('false');
-    expect(screen.getByTestId('location-string')).toHaveTextContent('');
-    expect(screen.getByTestId('is-transit')).toHaveTextContent('false');
-    expect(screen.getByTestId('highlighted-building')).toHaveTextContent('null');
-    expect(screen.getByTestId('location-coords')).toHaveTextContent('null');
-  });
-
-  test('updates routeData state correctly', () => {
-    render(
-      <CoordsProvider>
-        <TestCoordsComponent />
-      </CoordsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-route-data').click();
-    });
-    
-    expect(screen.getByTestId('route-data')).toHaveTextContent('{"test":"route"}');
-  });
-
-  test('updates isInsideBuilding state correctly', () => {
-    render(
-      <CoordsProvider>
-        <TestCoordsComponent />
-      </CoordsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-inside-building').click();
-    });
-    
-    expect(screen.getByTestId('is-inside-building')).toHaveTextContent('true');
-  });
-
-  test('updates myLocationString state correctly', () => {
-    render(
-      <CoordsProvider>
-        <TestCoordsComponent />
-      </CoordsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-location-string').click();
-    });
-    
-    expect(screen.getByTestId('location-string')).toHaveTextContent('Hall Building');
-  });
-
-  test('updates isTransit state correctly', () => {
-    render(
-      <CoordsProvider>
-        <TestCoordsComponent />
-      </CoordsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-is-transit').click();
-    });
-    
-    expect(screen.getByTestId('is-transit')).toHaveTextContent('true');
-  });
-
-  test('updates highlightedBuilding state correctly', () => {
-    render(
-      <CoordsProvider>
-        <TestCoordsComponent />
-      </CoordsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-highlighted-building').click();
-    });
-    
-    expect(screen.getByTestId('highlighted-building')).toHaveTextContent('{"properties":{"id":"hall"}}');
-  });
-
-  test('updates myLocationCoords state correctly', () => {
-    render(
-      <CoordsProvider>
-        <TestCoordsComponent />
-      </CoordsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-location-coords').click();
-    });
-    
-    expect(screen.getByTestId('location-coords')).toHaveTextContent('{"latitude":45.497,"longitude":-73.578}');
-  });
-
-  test('provides updated context value when state changes', () => {
-    render(
-      <CoordsProvider>
-        <TestCoordsComponent />
-      </CoordsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-route-data').click();
-      screen.getByTestId('set-inside-building').click();
-      screen.getByTestId('set-location-string').click();
-      screen.getByTestId('set-is-transit').click();
-      screen.getByTestId('set-highlighted-building').click();
-      screen.getByTestId('set-location-coords').click();
-    });
-    
-    expect(screen.getByTestId('route-data')).toHaveTextContent('{"test":"route"}');
-    expect(screen.getByTestId('is-inside-building')).toHaveTextContent('true');
-    expect(screen.getByTestId('location-string')).toHaveTextContent('Hall Building');
-    expect(screen.getByTestId('is-transit')).toHaveTextContent('true');
-    expect(screen.getByTestId('highlighted-building')).toHaveTextContent('{"properties":{"id":"hall"}}');
-    expect(screen.getByTestId('location-coords')).toHaveTextContent('{"latitude":45.497,"longitude":-73.578}');
-  });
-});
-
-describe('IndoorContext', () => {
-  test('provides default values', () => {
-    render(
-      <IndoorsProvider>
-        <TestIndoorComponent />
-      </IndoorsProvider>
-    );
-    
-    expect(screen.getByTestId('building-has-floors')).toHaveTextContent('false');
-    expect(screen.getByTestId('in-floor-view')).toHaveTextContent('false');
-    expect(screen.getByTestId('current-floor')).toHaveTextContent('null');
-    expect(screen.getByTestId('floor-list')).toHaveTextContent('[]');
-    expect(screen.getByTestId('floor-associations')).toHaveTextContent('[]');
-    expect(screen.getByTestId('indoor-features')).toHaveTextContent('[]');
-  });
-
-  test('updates buildingHasFloors state correctly', () => {
-    render(
-      <IndoorsProvider>
-        <TestIndoorComponent />
-      </IndoorsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-building-has-floors').click();
-    });
-    
-    expect(screen.getByTestId('building-has-floors')).toHaveTextContent('true');
-  });
-
-  test('updates inFloorView state correctly', () => {
-    render(
-      <IndoorsProvider>
-        <TestIndoorComponent />
-      </IndoorsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-in-floor-view').click();
-    });
-    
-    expect(screen.getByTestId('in-floor-view')).toHaveTextContent('true');
-  });
-
-  test('updates currentFloor state correctly', () => {
-    render(
-      <IndoorsProvider>
-        <TestIndoorComponent />
-      </IndoorsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-current-floor').click();
-    });
-    
-    expect(screen.getByTestId('current-floor')).toHaveTextContent('1st Floor');
-  });
-
-  test('updates floorList state correctly', () => {
-    render(
-      <IndoorsProvider>
-        <TestIndoorComponent />
-      </IndoorsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-floor-list').click();
-    });
-    
-    expect(screen.getByTestId('floor-list')).toHaveTextContent('["1st Floor","2nd Floor"]');
-  });
-
-  test('updates currentFloorAssociations state correctly', () => {
-    render(
-      <IndoorsProvider>
-        <TestIndoorComponent />
-      </IndoorsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-floor-associations').click();
-    });
-    
-    expect(screen.getByTestId('floor-associations')).toHaveTextContent('[{"buildingID":"hall","floor":"1","component":"h1Features"}]');
-  });
-
-  test('updates indoorFeatures state correctly', () => {
-    render(
-      <IndoorsProvider>
-        <TestIndoorComponent />
-      </IndoorsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-indoor-features').click();
-    });
-    
-    expect(screen.getByTestId('indoor-features')).toHaveTextContent('[{"type":"Feature","properties":{"ref":"H-101"}}]');
-  });
-
-  test('provides updated context value when state changes', () => {
-    render(
-      <IndoorsProvider>
-        <TestIndoorComponent />
-      </IndoorsProvider>
-    );
-    
-    act(() => {
-      screen.getByTestId('set-building-has-floors').click();
-      screen.getByTestId('set-in-floor-view').click();
-      screen.getByTestId('set-current-floor').click();
-      screen.getByTestId('set-floor-list').click();
-      screen.getByTestId('set-floor-associations').click();
-      screen.getByTestId('set-indoor-features').click();
-    });
-    
-    expect(screen.getByTestId('building-has-floors')).toHaveTextContent('true');
-    expect(screen.getByTestId('in-floor-view')).toHaveTextContent('true');
-    expect(screen.getByTestId('current-floor')).toHaveTextContent('1st Floor');
-    expect(screen.getByTestId('floor-list')).toHaveTextContent('["1st Floor","2nd Floor"]');
-    expect(screen.getByTestId('floor-associations')).toHaveTextContent('[{"buildingID":"hall","floor":"1","component":"h1Features"}]');
-    expect(screen.getByTestId('indoor-features')).toHaveTextContent('[{"type":"Feature","properties":{"ref":"H-101"}}]');
-  });
-});
-
-// Test using both contexts together
-describe('Context Integration', () => {
-  const CombinedContextsComponent = () => {
-    const { highlightedBuilding, setHighlightedBuilding } = useCoords();
-    const { 
-      currentFloorAssociations, 
-      setCurrentFloorAssociations,
-      setBuildingHasFloors
-    } = useIndoor();
-    
-    // When highlightedBuilding changes, update currentFloorAssociations
-    React.useEffect(() => {
-      if (highlightedBuilding && highlightedBuilding.properties) {
-        const buildingID = highlightedBuilding.properties.id;
-        setCurrentFloorAssociations([
-          { buildingID, floor: '1', component: 'h1Features' }
-        ]);
-        setBuildingHasFloors(true);
-      }
-    }, [highlightedBuilding]);
-    
-    return (
-      <div>
-        <button 
-          data-testid="set-highlighted-building" 
-          onClick={() => setHighlightedBuilding({ properties: { id: 'hall' } })}>
-          Set Highlighted Building
-        </button>
-        <div data-testid="highlighted-building">{JSON.stringify(highlightedBuilding)}</div>
-        <div data-testid="floor-associations">{JSON.stringify(currentFloorAssociations)}</div>
-      </div>
-    );
+// Mock the dependencies
+jest.mock('@rnmapbox/maps', () => {
+  return {
+    ShapeSource: ({ children }) => <div data-testid="mapbox-shape-source">{children}</div>,
+    FillLayer: () => <div data-testid="mapbox-fill-layer" />,
+    SymbolLayer: () => <div data-testid="mapbox-symbol-layer" />,
+    CircleLayer: () => <div data-testid="mapbox-circle-layer" />
   };
-  
-  test('contexts work together properly', () => {
-    render(
-      <CoordsProvider>
-        <IndoorsProvider>
-          <CombinedContextsComponent />
-        </IndoorsProvider>
-      </CoordsProvider>
-    );
+});
+
+jest.mock('../src/data/CoordsContext', () => ({
+  useCoords: jest.fn()
+}));
+
+jest.mock('../src/data/IndoorContext', () => ({
+  useIndoor: jest.fn()
+}));
+
+// Fix the import path for IndoorPointsOfInterest
+jest.mock('../src/components/IndoorPointsOfInterest', () => ({
+  IndoorPointsOfInterest: () => <div data-testid="indoor-points-of-interest" />
+}));
+
+jest.mock('../src/data/buildingFloorAssociations.ts', () => ({
+  buildingFloorAssociations: [
+    { buildingID: 'hall', floor: '1', component: 'h1Features' },
+    { buildingID: 'hall', floor: '2', component: 'h2Features' }
+  ]
+}));
+
+// Mock all indoor feature imports
+jest.mock('../src/data/indoor/Hall/H1.ts', () => ({
+  h1Features: [{ type: 'Feature', properties: { ref: 'H1-101' } }]
+}));
+
+jest.mock('../src/data/indoor/Hall/H2.ts', () => ({
+  h2Features: [{ type: 'Feature', properties: { ref: 'H2-101' } }]
+}));
+
+// Mock the remaining imports (shortened for brevity)
+const mockEmptyFeatures = [];
+jest.mock('../src/data/indoor/Hall/H8.ts', () => ({ h8Features: mockEmptyFeatures }));
+jest.mock('../src/data/indoor/Hall/H9.ts', () => ({ h9Features: mockEmptyFeatures }));
+jest.mock('../src/data/indoor/CC/CC1.ts', () => ({ cc1Features: mockEmptyFeatures }));
+jest.mock('../src/data/indoor/MB/MB1.ts', () => ({ mb1Features: mockEmptyFeatures }));
+jest.mock('../src/data/indoor/MB/MBS2.ts', () => ({ mb2Features: mockEmptyFeatures }));
+jest.mock('../src/data/indoor/VE/VE1.ts', () => ({ ve1Features: mockEmptyFeatures }));
+jest.mock('../src/data/indoor/VE/VE2.ts', () => ({ ve2Features: mockEmptyFeatures }));
+jest.mock('../src/data/indoor/VL/VL1.ts', () => ({ vl1Features: mockEmptyFeatures }));
+jest.mock('../src/data/indoor/VL/VL2.ts', () => ({ vl2Features: mockEmptyFeatures }));
+
+describe('HighlightIndoorMap Component', () => {
+  beforeEach(() => {
+    // Reset all mocks
+    jest.clearAllMocks();
     
-    // Check initial states
-    expect(screen.getByTestId('highlighted-building')).toHaveTextContent('null');
-    expect(screen.getByTestId('floor-associations')).toHaveTextContent('[]');
-    
-    // Trigger state change
-    act(() => {
-      screen.getByTestId('set-highlighted-building').click();
+    // Setup default mock values
+    useCoords.mockReturnValue({
+      highlightedBuilding: null,
+      isInsideBuilding: false,
+      destinationCoords: null,
+      myLocationCoords: null
     });
     
-    // Check updated states reflecting integration between contexts
-    expect(screen.getByTestId('highlighted-building')).toHaveTextContent('{"properties":{"id":"hall"}}');
-    expect(screen.getByTestId('floor-associations')).toHaveTextContent('[{"buildingID":"hall","floor":"1","component":"h1Features"}]');
+    useIndoor.mockReturnValue({
+      setBuildingHasFloors: jest.fn(),
+      setInFloorView: jest.fn(),
+      inFloorView: false,
+      setCurrentFloor: jest.fn(),
+      setFloorList: jest.fn(),
+      currentFloorAssociations: [],
+      setCurrentFloorAssociations: jest.fn(),
+      setIndoorFeatures: jest.fn(),
+      indoorFeatures: [],
+      originRoom: null,
+      destinationRoom: null,
+      currentFloor: null
+    });
+  });
+
+  test('should not render Mapbox layers when indoorFeatures is empty', () => {
+    render(<HighlightIndoorMap />);
+    
+    const shapeSource = screen.queryByTestId('mapbox-shape-source');
+    expect(shapeSource).not.toBeInTheDocument();
+  });
+
+  test('should render Mapbox layers when indoorFeatures exist and inFloorView is true', () => {
+    useIndoor.mockReturnValue({
+      setBuildingHasFloors: jest.fn(),
+      setInFloorView: jest.fn(),
+      inFloorView: true,
+      setCurrentFloor: jest.fn(),
+      setFloorList: jest.fn(),
+      currentFloorAssociations: [],
+      setCurrentFloorAssociations: jest.fn(),
+      setIndoorFeatures: jest.fn(),
+      indoorFeatures: [{ type: 'Feature', properties: { ref: 'H1-101' } }],
+      originRoom: null,
+      destinationRoom: null,
+      currentFloor: null
+    });
+    
+    render(<HighlightIndoorMap />);
+    
+    const shapeSource = screen.getByTestId('mapbox-shape-source');
+    expect(shapeSource).toBeInTheDocument();
+    
+    const fillLayer = screen.getByTestId('mapbox-fill-layer');
+    expect(fillLayer).toBeInTheDocument();
+    
+    const symbolLayer = screen.getByTestId('mapbox-symbol-layer');
+    expect(symbolLayer).toBeInTheDocument();
+  });
+
+  test('should render origin room pin when conditions are met', () => {
+    useIndoor.mockReturnValue({
+      setBuildingHasFloors: jest.fn(),
+      setInFloorView: jest.fn(),
+      inFloorView: true,
+      setCurrentFloor: jest.fn(),
+      setFloorList: jest.fn(),
+      currentFloorAssociations: [],
+      setCurrentFloorAssociations: jest.fn(),
+      setIndoorFeatures: jest.fn(),
+      indoorFeatures: [],
+      originRoom: { coordinates: [-73.577142, 45.495753], ref: 'H1-101', floor: '1' },
+      destinationRoom: null,
+      currentFloor: '1st Floor'
+    });
+    
+    render(<HighlightIndoorMap />);
+    
+    // We expect shapeSources to be 1 since we're only showing the origin pin
+    const shapeSources = screen.getAllByTestId('mapbox-shape-source');
+    expect(shapeSources.length).toBe(1);
+    
+    const circleLayer = screen.getByTestId('mapbox-circle-layer');
+    expect(circleLayer).toBeInTheDocument();
+  });
+
+  test('should render destination room pin when conditions are met', () => {
+    useIndoor.mockReturnValue({
+      setBuildingHasFloors: jest.fn(),
+      setInFloorView: jest.fn(),
+      inFloorView: true,
+      setCurrentFloor: jest.fn(),
+      setFloorList: jest.fn(),
+      currentFloorAssociations: [],
+      setCurrentFloorAssociations: jest.fn(),
+      setIndoorFeatures: jest.fn(),
+      indoorFeatures: [],
+      originRoom: null,
+      destinationRoom: { coordinates: [-73.577142, 45.495753], ref: 'H1-102', floor: '1' },
+      currentFloor: '1st Floor'
+    });
+    
+    render(<HighlightIndoorMap />);
+    
+    const shapeSources = screen.getAllByTestId('mapbox-shape-source');
+    expect(shapeSources.length).toBe(1);
+    
+    const circleLayer = screen.getByTestId('mapbox-circle-layer');
+    expect(circleLayer).toBeInTheDocument();
+  });
+
+  test('should not show room pins when floor does not match', () => {
+    useIndoor.mockReturnValue({
+      setBuildingHasFloors: jest.fn(),
+      setInFloorView: jest.fn(),
+      inFloorView: true,
+      setCurrentFloor: jest.fn(),
+      setFloorList: jest.fn(),
+      currentFloorAssociations: [],
+      setCurrentFloorAssociations: jest.fn(),
+      setIndoorFeatures: jest.fn(),
+      indoorFeatures: [],
+      originRoom: { coordinates: [-73.577142, 45.495753], ref: 'H1-101', floor: '1' },
+      destinationRoom: { coordinates: [-73.577142, 45.495753], ref: 'H2-201', floor: '2' },
+      currentFloor: '2nd Floor'
+    });
+    
+    render(<HighlightIndoorMap />);
+    
+    // Only destination is on 2nd floor, so we should have 1 shape source
+    const shapeSources = screen.getAllByTestId('mapbox-shape-source');
+    expect(shapeSources.length).toBe(1);
+  });
+
+  test('should update floor info when highlightedBuilding changes', () => {
+    const setCurrentFloorAssociations = jest.fn();
+    
+    useCoords.mockReturnValue({
+      highlightedBuilding: { properties: { id: 'hall' } },
+      isInsideBuilding: false,
+      destinationCoords: null,
+      myLocationCoords: null
+    });
+    
+    useIndoor.mockReturnValue({
+      setBuildingHasFloors: jest.fn(),
+      setInFloorView: jest.fn(),
+      inFloorView: false,
+      setCurrentFloor: jest.fn(),
+      setFloorList: jest.fn(),
+      currentFloorAssociations: [],
+      setCurrentFloorAssociations,
+      setIndoorFeatures: jest.fn(),
+      indoorFeatures: [],
+      originRoom: null,
+      destinationRoom: null,
+      currentFloor: null
+    });
+    
+    render(<HighlightIndoorMap />);
+    
+    // We need to wait for the useEffect to be called
+    expect(setCurrentFloorAssociations).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ buildingID: 'hall' })
+      ])
+    );
+  });
+
+  test('should set inFloorView when destinationCoords exists and isInsideBuilding is true', () => {
+    const setInFloorView = jest.fn();
+    
+    useCoords.mockReturnValue({
+      highlightedBuilding: null,
+      isInsideBuilding: true,
+      destinationCoords: [-73.577142, 45.495753],
+      myLocationCoords: [-73.577142, 45.495753]
+    });
+    
+    useIndoor.mockReturnValue({
+      setBuildingHasFloors: jest.fn(),
+      setInFloorView,
+      inFloorView: false,
+      setCurrentFloor: jest.fn(),
+      setFloorList: jest.fn(),
+      currentFloorAssociations: [],
+      setCurrentFloorAssociations: jest.fn(),
+      setIndoorFeatures: jest.fn(),
+      indoorFeatures: [],
+      originRoom: null,
+      destinationRoom: null,
+      currentFloor: null
+    });
+    
+    render(<HighlightIndoorMap />);
+    
+    expect(setInFloorView).toHaveBeenCalledWith(true);
+  });
+
+  test('should render IndoorPointsOfInterest component', () => {
+    // Mock implementation for IndoorPointsOfInterest
+    render(<HighlightIndoorMap />);
+    
+    const pointsOfInterest = screen.getByTestId('indoor-points-of-interest');
+    expect(pointsOfInterest).toBeInTheDocument();
+  });
+});
+
+describe('useIndoorFeatures Hook', () => {
+  test('should select indoor features correctly', () => {
+    const setIndoorFeatures = jest.fn();
+    const setCurrentFloor = jest.fn();
+    
+    useIndoor.mockReturnValue({
+      setCurrentFloor,
+      currentFloorAssociations: [
+        { floor: '1', component: 'h1Features' }
+      ],
+      setIndoorFeatures
+    });
+    
+    const { selectIndoorFeatures } = useIndoorFeatures();
+    
+    selectIndoorFeatures(0);
+    
+    expect(setIndoorFeatures).toHaveBeenCalled();
+    expect(setCurrentFloor).toHaveBeenCalledWith('1st Floor');
+  });
+  
+  test('should handle invalid index or undefined associations', () => {
+    const setIndoorFeatures = jest.fn();
+    const setCurrentFloor = jest.fn();
+    
+    useIndoor.mockReturnValue({
+      setCurrentFloor,
+      currentFloorAssociations: [],
+      setIndoorFeatures
+    });
+    
+    const { selectIndoorFeatures } = useIndoorFeatures();
+    
+    // Test with an invalid index
+    selectIndoorFeatures(5);
+    
+    expect(setIndoorFeatures).toHaveBeenCalledWith([]);
+    expect(setCurrentFloor).toHaveBeenCalledWith(null);
+  });
+  
+  test('should handle non-existent feature component', () => {
+    const setIndoorFeatures = jest.fn();
+    const setCurrentFloor = jest.fn();
+    
+    useIndoor.mockReturnValue({
+      setCurrentFloor,
+      currentFloorAssociations: [
+        { floor: '1', component: 'nonExistentFeatures' }
+      ],
+      setIndoorFeatures
+    });
+    
+    const { selectIndoorFeatures } = useIndoorFeatures();
+    
+    selectIndoorFeatures(0);
+    
+    expect(setIndoorFeatures).toHaveBeenCalledWith([]);
+    expect(setCurrentFloor).toHaveBeenCalledWith(null);
   });
 });
