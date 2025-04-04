@@ -22,7 +22,7 @@ const POI_ICONS = {
   arts_and_entertainment: "movie",
 };
 
-export const fetchNearbyPOI = async (longitude, latitude, selectedPOI, radius = 25) => {
+export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => {
   const TILESET_ID = 'mapbox.mapbox-streets-v8';
   const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
@@ -76,7 +76,7 @@ export const onPoiClick = async (poi, setInputDestination) => {
     // But the reverseGeocode function expects (latitude, longitude)
     const address = await reverseGeocode(latitude, longitude);
     // Fix: Make sure we don't set empty string if address is null
-    setInputDestination(address ?? "Unknown location");
+    setInputDestination(address || "Unknown location");
   }
 };
 
@@ -103,7 +103,7 @@ const PointOfInterestMap: React.FC<PointOfInterestMapProps> = ({
           const { latitude, longitude } = myLocationCoords;
           const nearbyPois = await fetchNearbyPOI(longitude, latitude, radius, selectedPOI);
 
-          setCurrentIcon(POI_ICONS[selectedPOI] ?? "map-marker");
+          setCurrentIcon(POI_ICONS[selectedPOI] || "map-marker");
           setPoi(nearbyPois);
         } catch (error) {
           console.error("Error fetching POIs:", error);
