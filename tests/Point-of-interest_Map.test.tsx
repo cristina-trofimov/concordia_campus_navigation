@@ -6,6 +6,11 @@ jest.mock('@rnmapbox/maps', () => ({
 
   PointAnnotation: jest.fn().mockImplementation(({ children }) => children),
 }));
+jest.mock('../src/data/TokenManager', () => ({
+  TokenManager: {
+    getMapboxToken: jest.fn(() => 'mock-token-for-tests'),
+  },
+}));
 import React from 'react';
 import { render, waitFor, act } from '@testing-library/react-native';
 import PointOfInterestMap, { fetchNearbyPOI, reverseGeocode, onPoiClick } from '../src/components/Point-of-interest_Map';
