@@ -67,7 +67,7 @@ const CalendarScreen = () => {
 
         if (events.data?.events) {
           for (const event of events.data.events) {
-            console.log("EVENT" + event.title + " " + event.location + " " + event.description);
+            console.log("EVENT" + event.title + " " + event.location + " " + event.description + " " + event.startTime + " " + event.endTime);
           }
           setClassEvents(events.data?.events || []);
         }
