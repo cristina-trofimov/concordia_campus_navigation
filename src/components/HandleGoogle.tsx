@@ -4,6 +4,7 @@ import {
     statusCodes,
 } from '@react-native-google-signin/google-signin';
 import { WEBCLIENTID } from '@env'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configureReanimatedLogger, ReanimatedLogLevel } from 'react-native-reanimated';
 
 
@@ -16,22 +17,19 @@ export const configureGooggleSignIn = () => {
     });
     configureReanimatedLogger({
         level: ReanimatedLogLevel.warn,
-        strict: true, // Disables strict mode
+        strict: false, // Disables strict mode
     });
 }
-
 
 export const signIn = async () => {
     try {
 
         configureGooggleSignIn();
 
-        const currentUser = await GoogleSignin.getCurrentUser();
-        if (currentUser) {
-            console.log("Already signed in user:", JSON.stringify(currentUser, null, 2));
-
-            const tokens = await GoogleSignin.getTokens();
-            return tokens.accessToken;
+        const token = await AsyncStorage.getItem("accessToken");
+        if (token) {
+            console.log("User already signed in");
+            return token;
         }
 
 
@@ -42,6 +40,9 @@ export const signIn = async () => {
 
         const tokens = await GoogleSignin.getTokens();
         console.log("Sign-in successful. Access token obtained." + JSON.stringify(tokens.accessToken, null, 2));
+
+        await AsyncStorage.setItem( 'accessToken', tokens.accessToken, );
+
         return tokens.accessToken;
 
 
@@ -66,5 +67,16 @@ export const signIn = async () => {
             console.log('Non-status code error:', error);
         }
         return null;
+    }
+};
+
+export const signOut = async () => {
+    try {
+        await GoogleSignin.signOut();
+        await AsyncStorage.removeItem("accessToken")
+        await AsyncStorage.removeItem("chosenCalendar")
+        console.log('User signed out successfully');        
+    } catch (error) {
+        console.error('Error signing out:', error);
     }
 };

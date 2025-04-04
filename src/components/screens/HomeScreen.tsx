@@ -18,7 +18,6 @@ const { height } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
-
   const [inputDestination, setInputDestination] = useState<string>("");
   const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
   const [radius, setRadius] = useState<number | null>(null);

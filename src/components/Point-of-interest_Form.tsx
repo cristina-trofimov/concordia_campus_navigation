@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { PoiFormStyles } from "../styles/Point-of-interest_Form-STYLES.tsx";
 
@@ -74,7 +74,7 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
       {/* POI Picker */}
       <Picker
         testID="poi-picker"
-        selectedValue={selectedPOI || "none"}
+        selectedValue={selectedPOI ?? "none"}
         onValueChange={(itemValue) => handlePOIChange(itemValue)}
         style={PoiFormStyles.picker}
         mode="dropdown"
@@ -86,10 +86,10 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
       </Picker>
 
       {/* Radius Picker */}
-      <Text style={PoiFormStyles.title}>Search Radius</Text>a
+      <Text style={PoiFormStyles.title}>Search Radius</Text>
       <Picker
         testID="radius-picker"
-        selectedValue={selectedRadius || 50}
+        selectedValue={selectedRadius ?? 50}
         onValueChange={(value) => handleRadiusChange(value)}
         style={PoiFormStyles.picker}
         mode="dropdown"

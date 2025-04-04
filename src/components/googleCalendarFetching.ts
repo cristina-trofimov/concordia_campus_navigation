@@ -80,14 +80,14 @@ export const fetchUserCalendars = async (accessToken: string): Promise<CalendarA
         // Format the calendars into a clean structure
         const calendars: Calendar[] = response.data.items.map((calendar: any) => ({
             id: calendar.id,
-            title: calendar.summary || 'Untitled Calendar',
-            description: calendar.description || '',
-            backgroundColor: calendar.backgroundColor || '#4285F4',
-            foregroundColor: calendar.foregroundColor || '#FFFFFF',
-            selected: calendar.selected || false,
-            primary: calendar.primary || false,
-            accessRole: calendar.accessRole || 'reader',
-            timeZone: calendar.timeZone || 'UTC'
+            title: calendar.summary ?? 'Untitled Calendar',
+            description: calendar.description ?? '',
+            backgroundColor: calendar.backgroundColor ?? '#4285F4',
+            foregroundColor: calendar.foregroundColor ?? '#FFFFFF',
+            selected: calendar.selected ?? false,
+            primary: calendar.primary ?? false,
+            accessRole: calendar.accessRole ?? 'reader',
+            timeZone: calendar.timeZone ?? 'UTC'
         }));
 
         return {
@@ -99,10 +99,10 @@ export const fetchUserCalendars = async (accessToken: string): Promise<CalendarA
         };
 
     } catch (error: any) {
-        console.error('Error fetching user calendars:', error.response?.data || error.message);
+        console.error('Error fetching user calendars:', error.response?.data ?? error.message);
         return {
             type: 'error',
-            error: error.response?.data || error.message
+            error: error.response?.data ?? error.message
         };
     }
 };
@@ -163,19 +163,19 @@ export const fetchCalendarEventsByCalendarId = async (
         // Format the events into a cleaner structure
         const events: CalendarEvent[] = response.data.items.map((event: any) => ({
             id: event.id,
-            title: event.summary || "Untitled Event",
-            description: event.description || "",
-            location: event.location || "",
-            startTime: event.start?.dateTime || event.start?.date || "",
-            endTime: event.end?.dateTime || event.end?.date || "",
+            title: event.summary ?? "Untitled Event",
+            description: event.description ?? "",
+            location: event.location ?? "",
+            startTime: event.start?.dateTime ?? event.start?.date ?? "",
+            endTime: event.end?.dateTime ?? event.end?.date ?? "",
             isAllDay: !event.start?.dateTime,
-            organizer: event.organizer?.email || "",
+            organizer: event.organizer?.email ?? "",
             attendees: event.attendees?.map((attendee: any) => ({
-                email: attendee.email || "",
-                name: attendee.displayName || "",
-                responseStatus: attendee.responseStatus || "needsAction"
-            })) || [],
-            status: event.status || "confirmed",
+                email: attendee.email ?? "",
+                name: attendee.displayName ?? "",
+                responseStatus: attendee.responseStatus ?? "needsAction"
+            })) ?? [],
+            status: event.status ?? "confirmed",
             calendarId: calendarId
         }));
 
@@ -192,10 +192,10 @@ export const fetchCalendarEventsByCalendarId = async (
         };
 
     } catch (error: any) {
-        console.error(`Error fetching events from calendar "${calendarId}":`, error.response?.data || error.message);
+        console.error(`Error fetching events from calendar "${calendarId}":`, error.response?.data ?? error.message);
         return {
             type: 'error',
-            error: error.response?.data || error.message,
+            error: error.response?.data ?? error.message,
             calendarId
         };
     }
