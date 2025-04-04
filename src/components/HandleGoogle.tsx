@@ -26,10 +26,10 @@ export const signIn = async () => {
 
         configureGooggleSignIn();
 
-        const alreadySignedIn = await AsyncStorage.getItem("accessToken");
-        if (alreadySignedIn) {
+        const token = await AsyncStorage.getItem("accessToken");
+        if (token) {
             console.log("User already signed in");
-            return alreadySignedIn;
+            return token;
         }
 
 
