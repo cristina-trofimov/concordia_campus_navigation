@@ -64,12 +64,10 @@ export const SearchBarsStyle = StyleSheet.create({
     timeContainer: {
         alignItems: "center",
         marginRight: 10,
-        backgroundColor:'green'
     },
     timeValue: {
         fontSize: 18,
         fontWeight: "bold",
-            backgroundColor:'purple'
     },
     timeUnit: {
         fontSize: 14,
