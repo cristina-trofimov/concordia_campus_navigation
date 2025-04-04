@@ -12,8 +12,9 @@ import DirectionsSteps from "../DirectionsSteps";
 import MapComponent from "../MapComponent";
 import PointOfInterestSelector from "../Point-of-interest_Form";
 import { RoomSearchBars } from "../RoomSearchBars";
+import { useClassEvents } from "../../data/ClassEventsContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import UpcomingClassItem from "../UpcomingClassItem";
-import { CalendarEvent } from "../../interfaces/CalendraEvent";
 
 const { height } = Dimensions.get("window");
 
@@ -22,6 +23,8 @@ export default function HomeScreen() {
   const [inputDestination, setInputDestination] = useState<string>("");
   const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
   const [radius, setRadius] = useState<number | null>(null);
+  const { classEvents, setClassEvents } = useClassEvents();
+  const userIsSignedIn = AsyncStorage.getItem("accessToken");
 
   return (
     <CoordsProvider>
@@ -40,6 +43,10 @@ export default function HomeScreen() {
           <BottomDrawer drawerHeight={drawerHeight}>
             <ScrollView>
               <SearchBars inputDestination={inputDestination} />
+              {userIsSignedIn != null && classEvents && (
+                classEvents.map((event) => (
+                  <UpcomingClassItem calendarEvent={event} key={event.id} />
+                )))}
               <RoomSearchBars />
               <PointOfInterestSelector
                 pointsOfInterest={selectedPOI}
