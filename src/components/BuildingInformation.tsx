@@ -18,7 +18,7 @@ interface BuildingInformationProps {
 const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation, setInputDestination }) => {
     const { title, description, buildingInfo, coordinates } = buildingLocation || {};
     const { photo, address, departments, services } = buildingInfo || {};
-    const {setDestinationCoords} = useCoords();
+    const { setDestinationCoords } = useCoords();
     const { inFloorView } = useIndoor();
     const buildingId = (title ?? "").split(" ")[0];
 
@@ -29,7 +29,11 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                     <View style={BuildingInfoStyle.card}>
                         <View style={BuildingInfoStyle.titleContainer}>
                             <Text style={BuildingInfoStyle.title}>{title}</Text>
-                            <IndoorViewButton inFloorView={inFloorView} buildingId={buildingId} />
+                            <IndoorViewButton
+                                inFloorView={inFloorView}
+                                buildingId={buildingId}
+                                onClose={onClose}
+                            />
                             <TouchableOpacity
                                 style={BuildingInfoStyle.actionButton}
                                 onPress={() => {

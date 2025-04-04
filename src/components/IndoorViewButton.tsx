@@ -6,14 +6,14 @@ import { Entypo } from '@expo/vector-icons';
 import { IndoorViewButtonStyle } from '../styles/IndoorViewButtonStyle';
 import { changeCurrentFloorAssociations } from './IndoorMap';
 
-function IndoorViewButton({ inFloorView, buildingId }: { inFloorView: boolean, buildingId: string }) {
+function IndoorViewButton({ inFloorView, buildingId, onClose }: { inFloorView: boolean, buildingId: string, onClose: () => void; }) {
 
     const { setInFloorView, setCurrentFloorAssociations } = useIndoor();
-    const { isInsideBuilding } = useCoords();
-    const entypoBuildingColour = isInsideBuilding ? "#912338" : "grey"; 
-    const borderColourInsideBuilding = isInsideBuilding ? "#912338" : "grey";
-    const backgroundColorInsideBuilding = isInsideBuilding ? "white" : "#ddd";
-    const opacityInsideBuilding = isInsideBuilding ? 1 : 0.5;
+    const buildingFloorAssociations = changeCurrentFloorAssociations(buildingId);
+    const entypoBuildingColour = buildingFloorAssociations ? "#912338" : "grey"; 
+    const borderColourInsideBuilding = buildingFloorAssociations ? "#912338" : "grey";
+    const backgroundColorInsideBuilding = buildingFloorAssociations ? "white" : "#ddd";
+    const opacityInsideBuilding = buildingFloorAssociations ? 1 : 0.5;
 
 
     return (
@@ -29,7 +29,8 @@ function IndoorViewButton({ inFloorView, buildingId }: { inFloorView: boolean, b
                 ]}
                 onPress={() => {
                     setInFloorView(!inFloorView);
-                    setCurrentFloorAssociations(changeCurrentFloorAssociations(buildingId));
+                    setCurrentFloorAssociations(buildingFloorAssociations);
+                    onClose();
                 }}
             >
                 <View style={IndoorViewButtonStyle.buttonContent}>

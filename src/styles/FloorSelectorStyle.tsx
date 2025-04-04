@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 export const FloorSelectorStyle = StyleSheet.create({
     container: {
@@ -19,7 +19,17 @@ export const FloorSelectorStyle = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#cccccc',
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+        ...Platform.select({
+            ios: {
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+            },
+            android: {
+                elevation: 5,
+            },
+        }),
     },
     selectedFloorText: {
         fontSize: 16,
@@ -30,12 +40,15 @@ export const FloorSelectorStyle = StyleSheet.create({
         color: '#000000',
     },
     dropdownOptions: {
-        marginTop: 5,
+        position: 'absolute',
+        top: 45,
+        left: 50,
         backgroundColor: '#ffffff',
         borderRadius: 5,
         borderWidth: 1,
         borderColor: '#cccccc',
         width: '100%',
+        zIndex: 1001,
     },
     option: {
         padding: 10,
@@ -46,13 +59,25 @@ export const FloorSelectorStyle = StyleSheet.create({
         fontSize: 16,
     },
     backButton: {
-        padding: 10,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 8,
-    },
-    backButtonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
+        marginRight: 10,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
+        ...Platform.select({
+            ios: {
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+            },
+            android: {
+                elevation: 5,
+            },
+        }),
     },
 })

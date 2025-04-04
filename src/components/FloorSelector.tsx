@@ -4,6 +4,7 @@ import { useIndoor } from "../data/IndoorContext";
 import { useCoords } from "../data/CoordsContext";
 import { FloorSelectorStyle } from "../styles/FloorSelectorStyle";
 import { useIndoorFeatures } from "../components/IndoorMap";
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 export const useFloorSelection = () => {
     const { setCurrentFloor, floorList } = useIndoor();
@@ -39,7 +40,7 @@ export const FloorSelector = () => {
                                 setInFloorView(false);
                             }}
                         >
-                            <Text style={FloorSelectorStyle.backButtonText}>←</Text>
+                            <AntDesign name="arrowleft" size={24} color="black" />
                         </TouchableOpacity>
                     )}
 
@@ -60,7 +61,10 @@ export const FloorSelector = () => {
                             {floorList.map((floor, index) => (
                                 <TouchableOpacity
                                     key={index}
-                                    style={FloorSelectorStyle.option}
+                                    style={[
+                                        FloorSelectorStyle.option,
+                                        index === floorList.length - 1 && { borderBottomWidth: 0 }
+                                    ]}
                                     onPress={() => {
                                         handleSelectFloor(floor);
                                         setIsDropdownVisible(false);
