@@ -14,12 +14,18 @@ export const SearchBarsStyle = StyleSheet.create({
         width: "100%",
         paddingHorizontal: 20,
         borderBottomWidth: 1,
+        paddingBottom: 10,
         borderBottomColor: "#ddd",
     },
     transportButton: {
         alignItems: "center",
         padding: 10,
         borderRadius: 8,
+    },
+    selectedTransportButton: {
+        alignItems: "center",
+        padding: 5,
+        backgroundColor: "rgba(145, 35, 56, 0.3)", // RGB with opacity
     },
     instructionContainer: {
         padding: 10,
@@ -41,6 +47,9 @@ export const SearchBarsStyle = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         gap: 6,
+        paddingHorizontal: 15,
+        paddingVertical: 3,
+        borderRadius:20,
     },
     timeText: {
         fontSize: 12,
@@ -80,7 +89,7 @@ export const SearchBarsStyle = StyleSheet.create({
     buttonContent: {
         flexDirection: "row",
         alignItems: "center",
-        gap: 6,
+        gap: 6,      
     },
     buttonText: {
         fontSize: 15,
