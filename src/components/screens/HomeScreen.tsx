@@ -3,7 +3,6 @@ import { Animated, Dimensions, ScrollView, Text, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
 import { IndoorsProvider } from "../../data/IndoorContext";
-import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
 import { HomeStyle } from "../../styles/HomeStyle";
 import { FloorSelector } from "../FloorSelector";
@@ -32,7 +31,6 @@ export function HomeScreen() {
       <IndoorsProvider>
         <View style={HomeStyle.container}>
           <CalendarButton />
-          <LeftDrawer />
           <MapComponent
             drawerHeight={drawerHeight}
             setInputDestination={setInputDestination}

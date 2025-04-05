@@ -18,4 +18,6 @@ export interface IndoorContextType {
     setOriginRoom: (room: RoomInfo | null) => void;
     destinationRoom: RoomInfo | null;
     setDestinationRoom: (room: RoomInfo | null) => void;
+    indoorTransport: string;
+    setIndoorTransport: (transport: string) => void;
 }
