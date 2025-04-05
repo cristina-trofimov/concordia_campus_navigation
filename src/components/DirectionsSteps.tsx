@@ -15,7 +15,7 @@ const DirectionsSteps = () => {
 
 const [firstMessage, setFirstMessage] = useState("");
 const [secondMessage, setSecondMessage] = useState("");
-const [sameBuilding, setSameBuilding] = useState(true);
+const [sameBuilding, setSameBuilding] = useState(false);
 
   const formatSteps = (step: any): any => {
     return step.html_instructions
@@ -28,8 +28,8 @@ const [sameBuilding, setSameBuilding] = useState(true);
     const [first, second] = getIndoorDirectionText(originRoom, destinationRoom, indoorTransport);
     setFirstMessage(first);
     setSecondMessage(second);
-    if (originRoom?.building != destinationRoom?.building) {
-      setSameBuilding(false);}
+    if (originRoom && destinationRoom && (originRoom?.building == destinationRoom?.building)) {
+      setSameBuilding(true);}
     console.log("originRoom", originRoom);
     console.log("destinationRoom", destinationRoom);
     console.log("firstMessage", firstMessage);
