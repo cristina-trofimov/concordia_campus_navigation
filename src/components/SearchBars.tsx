@@ -12,7 +12,7 @@ import ShuttleBusTransit from './ShuttleBusTransit';
 import IndoorViewButton from './IndoorViewButton';
 
 
-function SearchBars({ inputDestination }: { inputDestination: string }) {
+function SearchBars({ inputDestination, setInputDestination }: { inputDestination: string, setInputDestination: (value: string) => void }) {
 
     const { setRouteData, myLocationString, setIsTransit, originCoords, setOriginCoords, destinationCoords, setDestinationCoords } = useCoords();
     const { inFloorView, setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
@@ -128,6 +128,7 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         setInFloorView(false);
         setOriginRoom(null);
         setDestinationRoom(null);
+        setInputDestination("");
     }, [setRouteData]);
 
     useEffect(() => {
@@ -216,7 +217,7 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                                     const walkFromStationMinutes = Math.ceil(endRouteCoords[0].legs[0].duration.value / 60);
 
                                     // Create template step object for custom steps
-                                    const  templateStep = routeCopy.legs[0].steps[0] ?? {};
+                                    const templateStep = routeCopy.legs[0].steps[0] ?? {};
 
                                     // Create all steps with hidden instructions for route visualization
                                     const allHiddenSteps = [

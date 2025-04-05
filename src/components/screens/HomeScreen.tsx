@@ -1,8 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Animated, Dimensions, ScrollView, Text, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
-import { CoordsProvider } from "../../data/CoordsContext";
-import { IndoorsProvider } from "../../data/IndoorContext";
+import { CoordsProvider, useCoords } from "../../data/CoordsContext";
+import { IndoorsProvider, useIndoor } from "../../data/IndoorContext";
 import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
 import { HomeStyle } from "../../styles/HomeStyle";
@@ -25,6 +25,10 @@ export function HomeScreen() {
   const [radius, setRadius] = useState<number | null>(null);
   const { classEvents } = useClassEvents();
 
+  console.log("INPUT DESTONATION", inputDestination);
+  console.log("EVENTS", classEvents.length);
+
+
   return (
     <CoordsProvider>
       <IndoorsProvider>
@@ -41,12 +45,16 @@ export function HomeScreen() {
 
           <BottomDrawer drawerHeight={drawerHeight}>
             <ScrollView>
-              <SearchBars inputDestination={inputDestination} />
-              {classEvents && classEvents.length > 0 && (
-                classEvents.map((event, index) => (
-                  <UpcomingClassItem calendarEvent={event} key={index} setInputDestination={setInputDestination} />
-                ))
-              )}
+              <SearchBars inputDestination={inputDestination} setInputDestination={setInputDestination} />
+              {inputDestination === "" ? (
+                classEvents.length > 0 ? (
+                  classEvents.map((event, index) => (
+                    <UpcomingClassItem calendarEvent={event} key={index} setInputDestination={setInputDestination} />
+                  ))
+                ) : (
+                  <Text>No upcoming classes</Text>
+                )
+              ) : null}
               <RoomSearchBars />
               <PointOfInterestSelector
                 pointsOfInterest={selectedPOI}
