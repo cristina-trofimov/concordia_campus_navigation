@@ -17,16 +17,18 @@ const CalendarButton = () => {
       const calendars = await fetchUserCalendars(token);
       if (calendars?.data?.calendars) {
         const calendarsData = calendars.data.calendars;
-        navigation.navigate("Calendar", { accessToken: token, calendars: calendarsData });
+        navigation.navigate("Calendar", { accessToken: token, calendars: calendarsData, open : true });
       }
     }
-}
+    // navigation.navigate("Calendar", { accessToken: token });
+
+  }
 
   return (
     <View testID="calendar-button" style={CalendarStyle.calendarButtonContainer} >
       <TouchableOpacity style={CalendarStyle.calBtn} onPress={goToCalendar}>
         <FontAwesome testID="calendar-icon" name="calendar" size={26} color="white" style={CalendarStyle.calButtonImg} />
-    </TouchableOpacity>
+      </TouchableOpacity>
     </View>
   );
 };
