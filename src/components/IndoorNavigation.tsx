@@ -507,6 +507,7 @@ export const IndoorNavigation: React.FC = () => {
   const { highlightedBuilding } = useCoords();
   const [routePath, setRoutePath] = useState<LineString | null>(null);
   const [debugNodes, setDebugNodes] = useState<Position[]>([]);
+  const [routeFloor, setRouteFloor] = useState<string | null>(null);
   
   // Map indoorTransport string to EntryPointType enum
   const getEntryPointTypeFromTransport = (): EntryPointType => {
@@ -522,14 +523,39 @@ export const IndoorNavigation: React.FC = () => {
     }
   };
   
+  // Clear route when destination is cleared
+  useEffect(() => {
+    if (!destinationRoom) {
+      setRoutePath(null);
+      setRouteFloor(null);
+    }
+  }, [destinationRoom]);
+  
+  // Check if we should display the route on the current floor
+  const shouldShowRoute = (): boolean => {
+    return routePath !== null && currentFloor === routeFloor;
+  };
+  
+  // Clear route when floor changes
+  useEffect(() => {
+    if (routeFloor && currentFloor !== routeFloor) {
+      // Don't clear the stored route, just don't display it
+      // We'll keep the calculated route in case user returns to the correct floor
+      console.log("Floor changed, hiding route");
+    }
+  }, [currentFloor]);
+  
   useEffect(() => {
     if (indoorFeatures.length === 0 || !currentFloor) return;
-    if (!originRoom && !destinationRoom) return; // No rooms selected yet
+    if (!destinationRoom) return; // No destination selected
     
     console.log("Building navigation graph...");
     console.log("Current building:", highlightedBuilding?.properties.id);
     console.log("Current floor:", currentFloor);
     console.log("Transport preference:", indoorTransport);
+    
+    // Store the floor this route is valid for
+    setRouteFloor(currentFloor);
     
     // Build the navigation graph
     const graph = buildNavigationGraph(indoorFeatures);
@@ -553,6 +579,7 @@ export const IndoorNavigation: React.FC = () => {
     
     if (!endNodeId) {
       console.error("Could not find destination node");
+      setRoutePath(null);
       return;
     }
     
@@ -572,8 +599,9 @@ export const IndoorNavigation: React.FC = () => {
       console.log(`Using ${indoorTransport} closest to destination as starting point`);
     }
     
-    if (!startNodeId || !endNodeId) {
-      console.error(`Could not find ${!startNodeId ? 'starting' : 'destination'} node`);
+    if (!startNodeId) {
+      console.error(`Could not find starting node`);
+      setRoutePath(null);
       return;
     }
     
@@ -597,13 +625,13 @@ export const IndoorNavigation: React.FC = () => {
   
   return (
     <>
-      {/* Route path display */}
-      {routePath && (
+      {/* Route path display - only show on the correct floor */}
+      {shouldShowRoute() && (
         <Mapbox.ShapeSource
           id="route-path"
           shape={{
             type: "Feature",
-            geometry: routePath,
+            geometry: routePath as LineString,
             properties: {}
           }}
         >
@@ -618,43 +646,15 @@ export const IndoorNavigation: React.FC = () => {
           />
         </Mapbox.ShapeSource>
       )}
-      
-      {/* Debug visualization of corridor nodes */}
-      {debugNodes.length > 0 && (
-        <Mapbox.ShapeSource
-          id="corridor-nodes"
-          shape={{
-            type: "FeatureCollection",
-            features: debugNodes.map((pos, i) => ({
-              type: "Feature",
-              geometry: {
-                type: "Point",
-                coordinates: pos
-              },
-              properties: { id: i }
-            }))
-          }}
-        >
-          <Mapbox.CircleLayer
-            id="corridor-node-circles"
-            style={{
-              circleRadius: 2,
-              circleColor: "#00FF00",
-              circleOpacity: 0.5
-            }}
-          />
-        </Mapbox.ShapeSource>
-      )}
-        
+          
     </>
-    
   );
 };
 
-// Helper component to integrate with your HighlightIndoorMap
-export const NavigationOverlay: React.FC = () => {
-  const { inFloorView, indoorFeatures } = useIndoor();
-  
+  // Helper component to integrate with your HighlightIndoorMap
+  export const NavigationOverlay: React.FC = () => {
+    const { inFloorView, indoorFeatures } = useIndoor();
+    
   if (!inFloorView || indoorFeatures.length === 0) return null;
   
   return <IndoorNavigation />;
