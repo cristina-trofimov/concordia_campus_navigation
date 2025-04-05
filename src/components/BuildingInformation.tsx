@@ -29,6 +29,8 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                     <View style={BuildingInfoStyle.card}>
                         <View style={BuildingInfoStyle.titleContainer}>
                             <Text style={BuildingInfoStyle.title}>{title}</Text>
+                        </View>
+                        <View style={BuildingInfoStyle.buttonsContainer}>
                             <IndoorViewButton
                                 inFloorView={inFloorView}
                                 buildingId={buildingId}
