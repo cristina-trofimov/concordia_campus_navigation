@@ -68,6 +68,7 @@ describe('SearchBars Component', () => {
   const mockSetInFloorView = jest.fn();
   const mockSetOriginRoom = jest.fn();
   const mockSetDestinationRoom = jest.fn();
+  const mockSetInputDestination = jest.fn();
   
   const mockRouteData = [
     {
@@ -108,19 +109,19 @@ describe('SearchBars Component', () => {
   });
 
   it('renders with destination prop', () => {
-    const { getByText } = render(<SearchBars inputDestination="Hall Building" />);
+    const { getByText } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
     // Check if the component rendered with the destination
     expect(getByText('Drive')).toBeDefined();
   });
 
   it('shows origin and destination search bars', () => {
-    const { getByText } = render(<SearchBars inputDestination="Hall Building" />);
+    const { getByText } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
     // Check if component renders with expected content
     expect(getByText('Drive')).toBeDefined();
   });
 
   it('clears destination and route data when clear button is pressed', async () => {
-    const { getByTestId } = render(<SearchBars inputDestination="Hall Building" />);
+    const { getByTestId } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
     
     // Get the mocked clear button and trigger its onPress function
     const clearButton = getByTestId('clear-destination-button');
@@ -132,6 +133,7 @@ describe('SearchBars Component', () => {
     expect(mockSetInFloorView).toHaveBeenCalledWith(false);
     expect(mockSetOriginRoom).toHaveBeenCalledWith(null);
     expect(mockSetDestinationRoom).toHaveBeenCalledWith(null);
+    expect(mockSetInputDestination).toHaveBeenCalledWith(""); // Verify this mock is called
   });
 
   it('handles error in getDirections', async () => {
@@ -139,7 +141,7 @@ describe('SearchBars Component', () => {
     
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     
-    const { getByTestId } = render(<SearchBars inputDestination="Hall Building" />);
+    const { getByTestId } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
     
     // Find and press the origin select button
     const originSelectButton = getByTestId('select-origin-button');
@@ -157,10 +159,10 @@ describe('SearchBars Component', () => {
   });
 
   it('updates destination when inputDestination prop changes', async () => {
-    const { rerender, getByText } = render(<SearchBars inputDestination="Hall Building" />);
+    const { rerender, getByText } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
     
     // Update props to simulate changing destination
-    rerender(<SearchBars inputDestination="Library Building" />);
+    rerender(<SearchBars inputDestination="Library Building" setInputDestination={mockSetInputDestination} />);
     
     // We expect the useEffect to be called when inputDestination changes
     // Since we can't easily test the internal state, we'll test if the component
@@ -169,7 +171,7 @@ describe('SearchBars Component', () => {
   });
 
   it('updates origin when myLocationString changes', async () => {
-    const { rerender, getByText } = render(<SearchBars inputDestination="Hall Building" />);
+    const { rerender, getByText } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
     
     // Update context to simulate changing myLocationString
     (useCoords as jest.Mock).mockReturnValue({
@@ -182,7 +184,7 @@ describe('SearchBars Component', () => {
       setDestinationCoords: mockSetDestinationCoords
     });
     
-    rerender(<SearchBars inputDestination="Hall Building" />);
+    rerender(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
     
     // Check if the component still renders with key UI elements
     expect(getByText('Drive')).toBeDefined();
