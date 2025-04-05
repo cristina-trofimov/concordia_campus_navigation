@@ -22,9 +22,15 @@ export const getIndoorDirectionText = (
         return ["",`Take the ${transport} up to floor ${destinationNum}.`];
     }
 
-    
+    //Different buildings
+    if ((originFloor && destinationFloor) && (originFloor.building != destinationFloor.building)) {
+        return [
+            `Take the ${transport} down to exit the campus.`,
+            `Take the ${transport} up to floor ${destinationNum}`,
+        ];
+    }
 
-    // Same floor
+    // Same building, same floor
     if (!isNaN(originNum) && !isNaN(destinationNum) && originNum === destinationNum) {
         return [
             `You are already on floor ${originNum}.`,

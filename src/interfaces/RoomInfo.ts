@@ -3,4 +3,5 @@ export interface RoomInfo {
     floor: string;
     component: string;
     coordinates?: [number, number];
+    building?: string;
   }
