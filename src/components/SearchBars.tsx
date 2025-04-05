@@ -292,23 +292,11 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
                         />
                     )}
 
-                    {/* Total Time, Start Button, and Floor/Outside View Button */}
-                    <View style={SearchBarsStyle.timeAndButtonsContainer}>
-                        <View style={SearchBarsStyle.timeContainer}>
-                            <Text style={SearchBarsStyle.timeValue}>
-                                {time}min
-                            </Text>
-
-                        </View>
-                        {/* Buttons Container */}
-                        <View style={SearchBarsStyle.buttonsContainer}>
-                            <TouchableOpacity style={[SearchBarsStyle.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}>
-                                <View style={SearchBarsStyle.buttonContent}>
-                                    <Entypo name="direction" size={20} color="white" />
-                                    <Text style={[SearchBarsStyle.buttonText, { color: "white" }]}>Start</Text>
-                                </View>
-                            </TouchableOpacity>
-                        </View>
+                    {/* Total Time */}
+                    <View style={SearchBarsStyle.timeContainer}>
+                        <Text style={SearchBarsStyle.timeValue}>
+                            {time}min
+                        </Text>
                     </View>
                 </>
             )}
