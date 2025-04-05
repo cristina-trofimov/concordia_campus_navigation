@@ -170,14 +170,16 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
                 ref: room.ref,
                 floor: room.floor,
                 component: room.component,
-                coordinates: center
+                coordinates: center,
+                building: buildingID
             });
         } else {
             setDestinationRoom({
                 ref: room.ref,
                 floor: room.floor,
                 component: room.component,
-                coordinates: center
+                coordinates: center,
+                building: buildingID
             });
         }
 

@@ -15,6 +15,7 @@ const DirectionsSteps = () => {
 
 const [firstMessage, setFirstMessage] = useState("");
 const [secondMessage, setSecondMessage] = useState("");
+const [sameBuilding, setSameBuilding] = useState(true);
 
   const formatSteps = (step: any): any => {
     return step.html_instructions
@@ -27,10 +28,13 @@ const [secondMessage, setSecondMessage] = useState("");
     const [first, second] = getIndoorDirectionText(originRoom, destinationRoom, indoorTransport);
     setFirstMessage(first);
     setSecondMessage(second);
+    if (originRoom?.building != destinationRoom?.building) {
+      setSameBuilding(false);}
     console.log("originRoom", originRoom);
     console.log("destinationRoom", destinationRoom);
     console.log("firstMessage", firstMessage);
     console.log("secondMessage", secondMessage);
+    console.log("sameBuilding", sameBuilding);
   }, [originRoom, destinationRoom, indoorTransport]);
 
 
@@ -85,7 +89,7 @@ const [secondMessage, setSecondMessage] = useState("");
   return (
     <View style={DirectionStepsStyle.container}>
       {/* First message at the top */}
-      {firstMessage !== "" && htmlInstructions.length > 0 && (
+      {(firstMessage !== "" && htmlInstructions.length > 0) && (
         <View style={DirectionStepsStyle.instructionsList}>
           <View>
             <View style={DirectionStepsStyle.iconsBox}>
@@ -101,7 +105,7 @@ const [secondMessage, setSecondMessage] = useState("");
       )}
   
       {/* Instruction List */}
-      {htmlInstructions.length > 0 && (firstMessage == "" || secondMessage == "") &&
+      {htmlInstructions.length > 0 && !sameBuilding &&
         htmlInstructions.map((instruction, index) => {
           const iconMappings: { [key: string]: string } = {
             destination: "location-on",
@@ -159,7 +163,7 @@ const [secondMessage, setSecondMessage] = useState("");
         })}
   
       {/* Second message at the bottom */}
-      {secondMessage !== "" && htmlInstructions.length > 0 && (
+      {(secondMessage !== "" && htmlInstructions.length > 0 ) && (
         <View style={DirectionStepsStyle.instructionsList}>
           <View>
             <View style={DirectionStepsStyle.iconsBox}>
