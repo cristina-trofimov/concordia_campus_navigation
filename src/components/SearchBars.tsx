@@ -6,16 +6,14 @@ import getDirections from './Route';
 import { useCoords } from '../data/CoordsContext';
 import { useIndoor } from '../data/IndoorContext';
 import { Ionicons } from "@expo/vector-icons";
-import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 import ShuttleBusTransit from './ShuttleBusTransit';
-import IndoorViewButton from './IndoorViewButton';
 
 
 function SearchBars({ inputDestination, setInputDestination }: { inputDestination: string, setInputDestination: (value: string) => void }) {
 
     const { setRouteData, myLocationString, setIsTransit, originCoords, setOriginCoords, destinationCoords, setDestinationCoords } = useCoords();
-    const { inFloorView, setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
+    const { setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState(inputDestination);
