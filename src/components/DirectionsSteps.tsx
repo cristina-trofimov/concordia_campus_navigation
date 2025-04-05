@@ -8,7 +8,7 @@ import { useIndoor } from "../data/IndoorContext";
 
 const DirectionsSteps = () => {
   const { routeData: routeCoordinates, isTransit } = useCoords();
-  const { originRoom, destinationRoom,indoorTransport,setIndoorFeatures } = useIndoor();
+  const { originRoom, destinationRoom,indoorTransport } = useIndoor();
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
 
 
@@ -30,11 +30,6 @@ const [sameBuilding, setSameBuilding] = useState(false);
     setSecondMessage(second);
     if (originRoom && destinationRoom && (originRoom?.building == destinationRoom?.building)) {
       setSameBuilding(true);}
-    console.log("originRoom", originRoom);
-    console.log("destinationRoom", destinationRoom);
-    console.log("firstMessage", firstMessage);
-    console.log("secondMessage", secondMessage);
-    console.log("sameBuilding", sameBuilding);
   }, [originRoom, destinationRoom, indoorTransport]);
 
 
