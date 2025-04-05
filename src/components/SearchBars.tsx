@@ -12,7 +12,7 @@ import ShuttleBusTransit from './ShuttleBusTransit';
 import IndoorViewButton from './IndoorViewButton';
 
 
-function SearchBars({ inputDestination }: { inputDestination: string }) {
+function SearchBars({ inputDestination, setInputDestination }: { inputDestination: string, setInputDestination: (value: string) => void }) {
 
     const { setRouteData, myLocationString, setIsTransit, originCoords, setOriginCoords, destinationCoords, setDestinationCoords } = useCoords();
     const { inFloorView, setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
@@ -128,6 +128,8 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         setInFloorView(false);
         setOriginRoom(null);
         setDestinationRoom(null);
+        setInputDestination("");
+        setOrigin(myLocationString);
     }, [setRouteData]);
 
     useEffect(() => {
@@ -169,18 +171,23 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                         {transportModes.map(({ mode, icon, color }) => (
                             <TouchableOpacity
                                 key={mode}
-                                style={SearchBarsStyle.transportButton}
+                                //style={SearchBarsStyle.transportButton}
                                 onPress={() => setSelectedMode(mode)}
 
                             >
-                                <View style={SearchBarsStyle.transportButtonContent}>
-                                    <Ionicons
-                                        name={icon as keyof typeof Ionicons.glyphMap}
-                                        size={24}
-                                        color={selectedMode === mode ? color : "black"}
-                                    />
-                                    {selectedMode === mode}
+                                <View style={[
+                                    SearchBarsStyle.transportButtonContent,
+                                    selectedMode === mode && SearchBarsStyle.selectedTransportButton
+                                ]}>
+                                    <View style={SearchBarsStyle.transportButtonContent}>
+                                        <Ionicons
+                                            name={icon as keyof typeof Ionicons.glyphMap}
+                                            size={24}
+                                            color='black'
+                                        />
+                                        {selectedMode === mode}
 
+                                    </View>
                                 </View>
                             </TouchableOpacity>
                         ))}
@@ -216,7 +223,7 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                                     const walkFromStationMinutes = Math.ceil(endRouteCoords[0].legs[0].duration.value / 60);
 
                                     // Create template step object for custom steps
-                                    const  templateStep = routeCopy.legs[0].steps[0] ?? {};
+                                    const templateStep = routeCopy.legs[0].steps[0] ?? {};
 
                                     // Create all steps with hidden instructions for route visualization
                                     const allHiddenSteps = [

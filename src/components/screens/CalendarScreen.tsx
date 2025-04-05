@@ -10,21 +10,20 @@ import { CalendarStyle } from "../../styles/CalendarStyle";
 import RightDrawer from "../RightDrawer";
 import { Calendar } from "../../interfaces/calendar";
 import { fetchCalendarEventsByCalendarId } from "../googleCalendarFetching";
+import { ClassEventsProvider, useClassEvents } from "../../data/ClassEventsContext";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const theme = {
-  calendarBackground: '#f0f0f0',
-  dayTextColor: '#333',
-  selectedDayBackground: '#007bff',
-};
-
 const CalendarScreen = () => {
+  const route = useRoute<CalendarScreenProp>();
+  const accessToken = route.params?.accessToken;
+  const open = route.params?.open;
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [events, setEvents] = useState<EventItem[]>([]);
   const calendarRef = useRef<CalendarKitHandle>(null);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [chosenCalendar, setChosenCalendar] = useState<Calendar | null>(null);
+  const { setClassEvents } = useClassEvents();
 
   const [modalVisible, setModalVisible] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
@@ -34,10 +33,10 @@ const CalendarScreen = () => {
     const date = currentDate || new Date();
     const dayOfWeek = date.getDay(); // 0 = Sun, 1 = Mon, etc
     const firstDay = new Date(date);
-    firstDay.setDate(date.getDate() - dayOfWeek + ( dayOfWeek === 0 ? -6 : 1 )) // First day is monday
+    firstDay.setDate(date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)) // First day is monday
     const lastDay = new Date(firstDay);
     lastDay.setDate(firstDay.getDate() + 6);
-  
+
     if (firstDay.getDate() > lastDay.getDate()) {
       return `${months[date.getMonth()]} ${firstDay.getDate()} - ${months[lastDay.getMonth()]} ${lastDay.getDate()}, ${date.getFullYear()}`;
     } else {
@@ -53,30 +52,38 @@ const CalendarScreen = () => {
 
   useEffect(() => {
     console.log("Updated current date:", currentDate);
-}, [currentDate]);
+  }, [currentDate]);
 
-  const route = useRoute<CalendarScreenProp>();
-  const accessToken = route.params?.accessToken;
+
+
 
   useEffect(() => {
     const fetchEvents = async () => {
-        if (chosenCalendar && accessToken) {
-          const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
-          const modifiedEvents = events.data?.events.map((event) => {
-            return {
-              id: event.id,
-              title: event.title,
-              start: { dateTime: event.startTime },
-              end: { dateTime: event.endTime },
-              color: '#4285F4',
-            };
-          })
-          setEvents(modifiedEvents || []);
+      if (chosenCalendar && accessToken) {
+        const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
+
+        if (events.data?.events) {
+          for (const event of events.data.events) {
+            console.log("EVENT" + event.title + " " + event.location + " " + event.description + " " + event.startTime + " " + event.endTime);
+          }
+          setClassEvents(events.data?.events || []);
         }
+
+        const modifiedEvents = events.data?.events.map((event) => {
+          return {
+            id: event.id,
+            title: event.title,
+            start: { dateTime: event.startTime },
+            end: { dateTime: event.endTime },
+            color: '#4285F4',
+          };
+        })
+        setEvents(modifiedEvents || []);
       }
+    }
     fetchEvents();
 
-  }, [chosenCalendar]);
+  }, [chosenCalendar, accessToken]);
 
   useEffect(() => {
     const loadCalendar = async () => {
@@ -88,86 +95,90 @@ const CalendarScreen = () => {
         setChosenCalendar(null);
       }
     };
-  
+
     loadCalendar();
   }, []);
 
 
   return (
-    <View style={CalendarStyle.container}>
-      {/* Header */}
-      <View style={CalendarStyle.headerContainer}>
-        <View style={{ flexDirection: "row" }} >
-          <TouchableOpacity style={CalendarStyle.backBTN} onPress={() => { navigation.navigate("Home") }} >
-            <Ionicons name="arrow-back-outline" size={32} color="#912338" />
-            <Text style={{ color: "#912338", fontSize: 18, fontWeight: "bold", margin: 2.5 }} >Map</Text>
+    <ClassEventsProvider>
+      <View style={CalendarStyle.container}>
+        {/* Header */}
+        <View style={CalendarStyle.headerContainer}>
+          <View style={{ flexDirection: "row" }} >
+            <TouchableOpacity style={CalendarStyle.backBTN} onPress={() => { navigation.navigate("Home") }} >
+              <Ionicons name="arrow-back-outline" size={32} color="#912338" />
+              <Text style={{ color: "#912338", fontSize: 18, fontWeight: "bold", margin: 2.5 }} >Map</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => setCurrentDate(new Date())} >
+            <MaterialIcons name="today" size={24} color="white" />
+            <Text style={{ color: "white", fontWeight: "bold", margin: 2.5 }} >TODAY</Text>
+          </TouchableOpacity>
+
+          <RightDrawer setChosenCalendar={setChosenCalendar} open={open || false} />
+        </View>
+
+        <View style={CalendarStyle.headerCalendarButtonsContainer} >
+          <TouchableOpacity onPress={() => { handleWeekChange(-7) }} >
+            <Feather name="chevron-left" size={30} color="black" />
+          </TouchableOpacity>
+
+          <Text style={{ paddingLeft: 10, marginTop: 5 }} >{currentWeek(currentDate)}</Text>
+
+          <TouchableOpacity onPress={() => { handleWeekChange(7) }} >
+            <Feather name="chevron-right" size={30} color="black" />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => setCurrentDate(new Date()) } >
-          <MaterialIcons name="today" size={24} color="white" />
-          <Text style={{ color: "white", fontWeight: "bold", margin: 2.5 }} >TODAY</Text>
-        </TouchableOpacity>
+        {/* Renders the calendar view */}
+        <CalendarContainer
+          key={currentDate.toISOString()}
+          ref={calendarRef}
+          events={events}
+          initialDate={currentDate.toISOString()}
+        >
+          <CalendarHeader />
+          <CalendarBody />
+        </CalendarContainer>
 
-        <RightDrawer setChosenCalendar={setChosenCalendar} />
-      </View>
+        {/* Modal to edit an event */}
+        <Modal
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            setModalVisible(false);
+          }}
+          animationType="fade"
+        >
+          <View style={CalendarStyle.modalContainer} >
+            <View style={CalendarStyle.modalContent}>
+              <Text style={CalendarStyle.modalText}>Edit Event</Text>
+              <TextInput style={CalendarStyle.input} />
+              <TextInput
+                style={CalendarStyle.input}
+                value={editingEvent?.title ?? ''}
+                onChangeText={(text) => {
+                  if (editingEvent) {
+                    setEditingEvent({ ...editingEvent, title: text });
+                  }
+                }}
+                placeholder="Event Title"
+              />
 
-      <View style={CalendarStyle.headerCalendarButtonsContainer} >
-        <TouchableOpacity onPress={ () => {handleWeekChange(-7)}} >
-          <Feather name="chevron-left" size={30} color="black" />
-        </TouchableOpacity>
-
-        <Text style={{ paddingLeft: 10, marginTop: 5 }} >{currentWeek(currentDate)}</Text>
-
-        <TouchableOpacity onPress={ () => {handleWeekChange(7)}} >
-          <Feather name="chevron-right" size={30} color="black" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Renders the calendar view */}
-      <CalendarContainer
-        key={currentDate.toISOString()}
-        ref={calendarRef}
-        events={events}
-        initialDate={currentDate.toISOString()}
-      >
-        <CalendarHeader />
-        <CalendarBody />
-      </CalendarContainer>
-
-      {/* Modal to edit an event */}
-      <Modal
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}
-        animationType="fade"
-      >
-        <View style={CalendarStyle.modalContainer} >
-          <View style={CalendarStyle.modalContent}>
-            <Text style={CalendarStyle.modalText}>Edit Event</Text>
-            <TextInput style={CalendarStyle.input} />
-            <TextInput
-              style={CalendarStyle.input}
-              value={editingEvent?.title ?? ''}
-              onChangeText={(text) => {
-                if (editingEvent) {
-                  setEditingEvent({ ...editingEvent, title: text });
-                }
-              }}
-              placeholder="Event Title"
-            />
-
-            <View onTouchEnd={() => { setModalVisible(false); }} >
-              <Button title="Cancel 2" onPress={() => { setModalVisible(false); console.log('Modal content touched') }} />
+              <View onTouchEnd={() => { setModalVisible(false); }} >
+                <Button title="Cancel 2" onPress={() => { setModalVisible(false); console.log('Modal content touched') }} />
+              </View>
+              <Button title="Cancel 3" onPress={() => { setModalVisible(false); }} />
             </View>
-            <Button title="Cancel 3" onPress={() => { setModalVisible(false); }} />
           </View>
-        </View>
-      </Modal>
-    </View>
+        </Modal>
+      </View>
+    </ClassEventsProvider>
   );
 };
+
+
 
 export default CalendarScreen;
