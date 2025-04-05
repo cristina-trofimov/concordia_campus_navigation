@@ -651,11 +651,32 @@ export const IndoorNavigation: React.FC = () => {
   );
 };
 
-  // Helper component to integrate with your HighlightIndoorMap
-  export const NavigationOverlay: React.FC = () => {
-    const { inFloorView, indoorFeatures } = useIndoor();
-    
+// Helper component to integrate with your HighlightIndoorMap
+export const NavigationOverlay: React.FC = () => {
+  const { inFloorView, indoorFeatures, setOriginRoom, setDestinationRoom } = useIndoor();
+  const { setOriginCoords, setDestinationCoords } = useCoords();
+  
+  useEffect(() => {
+    // When exiting floor view, clear indoor navigation data
+    if (!inFloorView) {
+      // Clear indoor room selections when exiting floor view
+      setOriginRoom(null);
+      setDestinationRoom(null);
+    }
+  }, [inFloorView]);
+  
+  useEffect(() => {
+    // When entering indoor navigation mode, clear outdoor navigation data
+    if (inFloorView) {
+      // Clear outdoor coordinates to prevent mixed navigation
+      setOriginCoords(null);
+      setDestinationCoords(null);
+    }
+  }, [inFloorView]);
+
   if (!inFloorView || indoorFeatures.length === 0) return null;
   
   return <IndoorNavigation />;
+
+  
 };
