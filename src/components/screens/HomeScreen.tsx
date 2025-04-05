@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { Animated, Dimensions, ScrollView, View } from "react-native";
+import React, {  useRef, useState } from "react";
+import { Animated, Dimensions, ScrollView, Text, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
 import { IndoorsProvider } from "../../data/IndoorContext";
@@ -11,16 +11,17 @@ import DirectionsSteps from "../DirectionsSteps";
 import MapComponent from "../MapComponent";
 import PointOfInterestSelector from "../Point-of-interest_Form";
 import { RoomSearchBars } from "../RoomSearchBars";
+import { useClassEvents } from "../../data/ClassEventsContext";
 import UpcomingClassItem from "../UpcomingClassItem";
-import { CalendarEvent } from "../../interfaces/CalendraEvent";
 
 const { height } = Dimensions.get("window");
 
-export default function HomeScreen() {
+export function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
   const [inputDestination, setInputDestination] = useState<string>("");
   const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
   const [radius, setRadius] = useState<number | null>(null);
+  const { classEvents } = useClassEvents();
 
   return (
     <CoordsProvider>
@@ -37,7 +38,16 @@ export default function HomeScreen() {
 
           <BottomDrawer drawerHeight={drawerHeight}>
             <ScrollView>
-              <SearchBars inputDestination={inputDestination} />
+              <SearchBars inputDestination={inputDestination} setInputDestination={setInputDestination} />
+              {inputDestination === "" ? (
+                classEvents.length > 0 ? (
+                  classEvents.map((event, index) => (
+                    <UpcomingClassItem calendarEvent={event} key={index} setInputDestination={setInputDestination} />
+                  ))
+                ) : (
+                  null
+                )
+              ) : null}
               <RoomSearchBars />
               <PointOfInterestSelector
                 pointsOfInterest={selectedPOI}
@@ -53,3 +63,6 @@ export default function HomeScreen() {
     </CoordsProvider>
   );
 }
+
+export default HomeScreen;
+

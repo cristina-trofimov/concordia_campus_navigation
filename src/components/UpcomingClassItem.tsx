@@ -1,9 +1,6 @@
 import {
   Text,
-  StyleSheet,
   View,
-  Dimensions,
-  ImageSourcePropType,
 } from "react-native";
 import React, { Component } from "react";
 import { Image } from "@rneui/base";
@@ -13,6 +10,7 @@ import { Pressable } from "react-native";
 
 interface UpcomingClassItemProps {
   calendarEvent: CalendarEvent;
+  setInputDestination: (destination: string) => void;
 }
 
 interface ClassItemState {
@@ -83,18 +81,38 @@ export default class UpcomingClassItem extends Component<
     }
   };
 
-  render() {
-    const { title, startTime, endTime, location, description } =
-      this.props.calendarEvent;
 
-    const { statusColor, statusText } = this.isClassInProgress(
-      startTime,
-      endTime
-    );
+  private convertToHHMM(isoString: string): string {
+    const date = new Date(isoString);
+    const hours = date.getHours().toString().padStart(2, '0'); // Ensure 2-digit format
+    const minutes = date.getMinutes().toString().padStart(2, '0'); // Ensure 2-digit format
+    return `${hours}:${minutes}`;
+  }
+
+  private getBuildingName = (location: string): string => {
+    const locationParts = location.split(",");
+    return locationParts[0].trim(); // Return the first part of the location string
+  };
+
+  private getAdress = (location: string): string => {
+    const locationParts = location.split(",");
+    return locationParts[1].trim(); // Return the second part of the location string
+  }
+
+
+  render() {
+    const { title, startTime, endTime, location, description } = this.props.calendarEvent;
+    const { setInputDestination } = this.props;
+
+    const startTimeFormatted = this.convertToHHMM(startTime);
+    const endTimeFormatted = this.convertToHHMM(endTime);
+    const buildingName = this.getBuildingName(location);
+
+    const { statusColor, statusText } = this.isClassInProgress(startTimeFormatted, endTimeFormatted);
 
     return (
       <Pressable
-        onPress={() => console.log(`Clicked on: ${title}`)}
+        onPress={() => setInputDestination(this.getAdress(location))}
         disabled={statusText === "Ended"} // Disable if class has ended
         style={({ pressed }) => [
           UpcomingClassItemStyle.container,
@@ -134,9 +152,9 @@ export default class UpcomingClassItem extends Component<
           </View>
 
           <Text style={[UpcomingClassItemStyle.startEndTime]}>
-            {`${startTime} - ${endTime}`}
+            {`${startTimeFormatted} - ${endTimeFormatted}`}
           </Text>
-          <Text style={[UpcomingClassItemStyle.building]}>{location}</Text>
+          <Text style={[UpcomingClassItemStyle.building]}>{buildingName}</Text>
           <Text>Room {description}</Text>
         </View>
       </Pressable>
