@@ -10,12 +10,24 @@ import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 import ShuttleBusTransit from './ShuttleBusTransit';
 
 
-function SearchBars({ inputDestination, setInputDestination }: { inputDestination: string, setInputDestination: (value: string) => void }) {
+function SearchBars(
+    {
+        inputDestination,
+        setInputDestination,
+        inputOrigin,
+        setInputOrigin
+    }:
+        {
+            inputDestination: string,
+            setInputDestination: (value: string) => void
+            inputOrigin: string,
+            setInputOrigin: (value: string) => void
+        }) {
 
     const { setRouteData, myLocationString, setIsTransit, originCoords, setOriginCoords, destinationCoords, setDestinationCoords } = useCoords();
     const { setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
 
-    const [origin, setOrigin] = useState('');
+    const [origin, setOrigin] = useState(inputOrigin);
     const [destination, setDestination] = useState(inputDestination);
 
     const [time, setTime] = useState('');
@@ -49,6 +61,27 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
             }
         }
     }, [inputDestination]);
+
+    useEffect(() => {
+        setOrigin(inputOrigin);
+
+        if (inputOrigin && !originCoords) {
+            if (destination) {
+                getDirections(inputOrigin, destination, selectedMode)
+                    .then(result => {
+                        if (result?.[0]?.legs?.[0]?.end_location) {
+                            const coords = {
+                                latitude: result[0].legs[0].end_location.lat,
+                                longitude: result[0].legs[0].end_location.lng
+                            };
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error getting coordinates for origin:", error);
+                    });
+            }
+        }
+    }, [inputOrigin]);
 
     // Need this to ensure destinationCoords gets updated
     // useEffect(() => {
@@ -127,6 +160,7 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
         setOriginRoom(null);
         setDestinationRoom(null);
         setInputDestination("");
+        setInputOrigin("");
         setOrigin(myLocationString);
     }, [setRouteData]);
 

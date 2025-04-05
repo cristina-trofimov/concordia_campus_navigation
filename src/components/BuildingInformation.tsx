@@ -7,18 +7,20 @@ import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
 import { useCoords } from '../data/CoordsContext';
 import IndoorViewButton from './IndoorViewButton';
 import { useIndoor } from '../data/IndoorContext';
+import Entypo from '@expo/vector-icons/Entypo';
 
 interface BuildingInformationProps {
     isVisible: boolean;
     onClose: () => void;
     buildingLocation: BuildingLocation | null;
     setInputDestination: (inputDestination: string) => void;
+    setInputOrigin: (inputOrigin: string) => void;
 }
 
-const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation, setInputDestination }) => {
+const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation, setInputDestination, setInputOrigin }) => {
     const { title, description, buildingInfo, coordinates } = buildingLocation || {};
     const { photo, address, departments, services } = buildingInfo || {};
-    const { setDestinationCoords } = useCoords();
+    const { setDestinationCoords, setOriginCoords, destinationCoords } = useCoords();
     const { inFloorView } = useIndoor();
     const buildingId = (title ?? "").split(" ")[0];
 
@@ -31,11 +33,31 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                             <Text style={BuildingInfoStyle.title}>{title}</Text>
                         </View>
                         <View style={BuildingInfoStyle.buttonsContainer}>
-                            <IndoorViewButton
-                                inFloorView={inFloorView}
-                                buildingId={buildingId}
-                                onClose={onClose}
-                            />
+                            {/* Indoor View Button */}
+                            {!destinationCoords && (
+                                <IndoorViewButton
+                                    inFloorView={inFloorView}
+                                    buildingId={buildingId}
+                                    onClose={onClose}
+                                />
+                            )}
+                            {/* Origin Location Button */}
+                            {destinationCoords && (
+                                <TouchableOpacity
+                                    style={BuildingInfoStyle.actionButton}
+                                    onPress={() => {
+                                        setInputOrigin(address ?? "");
+                                        if (coordinates) {
+                                            const [longitude, latitude] = coordinates;
+                                            setOriginCoords({ latitude, longitude });
+                                        }
+                                        onClose();
+                                    }}
+                                >
+                                    <Entypo name="location" size={32} color="white" />
+                                </TouchableOpacity>
+                            )}
+                            {/* Destination Location Button */}
                             <TouchableOpacity
                                 style={BuildingInfoStyle.actionButton}
                                 onPress={() => {
