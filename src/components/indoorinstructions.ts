@@ -19,7 +19,7 @@ export const getIndoorDirectionText = (
 
     // Only destination room, no origin
     if (!originFloor && destinationFloor) {
-        return [`Take the ${transport} up to floor ${destinationNum}.`, ""];
+        return ["",`Take the ${transport} up to floor ${destinationNum}.`];
     }
 
     
