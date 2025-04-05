@@ -8,7 +8,7 @@ export const ClassEventsContext = createContext<ClassEventContextType>({
 });
 
 export const ClassEventsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [classEvents, setClassEvents] = React.useState<CalendarEvent[]>([]); // Replace 'any' with the actual type of your class events
+    const [classEvents, setClassEvents] = React.useState<CalendarEvent[]>([]); 
 
 
     const contextValue = React.useMemo(() => ({ classEvents, setClassEvents }), [classEvents]);

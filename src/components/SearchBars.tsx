@@ -129,6 +129,7 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
         setOriginRoom(null);
         setDestinationRoom(null);
         setInputDestination("");
+        setOrigin(myLocationString);
     }, [setRouteData]);
 
     useEffect(() => {

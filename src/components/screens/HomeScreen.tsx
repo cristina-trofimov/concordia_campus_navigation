@@ -22,9 +22,6 @@ export function HomeScreen() {
   const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
   const [radius, setRadius] = useState<number | null>(null);
   const { classEvents } = useClassEvents();
-  console.log("INPUT DESTONATION", inputDestination);
-  console.log("EVENTS", classEvents.length);
-
 
   return (
     <CoordsProvider>
