@@ -1,9 +1,6 @@
 import {
   Text,
-  StyleSheet,
   View,
-  Dimensions,
-  ImageSourcePropType,
 } from "react-native";
 import React, { Component } from "react";
 import { Image } from "@rneui/base";

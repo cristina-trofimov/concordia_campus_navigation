@@ -8,19 +8,23 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { CalendarScreenProp, RootStackParamList } from "../../App";
 import { StackNavigationProp } from "@react-navigation/stack";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useClassEvents } from "../data/ClassEventsContext";
 
 const { width } = Dimensions.get("window");
 
-const RightDrawer = ({setChosenCalendar} : {setChosenCalendar : (calendar : Calendar) => void}) => {
+const RightDrawer = ({ setChosenCalendar }: { setChosenCalendar: (calendar: Calendar) => void }) => {
     const [isDrawerVisible, setIsDrawerVisible] = useState(false);
     const route = useRoute<CalendarScreenProp>();
     const calendars = route.params?.calendars;
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-
     const slideAnim = useRef(new Animated.Value(width)).current;
+    const { setClassEvents } = useClassEvents();
 
-    const handleSignOut = () => {
-        signOut().then(() => { setIsDrawerVisible(false); navigation.navigate("Home") });
+    const handleSignOut = async () => {
+        await signOut();
+        setClassEvents([]);
+        setIsDrawerVisible(false);
+        navigation.navigate("Home");
     };
 
     const handleOverlayPress = (event: GestureResponderEvent) => {

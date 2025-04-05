@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {  useRef, useState } from "react";
 import { Animated, Dimensions, ScrollView, Text, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
-import { CoordsProvider, useCoords } from "../../data/CoordsContext";
-import { IndoorsProvider, useIndoor } from "../../data/IndoorContext";
+import { CoordsProvider } from "../../data/CoordsContext";
+import { IndoorsProvider } from "../../data/IndoorContext";
 import LeftDrawer from "../LeftDrawer";
 import CalendarButton from "../CalendarButton";
 import { HomeStyle } from "../../styles/HomeStyle";
@@ -12,9 +12,8 @@ import DirectionsSteps from "../DirectionsSteps";
 import MapComponent from "../MapComponent";
 import PointOfInterestSelector from "../Point-of-interest_Form";
 import { RoomSearchBars } from "../RoomSearchBars";
-import { ClassEventsProvider, useClassEvents } from "../../data/ClassEventsContext";
+import { useClassEvents } from "../../data/ClassEventsContext";
 import UpcomingClassItem from "../UpcomingClassItem";
-import { CalendarEvent } from "../../interfaces/CalendraEvent";
 
 const { height } = Dimensions.get("window");
 
@@ -24,7 +23,6 @@ export function HomeScreen() {
   const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
   const [radius, setRadius] = useState<number | null>(null);
   const { classEvents } = useClassEvents();
-
   console.log("INPUT DESTONATION", inputDestination);
   console.log("EVENTS", classEvents.length);
 
@@ -52,7 +50,7 @@ export function HomeScreen() {
                     <UpcomingClassItem calendarEvent={event} key={index} setInputDestination={setInputDestination} />
                   ))
                 ) : (
-                  <Text>No upcoming classes</Text>
+                  null
                 )
               ) : null}
               <RoomSearchBars />
