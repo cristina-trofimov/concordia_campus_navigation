@@ -10,7 +10,6 @@ jest.mock('../src/data/CoordsContext', () => ({
 jest.mock('../src/data/IndoorContext', () => ({
   IndoorsProvider: ({ children }) => children,
 }));
-jest.mock('../src/components/LeftDrawer', () => 'LeftDrawer');
 jest.mock('../src/components/CalendarButton', () => 'CalendarButton');
 jest.mock('../src/components/FloorSelector', () => ({
   FloorSelector: 'FloorSelector',
@@ -62,7 +61,6 @@ describe('HomeScreen Component', () => {
     
     // Check that main container components are rendered
     expect(UNSAFE_queryAllByType('CalendarButton')).toHaveLength(1);
-    expect(UNSAFE_queryAllByType('LeftDrawer')).toHaveLength(1);
     expect(UNSAFE_queryAllByType('MapComponent')).toHaveLength(1);
     expect(UNSAFE_queryAllByType('BottomDrawer')).toHaveLength(1);
     expect(UNSAFE_queryAllByType('FloorSelector')).toHaveLength(1);

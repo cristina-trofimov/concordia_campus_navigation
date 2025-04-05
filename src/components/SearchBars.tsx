@@ -169,18 +169,23 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
                         {transportModes.map(({ mode, icon, color }) => (
                             <TouchableOpacity
                                 key={mode}
-                                style={SearchBarsStyle.transportButton}
+                                //style={SearchBarsStyle.transportButton}
                                 onPress={() => setSelectedMode(mode)}
 
                             >
-                                <View style={SearchBarsStyle.transportButtonContent}>
-                                    <Ionicons
-                                        name={icon as keyof typeof Ionicons.glyphMap}
-                                        size={24}
-                                        color={selectedMode === mode ? color : "black"}
-                                    />
-                                    {selectedMode === mode}
+                                <View style={[
+                                    SearchBarsStyle.transportButtonContent,
+                                    selectedMode === mode && SearchBarsStyle.selectedTransportButton
+                                ]}>
+                                    <View style={SearchBarsStyle.transportButtonContent}>
+                                        <Ionicons
+                                            name={icon as keyof typeof Ionicons.glyphMap}
+                                            size={24}
+                                            color='black'
+                                        />
+                                        {selectedMode === mode}
 
+                                    </View>
                                 </View>
                             </TouchableOpacity>
                         ))}
