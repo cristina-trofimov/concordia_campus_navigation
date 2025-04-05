@@ -578,7 +578,6 @@ export const IndoorNavigation: React.FC = () => {
     const endNodeId = targetRoom ? findRoomNode(graph, targetRoom) : null;
     
     if (!endNodeId) {
-      console.error("Could not find destination node");
       setRoutePath(null);
       return;
     }
@@ -600,7 +599,6 @@ export const IndoorNavigation: React.FC = () => {
     }
     
     if (!startNodeId) {
-      console.error(`Could not find starting node`);
       setRoutePath(null);
       return;
     }
@@ -618,7 +616,6 @@ export const IndoorNavigation: React.FC = () => {
       const lineString = pathToLineString(path, graph);
       setRoutePath(lineString);
     } else {
-      console.error("No path found");
       setRoutePath(null);
     }
   }, [indoorFeatures, currentFloor, originRoom, destinationRoom, indoorTransport]);
