@@ -14,13 +14,10 @@ import { ClassEventsProvider, useClassEvents } from "../../data/ClassEventsConte
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const theme = {
-  calendarBackground: '#f0f0f0',
-  dayTextColor: '#333',
-  selectedDayBackground: '#007bff',
-};
-
 const CalendarScreen = () => {
+  const route = useRoute<CalendarScreenProp>();
+  const accessToken = route.params?.accessToken;
+  const open = route.params?.open;
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [events, setEvents] = useState<EventItem[]>([]);
   const calendarRef = useRef<CalendarKitHandle>(null);
@@ -57,8 +54,8 @@ const CalendarScreen = () => {
     console.log("Updated current date:", currentDate);
   }, [currentDate]);
 
-  const route = useRoute<CalendarScreenProp>();
-  const accessToken = route.params?.accessToken;
+
+
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -120,7 +117,7 @@ const CalendarScreen = () => {
             <Text style={{ color: "white", fontWeight: "bold", margin: 2.5 }} >TODAY</Text>
           </TouchableOpacity>
 
-          <RightDrawer setChosenCalendar={setChosenCalendar} />
+          <RightDrawer setChosenCalendar={setChosenCalendar} open={open || false} />
         </View>
 
         <View style={CalendarStyle.headerCalendarButtonsContainer} >

@@ -12,8 +12,8 @@ import { useClassEvents } from "../data/ClassEventsContext";
 
 const { width } = Dimensions.get("window");
 
-const RightDrawer = ({ setChosenCalendar }: { setChosenCalendar: (calendar: Calendar) => void }) => {
-    const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+const RightDrawer = ({ setChosenCalendar, open }: { setChosenCalendar: (calendar: Calendar) => void, open: boolean }) => {
+    const [isDrawerVisible, setIsDrawerVisible] = useState(open);
     const route = useRoute<CalendarScreenProp>();
     const calendars = route.params?.calendars;
     const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -85,7 +85,12 @@ const RightDrawer = ({ setChosenCalendar }: { setChosenCalendar: (calendar: Cale
                                     <View>
                                         {calendars?.map((calendar) => {
                                             return (
-                                                <TouchableOpacity key={calendar.id} onPress={() => { setChosenCalendar(calendar); AsyncStorage.setItem("chosenCalendar", JSON.stringify(calendar)) }} >
+                                                <TouchableOpacity key={calendar.id} onPress={() => {
+                                                    setChosenCalendar(calendar);
+                                                    setIsDrawerVisible(false);
+                                                    AsyncStorage.setItem("chosenCalendar", JSON.stringify(calendar));
+
+                                                }} >
                                                     <View style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
                                                         <Ionicons name="calendar-outline" size={24} color="black" />
                                                         <Text>{calendar.title}</Text>

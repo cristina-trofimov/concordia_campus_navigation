@@ -17,7 +17,7 @@ const CalendarButton = () => {
       const calendars = await fetchUserCalendars(token);
       if (calendars?.data?.calendars) {
         const calendarsData = calendars.data.calendars;
-        navigation.navigate("Calendar", { accessToken: token, calendars: calendarsData });
+        navigation.navigate("Calendar", { accessToken: token, calendars: calendarsData, open : true });
       }
     }
     // navigation.navigate("Calendar", { accessToken: token });

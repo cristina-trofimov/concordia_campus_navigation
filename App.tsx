@@ -17,6 +17,7 @@ export type RootStackParamList = {
   Calendar: {
     accessToken?: string | null;
     calendars?: Calendar[];
+    open: boolean;
   } | undefined;
 };
 
