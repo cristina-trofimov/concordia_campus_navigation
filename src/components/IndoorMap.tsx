@@ -166,7 +166,6 @@ export const HighlightIndoorMap = () => {
                 </Mapbox.ShapeSource>
             )}
 
-            {/* Add the NavigationOverlay component here */}
             {indoorFeatures.length > 0 && inFloorView && (
                 <NavigationOverlay />
             )}
