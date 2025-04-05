@@ -48,6 +48,7 @@ const CalendarScreen = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() + days);
     setCurrentDate(newDate);
+    calendarRef.current?.goToDate({ date: newDate, animatedDate: true })
   };
 
   useEffect(() => {
@@ -112,7 +113,13 @@ const CalendarScreen = () => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => setCurrentDate(new Date())} >
+          <TouchableOpacity style={CalendarStyle.todayBTN}
+            onPress={() => {
+              const today = new Date();
+              calendarRef.current?.goToDate({ date: today, animatedDate: true });
+              setCurrentDate(today)
+            }}
+          >
             <MaterialIcons name="today" size={24} color="white" />
             <Text style={{ color: "white", fontWeight: "bold", margin: 2.5 }} >TODAY</Text>
           </TouchableOpacity>
@@ -134,10 +141,12 @@ const CalendarScreen = () => {
 
         {/* Renders the calendar view */}
         <CalendarContainer
-          key={currentDate.toISOString()}
           ref={calendarRef}
           events={events}
           initialDate={currentDate.toISOString()}
+          onDateChanged={(date) => {
+            setCurrentDate(new Date(date));
+          }}
         >
           <CalendarHeader />
           <CalendarBody />
