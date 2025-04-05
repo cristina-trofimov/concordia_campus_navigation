@@ -13,6 +13,7 @@ import { Pressable } from "react-native";
 
 interface UpcomingClassItemProps {
   calendarEvent: CalendarEvent;
+  setInputDestination: (destination: string) => void;
 }
 
 interface ClassItemState {
@@ -96,9 +97,15 @@ export default class UpcomingClassItem extends Component<
     return locationParts[0].trim(); // Return the first part of the location string
   };
 
+  private getAdress = (location: string): string => {
+    const locationParts = location.split(",");
+    return locationParts[1].trim(); // Return the second part of the location string
+  }
+
 
   render() {
     const { title, startTime, endTime, location, description } = this.props.calendarEvent;
+    const { setInputDestination } = this.props;
 
     const startTimeFormatted = this.convertToHHMM(startTime);
     const endTimeFormatted = this.convertToHHMM(endTime);
@@ -108,7 +115,7 @@ export default class UpcomingClassItem extends Component<
 
     return (
       <Pressable
-        onPress={() => console.log(`Clicked on: ${title}`)}
+        onPress={() => setInputDestination(this.getAdress(location))}
         disabled={statusText === "Ended"} // Disable if class has ended
         style={({ pressed }) => [
           UpcomingClassItemStyle.container,

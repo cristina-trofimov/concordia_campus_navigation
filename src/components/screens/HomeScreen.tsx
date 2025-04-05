@@ -44,7 +44,7 @@ export function HomeScreen() {
               <SearchBars inputDestination={inputDestination} />
               {classEvents && classEvents.length > 0 && (
                 classEvents.map((event, index) => (
-                  <UpcomingClassItem calendarEvent={event} key={index} />
+                  <UpcomingClassItem calendarEvent={event} key={index} setInputDestination={setInputDestination} />
                 ))
               )}
               <RoomSearchBars />
