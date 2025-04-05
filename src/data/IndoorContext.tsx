@@ -4,23 +4,25 @@ import { BuildingFloorAssociation } from '../interfaces/buildingFloorAssociation
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature.ts';
 import { RoomInfo } from "../interfaces/RoomInfo"
 
-export const IndoorContext = createContext<IndoorContextType>({
+export const IndoorContext = createContext<IndoorContextType>( {
     buildingHasFloors: false,
-    setBuildingHasFloors: () => { },
+    setBuildingHasFloors: () => {},
     inFloorView: false,
-    setInFloorView: () => { },
+    setInFloorView: () => {},
     currentFloor: null,
-    setCurrentFloor: () => { },
+    setCurrentFloor: () => {},
     floorList: [],
-    setFloorList: () => { },
+    setFloorList: () => {},
     currentFloorAssociations: [],
-    setCurrentFloorAssociations: () => { },
+    setCurrentFloorAssociations: () => {},
     indoorFeatures: [],
-    setIndoorFeatures: () => { },
+    setIndoorFeatures: () => {},
     originRoom: null,
-    setOriginRoom: () => { },
+    setOriginRoom: () => {},
     destinationRoom: null,
-    setDestinationRoom: () => { },
+    setDestinationRoom: () => {},
+    indoorTransport: "elevator",
+    setIndoorTransport: () => {},
 });
 
 export const IndoorsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -32,6 +34,7 @@ export const IndoorsProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [indoorFeatures, setIndoorFeatures] = useState<IndoorFeatureCollection[]>([]);
     const [originRoom, setOriginRoom] = useState<RoomInfo | null>(null);
     const [destinationRoom, setDestinationRoom] = useState<RoomInfo | null>(null);
+    const [indoorTransport, setIndoorTransport] = useState<string>("elevator");
 
     const contextValue = useMemo(() => ({
         buildingHasFloors,
@@ -49,12 +52,24 @@ export const IndoorsProvider: React.FC<{ children: React.ReactNode }> = ({ child
         originRoom,
         setOriginRoom,
         destinationRoom,
-        setDestinationRoom
-      }), [buildingHasFloors, inFloorView, currentFloor, floorList, currentFloorAssociations, indoorFeatures, originRoom, destinationRoom]);
+        setDestinationRoom,
+        indoorTransport,
+        setIndoorTransport: (transport: string) => setIndoorTransport(transport),
+    }), [
+        buildingHasFloors,
+        inFloorView,
+        currentFloor,
+        floorList,
+        currentFloorAssociations,
+        indoorFeatures,
+        originRoom,
+        destinationRoom,
+        indoorTransport,
+    ]);
     
-      return (
+    return (
         <IndoorContext.Provider value={contextValue}>
-          {children}
+            {children}
         </IndoorContext.Provider>
     );
 };
