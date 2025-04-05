@@ -1,15 +1,26 @@
 import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import { useIndoor } from "../data/IndoorContext";
+import { useCoords } from "../data/CoordsContext";
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature';
 import { FeatureCollection, LineString, Position } from 'geojson';
+
+// Starting points types
+export enum EntryPointType {
+  ELEVATOR = 'elevator',
+  ESCALATOR = 'escalator',
+  STAIRS = 'stairs',
+  ANY = 'any' // Default - will try all types
+}
 
 // Define types for our graph
 interface GraphNode {
   id: string;
   position: Position; // [longitude, latitude]
   neighbors: string[];
-  isElevator?: boolean;
+  isEntryPoint?: boolean;
+  entryPointType?: EntryPointType;
   isRoom?: boolean;
   roomNumber?: string;
   isCorridor?: boolean;
@@ -149,11 +160,11 @@ const getCenterline = (coordinates: Position[]): Position[] => {
   return centerline;
 };
 
-// Build a navigation graph from indoor features with explicit corridor paths
+// Build a navigation graph from indoor features
 const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
   const graph: Graph = { nodes: {} };
   
-  // First, extract the corridor polygons
+  // Extract the corridor polygons
   const corridorPolygons: {coordinates: Position[][]; id: number}[] = [];
   
   features.forEach((feature, featureIndex) => {
@@ -202,11 +213,12 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
     });
   });
   
-  // Create nodes for rooms based on actual data
+  // Process rooms and entry points (elevators, escalators, stairs)
   features.forEach((feature, featureIndex) => {
     if (feature.geometry.type === "Polygon" && feature.properties.indoor === "room") {
       // Create a node for each room (using centroid of polygon)
-      const nodeId = `room_${feature.properties.ref || featureIndex}`;
+      const roomRef = feature.properties.ref || `room_${featureIndex}`;
+      const nodeId = `room_${roomRef}`;
       const centroid = calculatePolygonCentroid(feature.geometry.coordinates[0]);
       
       graph.nodes[nodeId] = {
@@ -214,47 +226,84 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
         position: centroid,
         neighbors: [],
         isRoom: true,
-        roomNumber: feature.properties.ref as string,
+        roomNumber: roomRef as string,
       };
     }
+    // Check for entry points (elevators, escalators, stairs)
     else if (feature.geometry.type === "Polygon" && 
              (feature.properties.highway === "elevator" || 
-              feature.properties.highway === "steps")) {
-      // Identify elevators and stairs
+              feature.properties.highway === "steps" || 
+              feature.properties.escalators === "yes")) {
+      
+      // Determine entry point type
+      let entryType = EntryPointType.ANY;
+      if (feature.properties.highway === "elevator") {
+        entryType = EntryPointType.ELEVATOR;
+      } else if (feature.properties.highway === "steps") {
+        entryType = EntryPointType.STAIRS;
+      } else if (feature.properties.escalators === "yes") {
+        entryType = EntryPointType.ESCALATOR;
+      }
+      
+      // Create node for the entry point
       const centroid = calculatePolygonCentroid(feature.geometry.coordinates[0]);
-      const nodeId = `elevator_${featureIndex}`;
+      const nodeId = `entrypoint_${entryType}_${featureIndex}`;
       
       graph.nodes[nodeId] = {
         id: nodeId,
         position: centroid,
         neighbors: [],
-        isElevator: true,
+        isEntryPoint: true,
+        entryPointType: entryType
       };
+    }
+    // Check for point entry points (they might be defined as points)
+    else if (feature.geometry.type === "Point" && 
+             (feature.properties.highway === "elevator" || 
+              feature.properties.entrance === "yes")) {
+      
+      // For point features, check if they're entry points
+      let entryType = EntryPointType.ANY;
+      if (feature.properties.highway === "elevator") {
+        entryType = EntryPointType.ELEVATOR;
+      } else if (feature.properties.entrance === "yes") {
+        // Check for other properties that might indicate stairs/escalators
+        if (feature.properties.escalators === "yes") {
+          entryType = EntryPointType.ESCALATOR;
+        } else if (feature.properties.stairs === "yes" || feature.properties.steps === "yes") {
+          entryType = EntryPointType.STAIRS;
+        }
+      }
+      
+      // Only create if it's a valid entry point
+      if (entryType !== EntryPointType.ANY || feature.properties.entrance === "yes") {
+        const nodeId = `entrypoint_${entryType}_${featureIndex}`;
+        const position = feature.geometry.coordinates;
+        
+        graph.nodes[nodeId] = {
+          id: nodeId,
+          position,
+          neighbors: [],
+          isEntryPoint: true,
+          entryPointType: entryType
+        };
+      }
     }
   });
   
-  // Explicitly add the main elevator
-  const elevatorNodeId = "elevator_main";
-  graph.nodes[elevatorNodeId] = {
-    id: elevatorNodeId,
-    position: [-73.57872, 45.49731],
-    neighbors: [],
-    isElevator: true
-  };
-  
-  // Connect corridor nodes to each other based on proximity
+  // Connect corridor nodes to each other
   connectCorridorNodes(graph);
   
-  // Connect rooms to nearby corridor nodes
-  connectRoomsToNearestCorridorNode(graph);
+  // Connect rooms to corridors
+  connectRoomsToCorridors(graph);
   
-  // Connect elevators to corridor
-  connectElevatorsToCorridors(graph);
+  // Connect entry points to corridors
+  connectEntryPointsToCorridors(graph);
   
   return graph;
 };
 
-// Connect corridor nodes based on real corridor geometries
+// Connect corridor nodes based on proximity
 const connectCorridorNodes = (graph: Graph): void => {
   const corridorNodes = Object.values(graph.nodes).filter(node => node.isCorridor);
   
@@ -286,14 +335,13 @@ const connectCorridorNodes = (graph: Graph): void => {
   }
 };
 
-// Connect rooms to nearest corridor nodes based on actual corridor paths
-const connectRoomsToNearestCorridorNode = (graph: Graph): void => {
-  // Get all room nodes and corridor nodes
+// Connect rooms to corridors
+const connectRoomsToCorridors = (graph: Graph): void => {
   const roomNodes = Object.values(graph.nodes).filter(node => node.isRoom);
   const corridorNodes = Object.values(graph.nodes).filter(node => node.isCorridor);
   
-  // Special connections for important rooms like elevators and destinations
-  const specificRooms = ["825", "820", "817", "831", "843", "862"];
+  // Special connections for important rooms
+  const specificRooms = ["825", "820", "817", "831", "843", "862", "801"];
   
   // Connect each room to the closest corridor nodes
   roomNodes.forEach(roomNode => {
@@ -318,8 +366,8 @@ const connectRoomsToNearestCorridorNode = (graph: Graph): void => {
       }
     });
     
-    // Make sure room 825 has good connections
-    if (roomNode.roomNumber === "825" && roomNode.neighbors.length === 0) {
+    // Ensure important rooms have connections
+    if (specificRooms.includes(roomNode.roomNumber || "") && roomNode.neighbors.length === 0) {
       // Force connection to the closest node
       if (closestNodes.length > 0) {
         roomNode.neighbors.push(closestNodes[0].node.id);
@@ -329,75 +377,104 @@ const connectRoomsToNearestCorridorNode = (graph: Graph): void => {
   });
 };
 
-// Connect elevators specifically to corridor nodes
-const connectElevatorsToCorridors = (graph: Graph): void => {
-  const elevatorNodes = Object.values(graph.nodes).filter(node => node.isElevator);
+// Connect entry points (elevators/stairs/escalators) to corridors
+const connectEntryPointsToCorridors = (graph: Graph): void => {
+  const entryPointNodes = Object.values(graph.nodes).filter(node => node.isEntryPoint);
   const corridorNodes = Object.values(graph.nodes).filter(node => node.isCorridor);
   
-  // For each elevator, find the closest corridor nodes
-  elevatorNodes.forEach(elevator => {
-    // Find the 5 closest corridor nodes
+  // Connect each entry point to multiple corridor nodes
+  entryPointNodes.forEach(entryPoint => {
+    // Find several closest corridor nodes
     const closestCorridorNodes = corridorNodes
       .map(corridorNode => ({
         node: corridorNode,
-        dist: distance(elevator.position, corridorNode.position)
+        dist: distance(entryPoint.position, corridorNode.position)
       }))
       .sort((a, b) => a.dist - b.dist)
       .slice(0, 5);
     
-    // Connect to the closest corridor nodes
+    // Connect to closest corridor nodes
     closestCorridorNodes.forEach(({ node, dist }) => {
-      if (dist < 0.0003) { // Reasonable connection distance
-        elevator.neighbors.push(node.id);
-        node.neighbors.push(elevator.id);
+      if (dist < 0.0004) { // Reasonable connection distance
+        entryPoint.neighbors.push(node.id);
+        node.neighbors.push(entryPoint.id);
       }
     });
     
-    // For the main elevator, ensure it has connections
-    if (elevator.id === "elevator_main" && elevator.neighbors.length === 0) {
-      // Force connection to the closest node regardless of distance
+    // Ensure the entry point has at least one connection
+    if (entryPoint.neighbors.length === 0 && closestCorridorNodes.length > 0) {
       const closest = closestCorridorNodes[0];
-      if (closest) {
-        elevator.neighbors.push(closest.node.id);
-        graph.nodes[closest.node.id].neighbors.push(elevator.id);
-      }
+      entryPoint.neighbors.push(closest.node.id);
+      graph.nodes[closest.node.id].neighbors.push(entryPoint.id);
     }
   });
 };
 
-// Find the closest elevator node
-const findClosestElevator = (graph: Graph, elevatorPositions: Position[]): string | null => {
-  // Try to find the main elevator node first
-  if (graph.nodes["elevator_main"]) {
-    return "elevator_main";
-  }
+// Find an entry point of the specified type that's closest to a destination
+const findEntryPoint = (
+  graph: Graph,
+  entryType: EntryPointType = EntryPointType.ELEVATOR,
+  destinationNodeId: string | null = null
+): string | null => {
+  // First filter entry points by type
+  const entryPointsOfType = Object.values(graph.nodes).filter(
+    node => node.isEntryPoint && 
+    (node.entryPointType === entryType || entryType === EntryPointType.ANY)
+  );
   
-  // Then look for any elevator nodes
-  const elevatorNodes = Object.values(graph.nodes).filter(node => node.isElevator);
-  
-  if (elevatorNodes.length > 0) {
-    return elevatorNodes[0].id;
-  }
-  
-  // If no elevator nodes were found, try to find nodes near known elevator positions
-  let closestNode = null;
-  let minDist = Infinity;
-  
-  Object.values(graph.nodes).forEach(node => {
-    // Only consider corridor nodes as potential connection points to elevators
-    if (!node.isCorridor) return;
+  // If we have a destination node, find the closest entry point to it
+  if (destinationNodeId && entryPointsOfType.length > 0) {
+    const destinationNode = graph.nodes[destinationNodeId];
     
-    // Check against known elevator positions
-    elevatorPositions.forEach(elevatorPos => {
-      const dist = distance(node.position, elevatorPos);
-      if (dist < minDist) {
-        minDist = dist;
-        closestNode = node.id;
-      }
-    });
-  });
+    // Sort entry points by distance to destination
+    const sortedEntryPoints = entryPointsOfType
+      .map(entryPoint => ({
+        id: entryPoint.id,
+        dist: distance(entryPoint.position, destinationNode.position)
+      }))
+      .sort((a, b) => a.dist - b.dist);
+    
+    // Return the closest one
+    if (sortedEntryPoints.length > 0) {
+      return sortedEntryPoints[0].id;
+    }
+  } 
+  // If no destination or no entry points of the specified type found
+  else if (entryPointsOfType.length > 0) {
+    return entryPointsOfType[0].id;
+  }
   
-  return closestNode;
+  // If entry points of the specified type aren't found, try any entry point
+  if (entryType !== EntryPointType.ANY) {
+    const anyEntryPoints = Object.values(graph.nodes).filter(node => node.isEntryPoint);
+    
+    if (anyEntryPoints.length > 0) {
+      // If we have a destination, find the closest one
+      if (destinationNodeId) {
+        const destinationNode = graph.nodes[destinationNodeId];
+        const sortedEntryPoints = anyEntryPoints
+          .map(entryPoint => ({
+            id: entryPoint.id,
+            dist: distance(entryPoint.position, destinationNode.position)
+          }))
+          .sort((a, b) => a.dist - b.dist);
+        
+        if (sortedEntryPoints.length > 0) {
+          return sortedEntryPoints[0].id;
+        }
+      } else {
+        return anyEntryPoints[0].id;
+      }
+    }
+  }
+  
+  // As a last resort, try to find a corridor node
+  const corridorNodes = Object.values(graph.nodes).filter(node => node.isCorridor);
+  if (corridorNodes.length > 0) {
+    return corridorNodes[0].id;
+  }
+  
+  return null;
 };
 
 // Find room node by room number
@@ -420,25 +497,44 @@ const pathToLineString = (path: string[], graph: Graph): LineString => {
 
 // Main navigation component
 export const IndoorNavigation: React.FC = () => {
-  const { indoorFeatures, currentFloor, destinationRoom } = useIndoor();
+  const { 
+    indoorFeatures, 
+    currentFloor, 
+    destinationRoom, 
+    originRoom,
+    indoorTransport // Use the transport preference from context
+  } = useIndoor();
+  const { highlightedBuilding } = useCoords();
   const [routePath, setRoutePath] = useState<LineString | null>(null);
   const [debugNodes, setDebugNodes] = useState<Position[]>([]);
   
+  // Map indoorTransport string to EntryPointType enum
+  const getEntryPointTypeFromTransport = (): EntryPointType => {
+    switch(indoorTransport) {
+      case "stairs":
+        return EntryPointType.STAIRS;
+      case "escalator":
+        return EntryPointType.ESCALATOR;
+      case "elevator":
+        return EntryPointType.ELEVATOR;
+      default:
+        return EntryPointType.ELEVATOR; // Default to elevator if no preference
+    }
+  };
+  
   useEffect(() => {
     if (indoorFeatures.length === 0 || !currentFloor) return;
+    if (!originRoom && !destinationRoom) return; // No rooms selected yet
     
     console.log("Building navigation graph...");
+    console.log("Current building:", highlightedBuilding?.properties.id);
+    console.log("Current floor:", currentFloor);
+    console.log("Transport preference:", indoorTransport);
     
     // Build the navigation graph
     const graph = buildNavigationGraph(indoorFeatures);
     
     console.log(`Built graph with ${Object.keys(graph.nodes).length} nodes`);
-    
-    // Known elevator positions for H8 building
-    const elevatorPositions: Position[] = [
-      // Main elevator position
-      [-73.57872, 45.49731]
-    ];
     
     // Debug - collect corridor nodes for visualization
     const corridorNodes: Position[] = Object.values(graph.nodes)
@@ -446,15 +542,38 @@ export const IndoorNavigation: React.FC = () => {
       .map(node => node.position);
     setDebugNodes(corridorNodes);
     
-    // Get starting point (elevator) and destination
-    const startNodeId = findClosestElevator(graph, elevatorPositions);
+    // Log all entry points found
+    const entryPoints = Object.values(graph.nodes).filter(node => node.isEntryPoint);
+    console.log(`Found ${entryPoints.length} entry points:`, 
+      entryPoints.map(ep => `${ep.id} (${ep.entryPointType})`));
     
-    // Either use selected destination room or default to room 825
-    const targetRoom = destinationRoom?.ref || "861";
-    const endNodeId = findRoomNode(graph, targetRoom);
+    // Get destination room first so we can find the closest entry point to it
+    const targetRoom = destinationRoom?.ref || "";
+    const endNodeId = targetRoom ? findRoomNode(graph, targetRoom) : null;
+    
+    if (!endNodeId) {
+      console.error("Could not find destination node");
+      return;
+    }
+    
+    // Get starting point - use origin room if available, otherwise use entry point
+    let startNodeId: string | null = null;
+    
+    if (originRoom && originRoom.ref) {
+      startNodeId = findRoomNode(graph, originRoom.ref);
+      console.log(`Using origin room ${originRoom.ref} as starting point`);
+    }
+    
+    // If origin room not found, use the preferred transport type as starting point
+    // Find the one closest to the destination room
+    if (!startNodeId) {
+      const entryType = getEntryPointTypeFromTransport();
+      startNodeId = findEntryPoint(graph, entryType, endNodeId);
+      console.log(`Using ${indoorTransport} closest to destination as starting point`);
+    }
     
     if (!startNodeId || !endNodeId) {
-      console.error(`Could not find ${!startNodeId ? 'elevator' : 'room'} node`);
+      console.error(`Could not find ${!startNodeId ? 'starting' : 'destination'} node`);
       return;
     }
     
@@ -472,32 +591,33 @@ export const IndoorNavigation: React.FC = () => {
       setRoutePath(lineString);
     } else {
       console.error("No path found");
+      setRoutePath(null);
     }
-  }, [indoorFeatures, currentFloor, destinationRoom]);
-  
-  if (!routePath) return null;
+  }, [indoorFeatures, currentFloor, originRoom, destinationRoom, indoorTransport]);
   
   return (
     <>
-      {/* Main route path */}
-      <Mapbox.ShapeSource
-        id="route-path"
-        shape={{
-          type: "Feature",
-          geometry: routePath,
-          properties: {}
-        }}
-      >
-        <Mapbox.LineLayer
-          id="route-line"
-          style={{
-            lineColor: "#4285F4",
-            lineWidth: 4,
-            lineCap: "round",
-            lineJoin: "round"
+      {/* Route path display */}
+      {routePath && (
+        <Mapbox.ShapeSource
+          id="route-path"
+          shape={{
+            type: "Feature",
+            geometry: routePath,
+            properties: {}
           }}
-        />
-      </Mapbox.ShapeSource>
+        >
+          <Mapbox.LineLayer
+            id="route-line"
+            style={{
+              lineColor: "#4285F4",
+              lineWidth: 4,
+              lineCap: "round",
+              lineJoin: "round"
+            }}
+          />
+        </Mapbox.ShapeSource>
+      )}
       
       {/* Debug visualization of corridor nodes */}
       {debugNodes.length > 0 && (
@@ -525,7 +645,9 @@ export const IndoorNavigation: React.FC = () => {
           />
         </Mapbox.ShapeSource>
       )}
+        
     </>
+    
   );
 };
 
