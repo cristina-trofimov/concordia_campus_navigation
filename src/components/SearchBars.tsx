@@ -128,8 +128,7 @@ function SearchBars({ inputDestination }: { inputDestination: string }) {
         setInFloorView(false);
         setOriginRoom(null);
         setDestinationRoom(null);
-        setOrigin("");
-        
+        setOrigin(myLocationString);
     }, [setRouteData]);
 
     useEffect(() => {
