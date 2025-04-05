@@ -93,7 +93,8 @@ describe('CalendarButton', () => {
       expect(fetchUserCalendars).toHaveBeenCalledWith(mockToken);
       expect(mockNavigate).toHaveBeenCalledWith('Calendar', {
         accessToken: mockToken,
-        calendars: mockCalendarsData
+        calendars: mockCalendarsData,
+        open: true 
       });
     });
   });
