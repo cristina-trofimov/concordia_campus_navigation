@@ -57,7 +57,7 @@ const [sameBuilding, setSameBuilding] = useState(false);
             const busStop = step.transit_details.arrival_stop?.name || "Bus stop found";
             return step.html_instructions.replace(/<[^<>]*>/g, "") + `. Take Bus ${busNumber}. Get off at stop ${busStop}.`;
           }if (step.travel_mode === "TRANSIT" &&(step.transit_details.line?.vehicle?.name=='Subway')){
-            const metroStop = step.transit_details.arrival_stop?.name || "Metro stop found";
+            const metroStop = step.transit_details.arrival_stop?.name || "Metro stop not found";
             return step.html_instructions.replace(/<[^<>]*>/g, "") + `. Get off at stop ${metroStop}.`;
           }
           return step.html_instructions.replace(/<[^<>]*>/g, "");
