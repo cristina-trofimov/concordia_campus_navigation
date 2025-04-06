@@ -154,6 +154,7 @@ describe('DirectionsSteps Component', () => {
     expect(screen.getByText('Walk to Bus Stop')).toBeTruthy();
     expect(screen.getByText('Exit the building')).toBeTruthy();
     expect(screen.getByText('Turn right onto Main Street')).toBeTruthy();
+    expect(screen.getByText('Take bus 42')).toBeTruthy();
     expect(screen.getByText('Take cool bus. Take Bus Bus number not found. Get off at stop STOP.')).toBeTruthy();
     expect(screen.getByText('Take metro. Get off at stop Metro stop not found.')).toBeTruthy();
     expect(screen.getByText('Take metro. Get off at stop STOP.')).toBeTruthy();
