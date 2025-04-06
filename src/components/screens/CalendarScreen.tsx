@@ -64,10 +64,38 @@ const CalendarScreen = () => {
         const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
 
         if (events.data?.events) {
-          for (const event of events.data.events) {
-            console.log("EVENT" + event.title + " " + event.location + " " + event.description + " " + event.startTime + " " + event.endTime);
+          const today = new Date()
+          today.setHours(0, 0, 0, 0);
+          const max = new Date();
+          max.setDate(max.getDate() + 3);
+          max.setHours(23, 59, 59, 999);
+
+          const recentEvents = events.data?.events?.filter(event => {
+            const start = new Date(event.startTime);
+            const end = new Date(event.endTime);
+            const isValid = start >= today && end <= max
+
+            // console.log(`~~~~~~~~~Event: ${event.title}`, {
+            //   startTime: event.startTime,
+            //   parsedStart: start,
+            //   today: today,
+            //   max: max,
+            //   isValid
+            // });
+            
+            // Add validation and timezone-neutral comparison
+            return start >= today && end <= max
+          }) ?? [];
+
+          // console.log('\n\n\n\n\n')
+          // // const recentEvents = events.data?.events.filter(event => (new Date(event.startTime)) >= currentDate && (new Date(event.endTime)) <= (max))
+
+          for (const event of recentEvents) {
+            console.log("RECENT EVENT: " + event.title + " " + event.location + " " + event.description + " " + event.startTime + " " + event.endTime);
           }
-          setClassEvents(events.data?.events || []);
+
+          setClassEvents(recentEvents || []);
+          // setClassEvents(events.data?.events || []);
         }
 
         const modifiedEvents = events.data?.events.map((event) => {
