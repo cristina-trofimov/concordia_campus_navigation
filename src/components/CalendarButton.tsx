@@ -7,7 +7,6 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { CalendarStyle } from "../styles/CalendarStyle";
 import { signIn } from "./HandleGoogle";
 import { fetchUserCalendars } from "./googleCalendarFetching.ts";
-import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 const CalendarButton = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
