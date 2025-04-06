@@ -10,7 +10,6 @@ import { fixedBuildingFeatures } from "./BuildingCoordinates";
 import { useCoords } from "../data/CoordsContext";
 import { useFloorSelection } from "./FloorSelector";
 import { RoomInfo } from "../interfaces/RoomInfo"
-import analytics from '@react-native-firebase/analytics';
 import { useIndoor } from "../data/IndoorContext";
 
 interface RoomSearchBarProps {
