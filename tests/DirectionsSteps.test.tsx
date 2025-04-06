@@ -99,7 +99,46 @@ describe('DirectionsSteps Component', () => {
             {
               html_instructions: 'Take bus <b>42</b>',
               steps: undefined
-            }
+            },
+            {
+              html_instructions: 'Take cool bus',
+              travel_mode: 'TRANSIT',
+              transit_details:{
+                arrival_stop:{
+                  name:"STOP"
+                },
+                line:{
+                  vehicle:{
+                    name:"Bus"
+                  }
+                }
+              }
+            },
+            {
+              html_instructions: 'Take metro',
+              travel_mode: 'TRANSIT',
+              transit_details:{
+                line:{
+                  vehicle:{
+                    name:"Subway"
+                  }
+                }
+              }
+            },
+            {
+              html_instructions: 'Take metro',
+              travel_mode: 'TRANSIT',
+              transit_details:{
+                arrival_stop:{
+                  name:"STOP"
+                },
+                line:{
+                  vehicle:{
+                    name:"Subway"
+                  }
+                }
+              }
+            },
           ]
         }]
       }],
@@ -115,6 +154,9 @@ describe('DirectionsSteps Component', () => {
     expect(screen.getByText('Exit the building')).toBeTruthy();
     expect(screen.getByText('Turn right onto Main Street')).toBeTruthy();
     expect(screen.getByText('Take bus 42')).toBeTruthy();
+    expect(screen.getByText('Take cool bus. Take Bus Bus number not found. Get off at stop STOP.')).toBeTruthy();
+    expect(screen.getByText('Take metro. Get off at stop Metro stop not found.')).toBeTruthy();
+    expect(screen.getByText('Take metro. Get off at stop STOP.')).toBeTruthy();
   });
 
   // test('does not display hidden steps', () => {

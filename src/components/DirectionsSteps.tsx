@@ -18,6 +18,9 @@ const [secondMessage, setSecondMessage] = useState("");
 const [sameBuilding, setSameBuilding] = useState(false);
 
   const formatSteps = (step: any): any => {
+    if (!step?.html_instructions) {
+      return 'Continue'; 
+    }
     return step.html_instructions
       .replace(/<[^<>]*>/g, "")
       .replace(/(?=Destination)/gi, ". ");
@@ -49,6 +52,15 @@ const [sameBuilding, setSameBuilding] = useState(false);
       const number = filteredSteps.length;
       const instructionsGeneral = filteredSteps.map(
         (step: any) => {
+          if (step.travel_mode === "TRANSIT" &&(step.transit_details.line?.vehicle?.name=='Bus')) {
+            const busNumber = step.transit_details.line?.short_name ?? step.transit_details.line?.name ?? "Bus number not found";
+            const busStop = step.transit_details.arrival_stop?.name ?? "Bus stop found";
+            return step.html_instructions.replace(/<[^<>]*>/g, "") + `. Take Bus ${busNumber}. Get off at stop ${busStop}.`;
+          }
+          if (step.travel_mode === "TRANSIT" &&(step.transit_details.line?.vehicle?.name=='Subway')){
+            const metroStop = step.transit_details.arrival_stop?.name ?? "Metro stop not found";
+            return step.html_instructions.replace(/<[^<>]*>/g, "") + `. Get off at stop ${metroStop}.`;
+          }
           return step.html_instructions.replace(/<[^<>]*>/g, "");
         }
       );
