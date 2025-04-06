@@ -654,3 +654,11 @@ export const NavigationOverlay: React.FC = () => {
 
   
 };
+
+export {
+  findPath,
+  buildNavigationGraph,
+  findEntryPoint,
+  findRoomNode,
+  pathToLineString
+};

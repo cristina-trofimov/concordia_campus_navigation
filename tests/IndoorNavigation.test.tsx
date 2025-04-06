@@ -1,7 +1,7 @@
 /**
- * @jest-environment jsdom
- */
-
+  * @jest-environment jsdom
+  */
+ 
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -9,6 +9,13 @@ import { IndoorNavigation, NavigationOverlay } from '../src/components/IndoorNav
 import { useCoords } from '../src/data/CoordsContext';
 import { useIndoor } from '../src/data/IndoorContext';
 import { EntryPointType } from '../src/interfaces/IndoorGraph';
+import { 
+    findPath, 
+    buildNavigationGraph,
+    findEntryPoint,
+    findRoomNode,
+    pathToLineString
+  } from '../src/components/IndoorNavigation';
 
 // Mock the dependencies
 jest.mock('@rnmapbox/maps', () => {
@@ -281,168 +288,472 @@ describe('IndoorNavigation Component', () => {
     });
   });
 
-  test('should clear route when destination is cleared', async () => {
-    // We need to simulate the useEffect that watches destinationRoom
-    // First, let's set up a component that has the same effect
+  test('should use transport preference when origin room is not available', async () => {
+    const consoleLogSpy = jest.spyOn(console, 'log');
     
-    const TestComponent = () => {
-      const [routePath, setRoutePath] = React.useState({}); // Start with a non-null value
-      const [routeFloor, setRouteFloor] = React.useState("1st Floor"); // Start with a non-null value
-      const { destinationRoom } = useIndoor();
-      
-      // This mimics the useEffect in the real component
-      React.useEffect(() => {
-        if (!destinationRoom) {
-          setRoutePath(null);
-          setRouteFloor(null);
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      currentFloor: '1st Floor',
+      indoorFeatures: mockIndoorFeatures,
+      originRoom: null,
+      destinationRoom: { 
+        ref: '102', 
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576651, 45.495677] 
+      },
+      indoorTransport: "stairs",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
+    });
+
+    render(<IndoorNavigation />);
+    
+    // Check if "Using stairs" message is logged
+    await waitFor(() => {
+      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Using stairs'));
+    });
+  });
+  
+  // Additional tests to improve coverage
+  
+  test('should handle point geometry features', () => {
+    // Create features with point geometry for entry points
+    const pointFeatures = [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [-73.577200, 45.495800]
+        },
+        properties: {
+          highway: 'elevator'
         }
-      }, [destinationRoom]);
-      
-      return (
-        <div>
-          <div data-testid="route-path">{routePath ? 'has-route' : 'no-route'}</div>
-          <div data-testid="route-floor">{routeFloor || 'no-floor'}</div>
-        </div>
-      );
-    };
+      },
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [-73.577150, 45.495780]
+        },
+        properties: {
+          entrance: 'yes',
+          stairs: 'yes'
+        }
+      }
+    ];
     
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      currentFloor: '1st Floor',
+      indoorFeatures: pointFeatures,
+      originRoom: null,
+      destinationRoom: null,
+      indoorTransport: "elevator",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
+    });
+    
+    // This test just checks that the component doesn't crash with point features
+    expect(() => render(<IndoorNavigation />)).not.toThrow();
+  });
+  
+  test('should clear route when destination changes', async () => {
+    // Setup with a destination
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      currentFloor: '1st Floor',
+      indoorFeatures: mockIndoorFeatures,
+      originRoom: null,
+      destinationRoom: { 
+        ref: '101', 
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576902, 45.495858] 
+      },
+      indoorTransport: "elevator",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
+    });
+    
+    const { rerender } = render(<IndoorNavigation />);
+    
+    // Change to a different destination
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      currentFloor: '1st Floor',
+      indoorFeatures: mockIndoorFeatures,
+      originRoom: null,
+      destinationRoom: { 
+        ref: '102', // Different destination
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576651, 45.495677] 
+      },
+      indoorTransport: "elevator",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
+    });
+    
+    rerender(<IndoorNavigation />);
+    
+    // The route should be recalculated and shown
+    await waitFor(() => {
+      const routeShapeSource = screen.queryByTestId('mapbox-shape-source-route-path');
+      expect(routeShapeSource).toBeInTheDocument();
+    });
+  });
+
+  // Test for specific room connections
+test('should handle specific important rooms with more connections', async () => {
+    // Add a feature that matches one of the specific room numbers mentioned in connectRoomsToCorridors
+    const specificRoomFeatures = [
+      // Corridor
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-73.577142, 45.495753],
+              [-73.576864, 45.495662],
+              [-73.576793, 45.495773],
+              [-73.577069, 45.495864],
+              [-73.577142, 45.495753]
+            ]
+          ]
+        },
+        properties: {
+          indoor: 'corridor'
+        }
+      },
+      // Important room (825 is in the specificRooms array)
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-73.577069, 45.495864],
+              [-73.576793, 45.495773],
+              [-73.576736, 45.495853],
+              [-73.577012, 45.495944],
+              [-73.577069, 45.495864]
+            ]
+          ]
+        },
+        properties: {
+          indoor: 'room',
+          ref: '825'
+        }
+      }
+    ];
+    
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      currentFloor: '1st Floor',
+      indoorFeatures: specificRoomFeatures,
+      originRoom: null,
+      destinationRoom: { 
+        ref: '825', 
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576902, 45.495858] 
+      },
+      indoorTransport: "elevator",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
+    });
+    
+    // This is primarily testing that the component doesn't crash when dealing with special rooms
+    expect(() => render(<IndoorNavigation />)).not.toThrow();
+  });
+
+  // Test the NavigationOverlay component with a changing inFloorView value
+test('should update NavigationOverlay when inFloorView changes', () => {
+    const setOriginRoom = jest.fn();
+    const setDestinationRoom = jest.fn();
+    const setOriginCoords = jest.fn();
+    const setDestinationCoords = jest.fn();
+    
+    // First render with inFloorView = false
+    useIndoor.mockReturnValue({
+      inFloorView: false,
+      indoorFeatures: [],
+      setOriginRoom,
+      setDestinationRoom
+    });
+    
+    useCoords.mockReturnValue({
+      setOriginCoords,
+      setDestinationCoords
+    });
+    
+    const { rerender } = render(<NavigationOverlay />);
+    
+    // Verify calls when not in floor view
+    expect(setOriginRoom).toHaveBeenCalledWith(null);
+    expect(setDestinationRoom).toHaveBeenCalledWith(null);
+    expect(setOriginCoords).not.toHaveBeenCalled();
+    expect(setDestinationCoords).not.toHaveBeenCalled();
+    
+    // Reset mocks for next test
+    setOriginRoom.mockClear();
+    setDestinationRoom.mockClear();
+    setOriginCoords.mockClear();
+    setDestinationCoords.mockClear();
+    
+    // Now rerender with inFloorView = true
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      indoorFeatures: mockIndoorFeatures,
+      setOriginRoom,
+      setDestinationRoom
+    });
+    
+    rerender(<NavigationOverlay />);
+    
+    // Verify calls when in floor view
+    expect(setOriginRoom).not.toHaveBeenCalled();
+    expect(setDestinationRoom).not.toHaveBeenCalled();
+    expect(setOriginCoords).toHaveBeenCalledWith(null);
+    expect(setDestinationCoords).toHaveBeenCalledWith(null);
+  });
+  
+
+  test('should not calculate a new route when features are empty', async () => {
+    const consoleLogSpy = jest.spyOn(console, 'log');
+    
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      currentFloor: '1st Floor',
+      indoorFeatures: [], // Empty features
+      originRoom: null,
+      destinationRoom: { 
+        ref: '102', 
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576651, 45.495677] 
+      },
+      indoorTransport: "elevator",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
+    });
+    
+    render(<IndoorNavigation />);
+    
+    // Verify that route calculation was not attempted
+    expect(consoleLogSpy).not.toHaveBeenCalledWith("Building navigation graph...");
+    
+    const routeShapeSource = screen.queryByTestId('mapbox-shape-source-route-path');
+    expect(routeShapeSource).not.toBeInTheDocument();
+  });
+  
+  test('should use escalator as transport preference', async () => {
+    const consoleLogSpy = jest.spyOn(console, 'log');
+    
+    // Clear previous console calls
+    consoleLogSpy.mockClear();
+    
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      currentFloor: '1st Floor',
+      indoorFeatures: mockIndoorFeatures,
+      originRoom: null,
+      destinationRoom: { 
+        ref: '102', 
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576651, 45.495677] 
+      },
+      indoorTransport: "escalator", // Using escalator preference
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
+    });
+    
+    render(<IndoorNavigation />);
+    
+    // Wait for any asynchronous operations
+    await waitFor(() => {
+      // Find any log call that contains "escalator"
+      const hasEscalatorLog = consoleLogSpy.mock.calls.some(call => 
+        call.some(arg => typeof arg === 'string' && arg.includes('escalator'))
+      );
+      expect(hasEscalatorLog).toBe(true);
+    });
+  });
+  
+  test('should clear route when destination is cleared', async () => {
     // First render with a destination
     useIndoor.mockReturnValue({
-      destinationRoom: { ref: '101' }
-    });
-    
-    const { rerender, getByTestId } = render(<TestComponent />);
-    
-    // Now update to clear the destination
-    useIndoor.mockReturnValue({
-      destinationRoom: null
-    });
-    
-    rerender(<TestComponent />);
-    
-    // Check that the route and floor were cleared
-    expect(getByTestId('route-path').textContent).toBe('no-route');
-    expect(getByTestId('route-floor').textContent).toBe('no-floor');
-  });
-
-  test('should map indoorTransport correctly to EntryPointType', () => {
-    // Test each transport type mapping
-    const Component = () => {
-      // Expose the function for testing
-      const { indoorTransport } = useIndoor();
-      const getEntryPointTypeFromTransport = () => {
-        switch(indoorTransport) {
-          case "stairs":
-            return EntryPointType.STAIRS;
-          case "escalator":
-            return EntryPointType.ESCALATOR;
-          case "elevator":
-            return EntryPointType.ELEVATOR;
-          default:
-            return EntryPointType.ELEVATOR;
-        }
-      };
-      
-      // Render the result for testing
-      return <div data-testid="entry-type">{getEntryPointTypeFromTransport()}</div>;
-    };
-    
-    // Test stairs
-    useIndoor.mockReturnValue({
-      indoorTransport: "stairs",
       inFloorView: true,
       currentFloor: '1st Floor',
-      indoorFeatures: [],
+      indoorFeatures: mockIndoorFeatures,
       originRoom: null,
-      destinationRoom: null
-    });
-    
-    const { rerender, getByTestId } = render(<Component />);
-    expect(getByTestId('entry-type').textContent).toBe(EntryPointType.STAIRS);
-    
-    // Test escalator
-    useIndoor.mockReturnValue({
-      indoorTransport: "escalator",
-      inFloorView: true,
-      currentFloor: '1st Floor',
-      indoorFeatures: [],
-      originRoom: null,
-      destinationRoom: null
-    });
-    
-    rerender(<Component />);
-    expect(getByTestId('entry-type').textContent).toBe(EntryPointType.ESCALATOR);
-    
-    // Test elevator
-    useIndoor.mockReturnValue({
+      destinationRoom: { 
+        ref: '102', 
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576651, 45.495677] 
+      },
       indoorTransport: "elevator",
-      inFloorView: true,
-      currentFloor: '1st Floor',
-      indoorFeatures: [],
-      originRoom: null,
-      destinationRoom: null
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
     });
     
-    rerender(<Component />);
-    expect(getByTestId('entry-type').textContent).toBe(EntryPointType.ELEVATOR);
+    const { rerender } = render(<IndoorNavigation />);
     
-    // Test default
+    // Wait for route to be calculated
+    await waitFor(() => {
+      const routeShapeSource = screen.queryByTestId('mapbox-shape-source-route-path');
+      expect(routeShapeSource).toBeInTheDocument();
+    });
+    
+    // Now rerender with destinationRoom set to null
     useIndoor.mockReturnValue({
-      indoorTransport: "unknown",
       inFloorView: true,
       currentFloor: '1st Floor',
-      indoorFeatures: [],
+      indoorFeatures: mockIndoorFeatures,
       originRoom: null,
-      destinationRoom: null
+      destinationRoom: null, // Destination cleared
+      indoorTransport: "elevator",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
     });
     
-    rerender(<Component />);
-    expect(getByTestId('entry-type').textContent).toBe(EntryPointType.ELEVATOR);
+    rerender(<IndoorNavigation />);
+    
+    // Route should be cleared
+    const routeShapeSource = screen.queryByTestId('mapbox-shape-source-route-path');
+    expect(routeShapeSource).not.toBeInTheDocument();
   });
-
-  test('should log console message when floor changes', async () => {
-    // Create a simpler test component with just the floor change logic
-    const TestComponent = () => {
-      const [routeFloor, setRouteFloor] = React.useState('1st Floor');
-      const { currentFloor } = useIndoor();
-      
-      // Only include the logic we're testing
-      React.useEffect(() => {
-        if (routeFloor && currentFloor !== routeFloor) {
-          console.log("Floor changed, hiding route");
+  
+  test('should handle non-existent destination room ID', async () => {
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      currentFloor: '1st Floor',
+      indoorFeatures: mockIndoorFeatures,
+      originRoom: null,
+      destinationRoom: { 
+        ref: 'non-existent-room', // Room that doesn't exist
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576651, 45.495677] 
+      },
+      indoorTransport: "elevator",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
+    });
+    
+    render(<IndoorNavigation />);
+    
+    // No route should be rendered for non-existent room
+    const routeShapeSource = screen.queryByTestId('mapbox-shape-source-route-path');
+    expect(routeShapeSource).not.toBeInTheDocument();
+  });
+  
+  test('should handle case when no entry point is found', async () => {
+    // Mock indoor features without any entry points
+    const featuresWithoutEntryPoints = [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-73.577142, 45.495753],
+              [-73.576864, 45.495662],
+              [-73.576793, 45.495773],
+              [-73.577069, 45.495864],
+              [-73.577142, 45.495753]
+            ]
+          ]
+        },
+        properties: {
+          indoor: 'corridor'
         }
-      }, [currentFloor, routeFloor]);
-      
-      return null;
-    };
+      },
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-73.577069, 45.495864],
+              [-73.576793, 45.495773],
+              [-73.576736, 45.495853],
+              [-73.577012, 45.495944],
+              [-73.577069, 45.495864]
+            ]
+          ]
+        },
+        properties: {
+          indoor: 'room',
+          ref: '101'
+        }
+      }
+    ];
     
-    // Mock console.log
-    const consoleLogMock = jest.spyOn(console, 'log')
-      .mockImplementation(() => {}); // Suppress actual console output
-    
-    // First render with currentFloor matching routeFloor
     useIndoor.mockReturnValue({
+      inFloorView: true,
       currentFloor: '1st Floor',
+      indoorFeatures: featuresWithoutEntryPoints,
+      originRoom: null,
+      destinationRoom: { 
+        ref: '101', 
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576902, 45.495858] 
+      },
+      indoorTransport: "elevator",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
     });
     
-    const { rerender } = render(<TestComponent />);
+    render(<IndoorNavigation />);
     
-    // "Floor changed" should not be logged yet
-    expect(consoleLogMock).not.toHaveBeenCalledWith("Floor changed, hiding route");
-    
-    // Now change to a different floor
-    useIndoor.mockReturnValue({
-      currentFloor: '2nd Floor',
+    // The component shouldn't crash, but no route will be rendered
+    await waitFor(() => {
+      const routeShapeSource = screen.queryByTestId('mapbox-shape-source-route-path');
+      expect(routeShapeSource).not.toBeInTheDocument();
     });
-    
-    rerender(<TestComponent />);
-    
-    // Now we should see the log message
-    expect(consoleLogMock).toHaveBeenCalledWith("Floor changed, hiding route");
-    
-    consoleLogMock.mockRestore();
   });
-
+  
+  test('should handle case when currentFloor is null', async () => {
+    useIndoor.mockReturnValue({
+      inFloorView: true,
+      currentFloor: null, // No current floor
+      indoorFeatures: mockIndoorFeatures,
+      originRoom: null,
+      destinationRoom: { 
+        ref: '102', 
+        floor: '1',
+        component: 'h1Features',
+        coordinates: [-73.576651, 45.495677] 
+      },
+      indoorTransport: "elevator",
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      setIndoorTransport: jest.fn()
+    });
+    
+    render(<IndoorNavigation />);
+    
+    // The component shouldn't crash when currentFloor is null
+    const routeShapeSource = screen.queryByTestId('mapbox-shape-source-route-path');
+    expect(routeShapeSource).not.toBeInTheDocument();
+  });
 });
 
 describe('NavigationOverlay Component', () => {
@@ -547,230 +858,18 @@ describe('NavigationOverlay Component', () => {
     expect(setOriginCoords).toHaveBeenCalledWith(null);
     expect(setDestinationCoords).toHaveBeenCalledWith(null);
   });
-  test('should handle case when no path is found between valid points', async () => {
-    // Create a test component with a custom implementation of findPath that returns null
-    const TestComponent = () => {
-      const [routeStatus, setRouteStatus] = React.useState('unknown');
-      
-      React.useEffect(() => {
-        // Mock implementation of the path finding process
-        const findPath = () => null; // Simulate no path found
-        const graph = { nodes: { 'start': {}, 'end': {} } };
-        
-        // This simulates the actual code path in IndoorNavigation
-        const startNodeId = 'start';
-        const endNodeId = 'end';
-        
-        if (startNodeId && endNodeId) {
-          const path = findPath(graph, startNodeId, endNodeId);
-          
-          if (path) {
-            setRouteStatus('path-found');
-          } else {
-            setRouteStatus('no-path-found');
-          }
-        }
-      }, []);
-      
-      return <div data-testid="route-status">{routeStatus}</div>;
-    };
-    
-    const { getByTestId } = render(<TestComponent />);
-    
-    // The path should not be found, even with valid nodes
-    expect(getByTestId('route-status').textContent).toBe('no-path-found');
-  });
-
-  test('should handle all branches of getEntryPointTypeFromTransport', () => {
-    // This tests the entry point type selection more thoroughly
-    const mapTransportType = (type) => {
-      switch(type) {
-        case "stairs": return "STAIRS";
-        case "escalator": return "ESCALATOR";
-        case "elevator": return "ELEVATOR";
-        case null: return "ELEVATOR"; // Default when null
-        case undefined: return "ELEVATOR"; // Default when undefined
-        default: return "ELEVATOR"; // Default for any other value
-      }
-    };
-    
-    // Test all branches
-    expect(mapTransportType("stairs")).toBe("STAIRS");
-    expect(mapTransportType("escalator")).toBe("ESCALATOR");
-    expect(mapTransportType("elevator")).toBe("ELEVATOR");
-    expect(mapTransportType("unknown")).toBe("ELEVATOR");
-    expect(mapTransportType(null)).toBe("ELEVATOR");
-    expect(mapTransportType(undefined)).toBe("ELEVATOR");
-  });
-
-  test('should test routeFloor initialization and conditionals', () => {
-    // Create a test component to test the floor-related logic
-    const TestComponent = () => {
-      const [routeFloor, setRouteFloor] = React.useState(null);
-      const [routePath, setRoutePath] = React.useState(null);
-      const { currentFloor } = useIndoor();
-      
-      React.useEffect(() => {
-        // Set the route floor to the current floor (initialization)
-        setRouteFloor(currentFloor);
-      }, [currentFloor]);
-      
-      // Test the shouldShowRoute logic
-      const shouldShowRoute = routePath !== null && currentFloor === routeFloor;
-      
-      return (
-        <div>
-          <div data-testid="should-show">{shouldShowRoute ? 'show' : 'hide'}</div>
-          <div data-testid="route-floor">{routeFloor || 'none'}</div>
-        </div>
-      );
-    };
-    
-    // Test with no route
-    useIndoor.mockReturnValue({
-      currentFloor: '1st Floor'
-    });
-    
-    const { getByTestId, rerender } = render(<TestComponent />);
-    
-    // Should not show route (routePath is null)
-    expect(getByTestId('should-show').textContent).toBe('hide');
-    expect(getByTestId('route-floor').textContent).toBe('1st Floor');
-    
-    // Update component to simulate having a route but different floor
-    useIndoor.mockReturnValue({
-      currentFloor: '2nd Floor'
-    });
-    
-    rerender(<TestComponent />);
-    
-    // Should still hide route (floors don't match)
-    expect(getByTestId('should-show').textContent).toBe('hide');
-  });
-
-  test('should handle empty indoorFeatures array', () => {
-    // Test early return condition for empty features
-    const consoleLogSpy = jest.spyOn(console, 'log');
-    
+  
+  test('should handle case with inFloorView true but empty features', () => {
     useIndoor.mockReturnValue({
       inFloorView: true,
-      currentFloor: '1st Floor',
-      indoorFeatures: [], // Empty array
-      originRoom: null, 
-      destinationRoom: { ref: '101' }, // Has destination
-      indoorTransport: "elevator"
+      indoorFeatures: [], // Empty features
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn()
     });
     
-    render(<IndoorNavigation />);
+    const { container } = render(<NavigationOverlay />);
     
-    // buildNavigationGraph should not be called 
-    expect(consoleLogSpy).not.toHaveBeenCalledWith("Building navigation graph...");
-    consoleLogSpy.mockRestore();
-  });
-
-  test('should handle missing destination room', () => {
-    // Test early return condition for missing destination
-    const consoleLogSpy = jest.spyOn(console, 'log');
-    
-    useIndoor.mockReturnValue({
-      inFloorView: true,
-      currentFloor: '1st Floor',
-      indoorFeatures: mockIndoorFeatures,
-      originRoom: { ref: '101' }, // Has origin
-      destinationRoom: null, // No destination
-      indoorTransport: "elevator"
-    });
-    
-    render(<IndoorNavigation />);
-    
-    // buildNavigationGraph should not be called 
-    expect(consoleLogSpy).not.toHaveBeenCalledWith("Building navigation graph...");
-    consoleLogSpy.mockRestore();
-  });
-
-  test('should test all conditions in shouldShowRoute', () => {
-    // This test explicitly checks all branches of the shouldShowRoute function
-    
-    // Case 1: routePath is null
-    const routePath1 = null;
-    const currentFloor1 = '1st Floor';
-    const routeFloor1 = '1st Floor';
-    const result1 = routePath1 !== null && currentFloor1 === routeFloor1;
-    expect(result1).toBe(false);
-    
-    // Case 2: routePath exists but floors don't match
-    const routePath2 = { type: 'LineString', coordinates: [] };
-    const currentFloor2 = '1st Floor';
-    const routeFloor2 = '2nd Floor';
-    const result2 = routePath2 !== null && currentFloor2 === routeFloor2;
-    expect(result2).toBe(false);
-    
-    // Case 3: routePath exists and floors match
-    const routePath3 = { type: 'LineString', coordinates: [] };
-    const currentFloor3 = '1st Floor';
-    const routeFloor3 = '1st Floor';
-    const result3 = routePath3 !== null && currentFloor3 === routeFloor3;
-    expect(result3).toBe(true);
-  });
-
-  test('should handle conditional branches in findEntryPoint', () => {
-    // This test simulates the function's behavior for coverage
-    
-    // Helper function to mimic findEntryPoint logic
-    const mockFindEntryPoint = (
-      entryPointsOfType, 
-      anyEntryPoints,
-      corridorNodes,
-      hasDestination
-    ) => {
-      // First try entry points of the requested type
-      if (entryPointsOfType.length > 0) {
-        if (hasDestination) {
-          // Return closest to destination
-          return entryPointsOfType[0];
-        } else {
-          // Return any of this type
-          return entryPointsOfType[0];
-        }
-      }
-      
-      // If not found, try any entry point
-      if (anyEntryPoints.length > 0) {
-        if (hasDestination) {
-          // Return closest to destination
-          return anyEntryPoints[0];
-        } else {
-          // Return any entry point
-          return anyEntryPoints[0];
-        }
-      }
-      
-      // Last resort - try corridor nodes
-      if (corridorNodes.length > 0) {
-        return corridorNodes[0];
-      }
-      
-      return null;
-    };
-    
-    // Test all branches:
-    
-    // Case 1: Has entry points of the requested type and destination
-    expect(mockFindEntryPoint(['elevator1'], ['any1'], ['corridor1'], true)).toBe('elevator1');
-    
-    // Case 2: Has entry points of the requested type but no destination
-    expect(mockFindEntryPoint(['elevator1'], ['any1'], ['corridor1'], false)).toBe('elevator1');
-    
-    // Case 3: No entry points of requested type, but has other entry points and destination
-    expect(mockFindEntryPoint([], ['any1'], ['corridor1'], true)).toBe('any1');
-    
-    // Case 4: No entry points of requested type, but has other entry points and no destination
-    expect(mockFindEntryPoint([], ['any1'], ['corridor1'], false)).toBe('any1');
-    
-    // Case 5: No entry points at all, only corridors
-    expect(mockFindEntryPoint([], [], ['corridor1'], false)).toBe('corridor1');
-    
-    // Case 6: Nothing found
-    expect(mockFindEntryPoint([], [], [], false)).toBe(null);
+    // Nothing should be rendered
+    expect(container.firstChild).toBeNull();
   });
 });
