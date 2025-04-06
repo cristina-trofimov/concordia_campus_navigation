@@ -25,6 +25,19 @@ export function HomeScreen() {
   const [radius, setRadius] = useState<number | null>(null);
   const { classEvents } = useClassEvents();
 
+  const renderUpcomingClasses = () => {
+    if (inputDestination === "" && classEvents.length > 0) {
+      return classEvents.map((event, index) => (
+        <UpcomingClassItem 
+          calendarEvent={event} 
+          key={index} 
+          setInputDestination={setInputDestination} 
+        />
+      ));
+    }
+    return null;
+  };
+
   return (
     <CoordsProvider>
       <IndoorsProvider>
@@ -54,15 +67,7 @@ export function HomeScreen() {
                 inputOrigin={inputOrigin}
                 setInputOrigin={setInputOrigin}
               />
-              {inputDestination === "" ? (
-                classEvents.length > 0 ? (
-                  classEvents.map((event, index) => (
-                    <UpcomingClassItem calendarEvent={event} key={index} setInputDestination={setInputDestination} />
-                  ))
-                ) : (
-                  null
-                )
-              ) : null}
+              {renderUpcomingClasses()}
               <RoomSearchBars />
               <DirectionsSteps />
             </ScrollView>

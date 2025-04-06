@@ -1,11 +1,9 @@
-import React, { useState, useEffect  } from "react";
-import { AppRegistry, AppState } from 'react-native';
+import React, { useEffect  } from "react";
 import { createTheme } from "@rneui/themed";
 import HomeScreen from './src/components/screens/HomeScreen';
 import CalendarScreen from "./src/components/screens/CalendarScreen";
 import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 import { Calendar } from "./src/interfaces/calendar";
 import { ClassEventsProvider } from "./src/data/ClassEventsContext";
@@ -41,10 +39,8 @@ const theme = createTheme({
 
 export default function App(): React.ReactElement {
 useEffect(() => {
-    analytics().resetAnalyticsData();  // Clears any stored data
-  console.log("Generated User ID:", (globalThis as any).userId);
-  console.log('Initializing Firebase...');
-    analytics().setUserId((globalThis as any).userId);
+  analytics().resetAnalyticsData();
+  analytics().setUserId((globalThis as any).userId);
   analytics().setAnalyticsCollectionEnabled(true);
 
   analytics().logAppOpen();
@@ -53,7 +49,6 @@ useEffect(() => {
       analytics().logEvent('testing_mode_enabled', {
         message: 'App is in testing mode.',
       });
-      console.log('Custom Event Triggered: testing_mode_enabled');
     }
   }, []);
 

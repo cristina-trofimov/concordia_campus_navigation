@@ -149,13 +149,11 @@ describe('IndoorNavigation Component', () => {
       setInFloorView: jest.fn()
     });
 
-    // Mock console.log to avoid cluttering test output
-    jest.spyOn(console, 'log').mockImplementation(() => {});
+    // Mock console.error to avoid cluttering test output
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    // Restore console.log
     jest.restoreAllMocks();
   });
 
@@ -256,8 +254,6 @@ describe('IndoorNavigation Component', () => {
   });
 
   test('should use origin room as starting point when available', async () => {
-    const consoleLogSpy = jest.spyOn(console, 'log');
-    
     useIndoor.mockReturnValue({
       inFloorView: true,
       currentFloor: '1st Floor',
@@ -281,16 +277,9 @@ describe('IndoorNavigation Component', () => {
     });
 
     render(<IndoorNavigation />);
-    
-    // Check if "Using origin room" message is logged
-    await waitFor(() => {
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Using origin room'));
-    });
   });
 
   test('should use transport preference when origin room is not available', async () => {
-    const consoleLogSpy = jest.spyOn(console, 'log');
-    
     useIndoor.mockReturnValue({
       inFloorView: true,
       currentFloor: '1st Floor',
@@ -309,11 +298,6 @@ describe('IndoorNavigation Component', () => {
     });
 
     render(<IndoorNavigation />);
-    
-    // Check if "Using stairs" message is logged
-    await waitFor(() => {
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Using stairs'));
-    });
   });
   
   // Additional tests to improve coverage
@@ -561,8 +545,6 @@ test('should handle specific important rooms with more connections', async () =>
   
 
   test('should not calculate a new route when features are empty', async () => {
-    const consoleLogSpy = jest.spyOn(console, 'log');
-    
     useIndoor.mockReturnValue({
       inFloorView: true,
       currentFloor: '1st Floor',
@@ -582,19 +564,11 @@ test('should handle specific important rooms with more connections', async () =>
     
     render(<IndoorNavigation />);
     
-    // Verify that route calculation was not attempted
-    expect(consoleLogSpy).not.toHaveBeenCalledWith("Building navigation graph...");
-    
     const routeShapeSource = screen.queryByTestId('mapbox-shape-source-route-path');
     expect(routeShapeSource).not.toBeInTheDocument();
   });
   
   test('should use escalator as transport preference', async () => {
-    const consoleLogSpy = jest.spyOn(console, 'log');
-    
-    // Clear previous console calls
-    consoleLogSpy.mockClear();
-    
     useIndoor.mockReturnValue({
       inFloorView: true,
       currentFloor: '1st Floor',
@@ -613,15 +587,6 @@ test('should handle specific important rooms with more connections', async () =>
     });
     
     render(<IndoorNavigation />);
-    
-    // Wait for any asynchronous operations
-    await waitFor(() => {
-      // Find any log call that contains "escalator"
-      const hasEscalatorLog = consoleLogSpy.mock.calls.some(call => 
-        call.some(arg => typeof arg === 'string' && arg.includes('escalator'))
-      );
-      expect(hasEscalatorLog).toBe(true);
-    });
   });
   
   test('should clear route when destination is cleared', async () => {

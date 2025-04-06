@@ -5,9 +5,9 @@ import {
   PanResponder,
   Animated,
   PanResponderGestureState,
+  ScrollView,
 } from "react-native";
 import { BottomDrawerStyle } from "../styles/BottomDrawerStyle";
-import { ScrollView } from "react-native";
 
 const { height } = Dimensions.get("window");
 const COLLAPSED_HEIGHT = height * 0.1;
@@ -104,14 +104,12 @@ function BottomDrawer({
       if (drawerState.current === 2) animateToPosition(1);
       else if (drawerState.current === 1) animateToPosition(0);
       else animateToPosition(0);
+    } else if (currentHeight < midPoint1) {
+      animateToPosition(0);
+    } else if (currentHeight < midPoint2) {
+      animateToPosition(1);
     } else {
-      if (currentHeight < midPoint1) {
-        animateToPosition(0);
-      } else if (currentHeight < midPoint2) {
-        animateToPosition(1);
-      } else {
-        animateToPosition(2);
-      }
+      animateToPosition(2);
     }
   };
 

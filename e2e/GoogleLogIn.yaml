@@ -1,0 +1,18 @@
+appId: com.cristina.trofimov143.frontend
+---
+- launchApp
+
+- waitForAnimationToEnd:
+    timeout: 1100
+- longPressOn: "Destination"
+- inputText: "a"
+- tapOn:
+      point: 93%, 10%
+- tapOn: "Email or phone"
+- inputText: "ccntest789@gmail.com"
+- tapOn: "NEXT"
+- tapOn: "Enter your password"
+- inputText: "Idk0192."
+- tapOn: "NEXT"
+- tapOn: "I agree"
+- tapOn: "ACCEPT"

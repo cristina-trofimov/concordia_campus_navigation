@@ -52,10 +52,6 @@ const CalendarScreen = () => {
   };
 
   useEffect(() => {
-    console.log("Updated current date:", currentDate);
-  }, [currentDate]);
-
-  useEffect(() => {
     const fetchEvents = async () => {
       if (chosenCalendar && accessToken) {
         const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
@@ -179,7 +175,7 @@ const CalendarScreen = () => {
               />
 
               <View onTouchEnd={() => { setModalVisible(false); }} >
-                <Button title="Cancel 2" onPress={() => { setModalVisible(false); console.log('Modal content touched') }} />
+                <Button title="Cancel 2" onPress={() => { setModalVisible(false);}} />
               </View>
               <Button title="Cancel 3" onPress={() => { setModalVisible(false); }} />
             </View>
