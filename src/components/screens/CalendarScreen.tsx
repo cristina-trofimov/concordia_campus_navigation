@@ -79,7 +79,6 @@ const CalendarScreen = () => {
             start: { dateTime: event.startTime },
             end: { dateTime: event.endTime },
             color: '#FFF3B0',
-            // color: '#E09F3E',
           };
         }) ?? [];
         setEvents(modifiedEvents);
