@@ -1,3 +1,14 @@
 appId: com.cristina.trofimov143.frontend
 ---
 - launchApp
+
+- waitForAnimationToEnd:
+    timeout: 300
+- tapOn: "None"
+- tapOn: "Food and Drinks"
+- tapOn: "50 meters"
+- tapOn: "150 meters"
+- waitForAnimationToEnd:
+    timeout: 100
+- tapOn:
+    point: 64%, 21%

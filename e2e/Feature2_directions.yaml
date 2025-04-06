@@ -9,13 +9,11 @@ appId: com.cristina.trofimov143.frontend
 - tapOn: "Poulet Rouge Ste-Catherine, Saint-Catherine Street West, Montreal, QC, Canada"
 - waitForAnimationToEnd:
       timeout: 500
-- tapOn:
-      point: 93%, 94%
 - swipe:
     start: 50%, 50% # From (90% of width, 50% of height)
     end: 50%, 90% # To (10% of width, 50% of height)
 - waitForAnimationToEnd:
-    timeout: 500
+    timeout: 900
 
 - swipe:
     start: 50%, 90% # From (90% of width, 50% of height)
