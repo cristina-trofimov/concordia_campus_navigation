@@ -18,8 +18,8 @@ const [secondMessage, setSecondMessage] = useState("");
 const [sameBuilding, setSameBuilding] = useState(false);
 
   const formatSteps = (step: any): any => {
-    if (!step || !step.html_instructions) {
-      return ""; 
+    if (!step?.html_instructions) {
+      return 'Continue'; 
     }
     return step.html_instructions
       .replace(/<[^<>]*>/g, "")
