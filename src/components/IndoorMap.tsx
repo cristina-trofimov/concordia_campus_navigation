@@ -17,6 +17,7 @@ import { ve1Features } from '../data/indoor/VE/VE1.ts';
 import { ve2Features } from '../data/indoor/VE/VE2.ts';
 import { vl1Features } from '../data/indoor/VL/VL1.ts';
 import { vl2Features } from '../data/indoor/VL/VL2.ts';
+import { NavigationOverlay } from './IndoorNavigation.tsx';
 
 export const featureMap: { [key: string]: any } = {
     h1Features,
@@ -163,6 +164,10 @@ export const HighlightIndoorMap = () => {
                         }}
                     />
                 </Mapbox.ShapeSource>
+            )}
+
+            {indoorFeatures.length > 0 && inFloorView && (
+                <NavigationOverlay />
             )}
 
             {/* Origin Room Pin */}
