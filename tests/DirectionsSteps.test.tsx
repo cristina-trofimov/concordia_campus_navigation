@@ -74,7 +74,6 @@ describe('DirectionsSteps Component', () => {
     expect(screen.getByText('Walk towards Main Street')).toBeTruthy();
     expect(screen.getByText('Turn right onto Pine Avenue')).toBeTruthy();
     expect(screen.getByText('. Destination will be on your left')).toBeTruthy();
-    expect(screen.getByText('. Destination will be on your left')).toBeTruthy();
   });
 
   test('renders empty when no route data is available', () => {
