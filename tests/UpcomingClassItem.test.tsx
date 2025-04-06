@@ -17,31 +17,54 @@ console.log = mockConsoleLog;
 jest.useFakeTimers();
 
 describe('UpcomingClassItem Component', () => {
-  // Helper function to create a calendar event prop
+  // Mock setInputDestination function
+  const mockSetInputDestination = jest.fn();
+  
+  // Helper function to create a calendar event prop with proper ISO format
   const createCalendarEvent = (
     title: string,
     startTime: string,
     endTime: string,
     location: string,
     description: string
-  ): CalendarEvent => ({
-    title,
-    startTime,
-    endTime,
-    location,
-    description,
-  });
+  ): CalendarEvent => {
+    // Get today's date for creating ISO strings
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const day = today.getDate().toString().padStart(2, '0');
+    
+    // Create ISO strings for the start and end times
+    const [startHour, startMinute] = startTime.split(':');
+    const [endHour, endMinute] = endTime.split(':');
+    
+    // Create UTC ISO strings that will convert correctly to local time
+    // For testing, we need to ensure these times appear correctly after component's conversion
+    const startDate = new Date(year, parseInt(month) - 1, parseInt(day), parseInt(startHour), parseInt(startMinute));
+    const endDate = new Date(year, parseInt(month) - 1, parseInt(day), parseInt(endHour), parseInt(endMinute));
+    
+    return {
+      title,
+      startTime: startDate.toISOString(),
+      endTime: endDate.toISOString(),
+      location,
+      description,
+    };
+  };
 
   // Helper function to set current time for testing purposes
   const mockCurrentTime = (hours: number, minutes: number) => {
     const mockDate = new Date();
     mockDate.setHours(hours);
     mockDate.setMinutes(minutes);
+    mockDate.setSeconds(0);
+    mockDate.setMilliseconds(0);
     jest.setSystemTime(mockDate);
   };
 
   beforeEach(() => {
     mockConsoleLog.mockClear();
+    mockSetInputDestination.mockClear();
   });
 
   it('renders correctly with upcoming class', () => {
@@ -52,17 +75,27 @@ describe('UpcomingClassItem Component', () => {
       'Math 101',
       '10:00',
       '11:30',
-      'Science Building',
+      'Science Building, 302',
       '302'
     );
     
-    const { getByText, queryByText } = render(
-      <UpcomingClassItem calendarEvent={event} />
+    const { getByText } = render(
+      <UpcomingClassItem calendarEvent={event} setInputDestination={mockSetInputDestination} />
     );
     
     // Verify class details are rendered
     expect(getByText('Math 101')).toBeTruthy();
-    expect(getByText('10:00 - 11:30')).toBeTruthy();
+    
+    // Get the formatted times as they would appear in the component
+    const startDate = new Date(event.startTime);
+    const endDate = new Date(event.endTime);
+    const startHours = startDate.getHours().toString().padStart(2, '0');
+    const startMinutes = startDate.getMinutes().toString().padStart(2, '0');
+    const endHours = endDate.getHours().toString().padStart(2, '0');
+    const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+    const formattedTimeRange = `${startHours}:${startMinutes} - ${endHours}:${endMinutes}`;
+    
+    expect(getByText(formattedTimeRange)).toBeTruthy();
     expect(getByText('Science Building')).toBeTruthy();
     expect(getByText('Room 302')).toBeTruthy();
     
@@ -78,12 +111,12 @@ describe('UpcomingClassItem Component', () => {
       'Math 101',
       '10:00',
       '11:30',
-      'Science Building',
+      'Science Building, 302',
       '302'
     );
     
     const { getByText } = render(
-      <UpcomingClassItem calendarEvent={event} />
+      <UpcomingClassItem calendarEvent={event} setInputDestination={mockSetInputDestination} />
     );
     
     // Verify status is "In progress"
@@ -98,12 +131,12 @@ describe('UpcomingClassItem Component', () => {
       'Math 101',
       '10:00',
       '11:30',
-      'Science Building',
+      'Science Building, 302',
       '302'
     );
     
     const { getByText } = render(
-      <UpcomingClassItem calendarEvent={event} />
+      <UpcomingClassItem calendarEvent={event} setInputDestination={mockSetInputDestination} />
     );
     
     // Verify status is "Ended"
@@ -118,12 +151,12 @@ describe('UpcomingClassItem Component', () => {
       'Math 101',
       '10:00',
       '11:30',
-      'Science Building',
+      'Science Building, 302',
       '302'
     );
     
     const { UNSAFE_getByType } = render(
-      <UpcomingClassItem calendarEvent={event} />
+      <UpcomingClassItem calendarEvent={event} setInputDestination={mockSetInputDestination} />
     );
     
     // Find the Pressable component
@@ -132,8 +165,8 @@ describe('UpcomingClassItem Component', () => {
     // Simulate press
     fireEvent.press(pressable);
     
-    // Verify console.log was called with the expected message
-    expect(mockConsoleLog).toHaveBeenCalledWith('Clicked on: Math 101');
+    // Verify setInputDestination was called with the expected address
+    expect(mockSetInputDestination).toHaveBeenCalledWith('302');
   });
 
   it('disables press for ended classes', () => {
@@ -144,12 +177,12 @@ describe('UpcomingClassItem Component', () => {
       'Math 101',
       '10:00',
       '11:30',
-      'Science Building',
+      'Science Building, 302',
       '302'
     );
     
-    const { UNSAFE_getByType } = render(
-      <UpcomingClassItem calendarEvent={event} />
+    const { UNSAFE_getByType, getByText } = render(
+      <UpcomingClassItem calendarEvent={event} setInputDestination={mockSetInputDestination} />
     );
     
     // Find the Pressable component
@@ -158,14 +191,15 @@ describe('UpcomingClassItem Component', () => {
     // Check that the pressable component has disabled prop set to true
     expect(pressable.props.disabled).toBe(true);
     
-    // In React Native testing, the disabled prop doesn't actually prevent the press event
-    // in the test environment, so we need to manually respect it
-    if (!pressable.props.disabled) {
-      fireEvent.press(pressable);
-    }
+    // Verify status is "Ended" which confirms the press should be disabled
+    expect(getByText('Ended')).toBeTruthy();
     
-    // Verify console.log was NOT called
-    expect(mockConsoleLog).not.toHaveBeenCalled();
+    // Reset the mock to make sure our check is clean
+    mockSetInputDestination.mockClear();
+    
+    // Get the styles array that would be applied and check the opacity in the second style object
+    const styles = pressable.props.style({ pressed: false });
+    expect(styles[1]).toHaveProperty('opacity', 0.5);
   });
 
   it('applies line-through style to ended class title', () => {
@@ -176,12 +210,12 @@ describe('UpcomingClassItem Component', () => {
       'Math 101',
       '10:00',
       '11:30',
-      'Science Building',
+      'Science Building, 302',
       '302'
     );
     
     const { UNSAFE_getByProps } = render(
-      <UpcomingClassItem calendarEvent={event} />
+      <UpcomingClassItem calendarEvent={event} setInputDestination={mockSetInputDestination} />
     );
     
     // Find the Text component with the title and check its style
@@ -198,12 +232,12 @@ describe('UpcomingClassItem Component', () => {
       'Math 101',
       '10:00',
       '11:30',
-      'Science Building',
+      'Science Building, 302',
       '302'
     );
     
     const { getByText, queryByText, rerender } = render(
-      <UpcomingClassItem calendarEvent={event} />
+      <UpcomingClassItem calendarEvent={event} setInputDestination={mockSetInputDestination} />
     );
     
     // Verify initial status is "Upcoming"
@@ -218,7 +252,7 @@ describe('UpcomingClassItem Component', () => {
     });
     
     // Re-render with the same props to reflect state update
-    rerender(<UpcomingClassItem calendarEvent={event} />);
+    rerender(<UpcomingClassItem calendarEvent={event} setInputDestination={mockSetInputDestination} />);
     
     // Verify status changed to "In progress"
     expect(getByText('In progress')).toBeTruthy();
@@ -233,14 +267,14 @@ describe('UpcomingClassItem Component', () => {
       'Math 101',
       '10:00',
       '11:30',
-      'Science Building',
+      'Science Building, 302',
       '302'
     );
     
     const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
     
     const { unmount } = render(
-      <UpcomingClassItem calendarEvent={event} />
+      <UpcomingClassItem calendarEvent={event} setInputDestination={mockSetInputDestination} />
     );
     
     // Unmount the component
