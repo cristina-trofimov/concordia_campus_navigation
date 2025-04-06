@@ -9,7 +9,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 import analytics from '@react-native-firebase/analytics';
 import ShuttleBusTransit from './ShuttleBusTransit';
-import TransportModeSelector from './TransportationModeSelector';
 
 
 function SearchBars(
@@ -254,11 +253,37 @@ function SearchBars(
 
             {origin.length > 0 && destination.length > 0 && (
                 <>
-                    <TransportModeSelector
-                        transportModes={transportModes}
-                        selectedMode={selectedMode}
-                        setSelectedMode={setSelectedMode}
-                    />
+
+                    {/* Selected Transport Mode Title */}
+                    <View style={SearchBarsStyle.selectedModeContainer}>
+                        <Text style={SearchBarsStyle.selectedModeText}>
+                            {transportModes.find((t) => t.mode === selectedMode)?.label}
+                        </Text>
+                    </View>
+                    {/* Transport Buttons with Time Estimates */}
+                    <View style={SearchBarsStyle.transportButtonContainer}>
+                        {transportModes.map(({ mode, icon, color }) => (
+                            <TouchableOpacity
+                                key={mode}
+                                testID={`transport-mode-${mode}`}
+                                onPress={() => setSelectedMode(mode)}
+                            >
+                                <View style={[
+                                    SearchBarsStyle.transportButtonContent,
+                                    selectedMode === mode && SearchBarsStyle.selectedTransportButton
+                                ]}>
+                                    <View style={SearchBarsStyle.transportButtonContent}>
+                                        <Ionicons
+                                            name={icon as keyof typeof Ionicons.glyphMap}
+                                            size={24}
+                                            color='black'
+                                        />
+                                        {selectedMode === mode}
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
 
                     {/* Only render ShuttleBusTransit component when transit mode is selected */}
                     {!!(selectedMode === "transit" && origin && destinationCoords) && (
