@@ -55,63 +55,37 @@ const CalendarScreen = () => {
     console.log("Updated current date:", currentDate);
   }, [currentDate]);
 
-
-
-
   useEffect(() => {
     const fetchEvents = async () => {
       if (chosenCalendar && accessToken) {
         const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
 
-        if (events.data?.events) {
-          const today = new Date()
-          today.setHours(0, 0, 0, 0);
-          const max = new Date();
-          max.setDate(max.getDate() + 3);
-          max.setHours(23, 59, 59, 999);
+        const today = new Date()
+        today.setHours(0, 0, 0, 0);
+        const max = new Date();
+        max.setDate(max.getDate() + 3);
+        max.setHours(23, 59, 59, 999);
 
-          const recentEvents = events.data?.events?.filter(event => {
-            const start = new Date(event.startTime);
-            const end = new Date(event.endTime);
-            const isValid = start >= today && end <= max
+        const recentEvents = events.data?.events?.filter(event => {
+          return new Date(event.startTime) >= today && new Date(event.endTime) <= max
+        }) ?? [];
 
-            // console.log(`~~~~~~~~~Event: ${event.title}`, {
-            //   startTime: event.startTime,
-            //   parsedStart: start,
-            //   today: today,
-            //   max: max,
-            //   isValid
-            // });
-            
-            // Add validation and timezone-neutral comparison
-            return start >= today && end <= max
-          }) ?? [];
+        setClassEvents(recentEvents);
 
-          // console.log('\n\n\n\n\n')
-          // // const recentEvents = events.data?.events.filter(event => (new Date(event.startTime)) >= currentDate && (new Date(event.endTime)) <= (max))
-
-          for (const event of recentEvents) {
-            console.log("RECENT EVENT: " + event.title + " " + event.location + " " + event.description + " " + event.startTime + " " + event.endTime);
-          }
-
-          setClassEvents(recentEvents || []);
-          // setClassEvents(events.data?.events || []);
-        }
-
-        const modifiedEvents = events.data?.events.map((event) => {
+        const modifiedEvents = events.data?.events?.map((event) => {
           return {
             id: event.id,
             title: event.title,
             start: { dateTime: event.startTime },
             end: { dateTime: event.endTime },
-            color: '#4285F4',
+            color: '#FFF3B0',
+            // color: '#E09F3E',
           };
-        })
-        setEvents(modifiedEvents || []);
+        }) ?? [];
+        setEvents(modifiedEvents);
       }
     }
     fetchEvents();
-
   }, [chosenCalendar, accessToken]);
 
   useEffect(() => {
@@ -169,6 +143,8 @@ const CalendarScreen = () => {
 
         {/* Renders the calendar view */}
         <CalendarContainer
+          // theme={{ todayNumberContainer: {backgroundColor: '#335C67'}, nowIndicatorColor: '#335C67' }}
+          theme={{ todayNumberContainer: {backgroundColor: '#E09F3E'}, nowIndicatorColor: '#E09F3E' }}
           ref={calendarRef}
           events={events}
           initialDate={currentDate.toISOString()}
