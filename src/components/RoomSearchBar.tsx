@@ -10,6 +10,7 @@ import { fixedBuildingFeatures } from "./BuildingCoordinates";
 import { useCoords } from "../data/CoordsContext";
 import { useFloorSelection } from "./FloorSelector";
 import { RoomInfo } from "../interfaces/RoomInfo"
+import analytics from '@react-native-firebase/analytics';
 import { useIndoor } from "../data/IndoorContext";
 
 interface RoomSearchBarProps {
@@ -192,7 +193,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
 
         if (floorIndex !== -1) {
             // only change to that floor if inside the building
-            if (highlightedBuilding.properties.id === buildingID) {
+            if (highlightedBuilding && highlightedBuilding.properties.id === buildingID) {
                 handleSelectFloor(floorNameFormat(room.floor));
             }
         };
