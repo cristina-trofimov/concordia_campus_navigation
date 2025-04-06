@@ -7,12 +7,23 @@ jest.mock('../src/components/BottomDrawer', () => 'BottomDrawer');
 jest.mock('../src/data/CoordsContext', () => ({
   CoordsProvider: ({ children }) => children,
 }));
+jest.mock('@react-native-firebase/analytics', () => () => ({
+  logEvent: jest.fn(),
+}));
 jest.mock('../src/data/IndoorContext', () => ({
   IndoorsProvider: ({ children }) => children,
 }));
 jest.mock('../src/components/CalendarButton', () => 'CalendarButton');
+jest.mock('@expo/vector-icons/Feather', () => ({
+  __esModule: true,
+  default: () => null,
+}));
 jest.mock('../src/components/FloorSelector', () => ({
   FloorSelector: 'FloorSelector',
+}));
+jest.mock('@expo/vector-icons/Ionicons', () => ({
+  __esModule: true,
+  default: (props) => props.name === "arrow-back-outline" ? <div>BackIcon</div> : null,
 }));
 jest.mock('../src/components/SearchBars', () => 'SearchBars');
 jest.mock('../src/components/DirectionsSteps', () => 'DirectionsSteps');

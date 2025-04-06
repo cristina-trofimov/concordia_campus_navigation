@@ -8,7 +8,9 @@ import { Text, Pressable } from 'react-native';
 jest.mock('@rneui/base', () => ({
   Image: 'Image',
 }));
-
+jest.mock('@react-native-firebase/analytics', () => () => ({
+  logEvent: jest.fn(),
+}));
 // Mock console.log
 const mockConsoleLog = jest.fn();
 console.log = mockConsoleLog;

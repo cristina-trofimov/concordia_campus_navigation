@@ -60,13 +60,34 @@ export const RoomSearchBars = () => {
           gap: 20,
           marginVertical: 10,
         }}>
-          <TouchableOpacity onPress={() => handleIconPress("stairs")}>
+          <TouchableOpacity onPress={() =>{
+              if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+              analytics().logEvent('Task_4_wrong_mode', {
+              type: "escalator",
+              user_id: (globalThis as any).userId,
+              });}
+               handleIconPress("stairs")}}>
             <MaterialIcons name="stairs" size={30} color={getIconColor("stairs")} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleIconPress("elevator")}>
+          <TouchableOpacity onPress={() => {
+          if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+                 analytics().logEvent('Task_4_wrong_mode', {
+                 type: "escalator",
+                 user_id: (globalThis as any).userId,
+                 });}
+                 handleIconPress("elevator")}}>
             <MaterialIcons name="elevator" size={30} color={getIconColor("elevator")} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleIconPress("escalator")}>
+          <TouchableOpacity onPress={() => {
+            if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+                const elapsedTime = (globalThis as any).taskTimer.stop();
+                analytics().logEvent('Task_4_finished', {
+                   elapsed_time: elapsedTime/1000,
+                   user_id: (globalThis as any).userId,
+                                           });}
+              handleIconPress("escalator")}}>
+
+
             <MaterialIcons name="escalator" size={30} color={getIconColor("escalator")} />
           </TouchableOpacity>
         </View>

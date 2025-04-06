@@ -7,15 +7,29 @@ import { useCoords } from '../data/CoordsContext';
 import { useIndoor } from '../data/IndoorContext';
 import { Ionicons } from "@expo/vector-icons";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
+import firebase from './src/components/firebase';
+import analytics from '@react-native-firebase/analytics';
 import ShuttleBusTransit from './ShuttleBusTransit';
 
 
-function SearchBars({ inputDestination, setInputDestination }: { inputDestination: string, setInputDestination: (value: string) => void }) {
+function SearchBars(
+    {
+        inputDestination,
+        setInputDestination,
+        inputOrigin,
+        setInputOrigin
+    }:
+        {
+            inputDestination: string,
+            setInputDestination: (value: string) => void
+            inputOrigin: string,
+            setInputOrigin: (value: string) => void
+        }) {
 
     const { setRouteData, myLocationString, setIsTransit, originCoords, setOriginCoords, destinationCoords, setDestinationCoords } = useCoords();
     const { setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
 
-    const [origin, setOrigin] = useState('');
+    const [origin, setOrigin] = useState(inputOrigin);
     const [destination, setDestination] = useState(inputDestination);
 
     const [time, setTime] = useState('');
@@ -50,6 +64,27 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
         }
     }, [inputDestination]);
 
+    useEffect(() => {
+        setOrigin(inputOrigin);
+
+        if (inputOrigin && !originCoords) {
+            if (destination) {
+                getDirections(inputOrigin, destination, selectedMode)
+                    .then(result => {
+                        if (result?.[0]?.legs?.[0]?.end_location) {
+                            const coords = {
+                                latitude: result[0].legs[0].end_location.lat,
+                                longitude: result[0].legs[0].end_location.lng
+                            };
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error getting coordinates for origin:", error);
+                    });
+            }
+        }
+    }, [inputOrigin]);
+
     // Need this to ensure destinationCoords gets updated
     // useEffect(() => {
     // }, [destinationCoords]);
@@ -60,6 +95,66 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
             setOrigin(myLocationString);
         }
     }, [myLocationString]);
+
+    // FIREBASE LOGGING EVENT 2
+    const logNavigationEvent = async () => {
+        if (!origin || !destination) {
+            console.warn("Cannot log event: Origin or Destination is missing.");
+            return;
+        }
+
+        try {
+            if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+                console.log(destination);
+                if (destination === "Uncle Tetsu, Rue Pierce, Montréal, QC, Canada") {
+                    if (origin === myLocationString) {
+                        console.log(origin);
+                        if (selectedMode === "walking") {
+                            const elapsedTime = (globalThis as any).taskTimer.stop();
+                            await analytics().logEvent('Task_2_finished', {
+                                origin: origin,
+                                destination: destination,
+                                mode_of_transport: selectedMode,
+                                elapsed_time: elapsedTime / 1000,  // Add the elapsed time
+                                user_id: (globalThis as any).userId,
+                            });
+                            console.log(`Custom Event Logged: Task 2 Finished`);
+                            console.log(`Elapsed Time: ${elapsedTime / 1000} seconds`);  // Log in seconds for readability
+                        } else {
+                            await analytics().logEvent('Task_2_wrong_transportMode', {
+                                origin: origin,
+                                destination: destination,
+                                mode_of_transport: selectedMode,
+                                user_id: (globalThis as any).userId,
+                            });
+                            console.log(`Custom Event Logged: Task 2 error - wrong transport mode`);
+
+                        }
+                    } else {
+                        await analytics().logEvent('Task_2_wrong_origin', {
+                            origin: origin,
+                            destination: destination,
+                            mode_of_transport: selectedMode,
+                            user_id: (globalThis as any).userId,
+                        });
+                        console.log(`Custom Event Logged: Task 2 error - wrong origin`);
+                    }
+                } else {
+                    await analytics().logEvent('Task_2_wrong_destination', {
+                        origin: origin,
+                        destination: destination,
+                        mode_of_transport: selectedMode,
+                        user_id: (globalThis as any).userId,
+                    });
+                    console.log(`Custom Event Logged: Task 2 error - wrong destination`);
+                }
+            }
+
+        } catch (error) {
+            console.error("Error logging Firebase event:", error);
+        }
+    };
+
 
     //WHEN ORIGIN SEARCH BAR VALUE CHANGES METHOD HERE TO GETROUTEDATA
     const handleOriginSelect = useCallback(async (selectedOrigin: string, coords: any) => {
@@ -127,6 +222,7 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
         setOriginRoom(null);
         setDestinationRoom(null);
         setInputDestination("");
+        setInputOrigin("");
         setOrigin(myLocationString);
     }, [setRouteData]);
 
@@ -169,9 +265,8 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
                         {transportModes.map(({ mode, icon, color }) => (
                             <TouchableOpacity
                                 key={mode}
-                                //style={SearchBarsStyle.transportButton}
+                                testID={`transport-mode-${mode}`}
                                 onPress={() => setSelectedMode(mode)}
-
                             >
                                 <View style={[
                                     SearchBarsStyle.transportButtonContent,
@@ -184,7 +279,6 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
                                             color='black'
                                         />
                                         {selectedMode === mode}
-
                                     </View>
                                 </View>
                             </TouchableOpacity>

@@ -1,11 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect  } from "react";
+import { AppRegistry, AppState } from 'react-native';
 import { createTheme } from "@rneui/themed";
 import HomeScreen from './src/components/screens/HomeScreen';
 import CalendarScreen from "./src/components/screens/CalendarScreen";
 import { NavigationContainer, RouteProp } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
-import crashlytics from '@react-native-firebase/crashlytics';
 import { Calendar } from "./src/interfaces/calendar";
 import { ClassEventsProvider } from "./src/data/ClassEventsContext";
 
@@ -25,6 +26,11 @@ export type CalendarScreenProp = RouteProp<RootStackParamList, "Calendar">;
 
 export interface CalendarScreenProps { route: CalendarScreenProp; }
 
+if (!(globalThis as any).userId) {
+  (globalThis as any).userId = `user_${Date.now()}`;
+}
+
+
 const theme = createTheme({
   lightColors: {
     primary: '#912338',
@@ -34,11 +40,14 @@ const theme = createTheme({
 });
 
 export default function App(): React.ReactElement {
-  useEffect(() => {
-    console.log('Initializing Firebase...');
-    analytics().setAnalyticsCollectionEnabled(true);
-    crashlytics().setCrashlyticsCollectionEnabled(true);
-    analytics().logAppOpen();
+useEffect(() => {
+    analytics().resetAnalyticsData();  // Clears any stored data
+  console.log("Generated User ID:", (globalThis as any).userId);
+  console.log('Initializing Firebase...');
+    analytics().setUserId((globalThis as any).userId);
+  analytics().setAnalyticsCollectionEnabled(true);
+
+  analytics().logAppOpen();
 
     if (globalThis.isTesting) {
       analytics().logEvent('testing_mode_enabled', {

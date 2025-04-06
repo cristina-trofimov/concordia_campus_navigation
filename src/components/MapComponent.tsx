@@ -23,17 +23,21 @@ import ShuttleBusTracker from "./ShuttleBusTracker.tsx";
 import PointOfInterestMap from "./Point-of-interest_Map.tsx";
 import { HighlightIndoorMap } from './IndoorMap.tsx';
 import { MapComponentStyles } from "../styles/MapComponentStyles.tsx";
+import firebase from './src/components/firebase';
+import analytics from '@react-native-firebase/analytics';
 
 Mapbox.setAccessToken(MAPBOX_TOKEN);
 
 export default function MapComponent({
   drawerHeight,
   setInputDestination,
+  setInputOrigin,
   selectedPOI,
   radius,
 }: {
     readonly drawerHeight: Animated.Value;
     setInputDestination: (inputDestination: string) => void;
+    setInputOrigin: (inputOrigin: string) => void;
     selectedPOI?: string | null;
     radius?: number | null;
 }) {
@@ -234,6 +238,7 @@ export default function MapComponent({
         onClose={closeOverlay}
         buildingLocation={selectedBuilding}
         setInputDestination={setInputDestination}
+        setInputOrigin={setInputOrigin}
       />
       <MapView
         style={MapComponentStyles.map}
@@ -250,13 +255,20 @@ export default function MapComponent({
           centerCoordinate={[sgwCoords.longitude, sgwCoords.latitude]}
         />
 
-        {!inFloorView && locations.map((location) => (
+        {locations.map((location) => (
           <Mapbox.PointAnnotation
             key={location.id.toString()}
             id={`point-${location.id}`}
             coordinate={location.coordinates}
             style={{ zIndex: 1 }}
             onSelected={() => {
+                if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+                        analytics().logEvent('building_pressed', {
+                          building_name: location.title,
+                          user_id: (globalThis as any).userId,
+                        });
+                        console.log(`Custom Event Logged: Building: ${location.title} was pressed`);
+                      }
               openOverlay(location);
             }}
           >
