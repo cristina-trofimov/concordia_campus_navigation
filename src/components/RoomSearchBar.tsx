@@ -192,7 +192,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
 
         if (floorIndex !== -1) {
             // only change to that floor if inside the building
-            if (highlightedBuilding.properties.id === buildingID) {
+            if (highlightedBuilding && highlightedBuilding.properties.id === buildingID) {
                 handleSelectFloor(floorNameFormat(room.floor));
             }
         };
