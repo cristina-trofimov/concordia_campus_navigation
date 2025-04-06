@@ -197,7 +197,7 @@ export default function MapComponent({
       }
 
       let location = await Location.getCurrentPositionAsync({});
-      //console.log("User location received:", location.coords);
+      
       setMyLocationCoords(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);

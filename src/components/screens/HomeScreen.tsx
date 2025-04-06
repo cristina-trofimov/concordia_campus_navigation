@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Animated, Dimensions, ScrollView, Text, View } from "react-native";
+import { Animated, Dimensions, ScrollView, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
 import { IndoorsProvider } from "../../data/IndoorContext";
