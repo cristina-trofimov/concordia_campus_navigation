@@ -4,6 +4,8 @@ import Modal from 'react-native-modal';
 import { Icon } from 'react-native-elements';
 import BuildingLocation from '../interfaces/buildingLocation';
 import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
+import firebase from './src/components/firebase';
+import analytics from '@react-native-firebase/analytics';
 import { useCoords } from '../data/CoordsContext';
 import IndoorViewButton from './IndoorViewButton';
 import { useIndoor } from '../data/IndoorContext';
@@ -14,6 +16,22 @@ interface BuildingInformationProps {
     buildingLocation: BuildingLocation | null;
     setInputDestination: (inputDestination: string) => void;
 }
+const stopTimerAndLogEvent = (title: string) => {
+  if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+    // Stop the timer and get the elapsed time
+
+    const elapsedTime = (globalThis as any).taskTimer.stop();
+    // Log the custom event with building name and the elapsed time
+      analytics().logEvent('Task_1_finished', {
+        building_name: title,
+        elapsed_time: elapsedTime/1000,  // Add the elapsed time
+        user_id: (globalThis as any).userId,
+      });
+
+      console.log(`Custom Event Logged: Task 1 Finished`);
+      console.log(`Elapsed Time: ${elapsedTime / 1000} seconds`);  // Log in seconds for readability
+  }
+};
 
 const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation, setInputDestination }) => {
     const { title, description, buildingInfo, coordinates } = buildingLocation || {};
@@ -21,6 +39,7 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
     const { setDestinationCoords } = useCoords();
     const { inFloorView } = useIndoor();
     const buildingId = (title ?? "").split(" ")[0];
+
 
     return (
         <Modal isVisible={isVisible} onBackdropPress={onClose} onBackButtonPress={onClose}>
@@ -40,6 +59,9 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                                 style={BuildingInfoStyle.actionButton}
                                 onPress={() => {
                                     setInputDestination(address ?? "");
+                                    if(title=== "H Henry F. Hall Building"){
+                                          stopTimerAndLogEvent(title);
+                                        }
                                     if (coordinates) {
                                         const [longitude, latitude] = coordinates;
                                         setDestinationCoords({ latitude, longitude });

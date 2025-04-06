@@ -7,6 +7,8 @@ import { Image } from "@rneui/base";
 import { CalendarEvent } from "../interfaces/CalendraEvent";
 import { UpcomingClassItemStyle } from "../styles/UpcomingClassItemStyle";
 import { Pressable } from "react-native";
+import firebase from './src/components/firebase';
+import analytics from '@react-native-firebase/analytics';
 
 interface UpcomingClassItemProps {
   calendarEvent: CalendarEvent;
@@ -121,7 +123,17 @@ export default class UpcomingClassItem extends Component<
 
     return (
       <Pressable
-        onPress={() => setInputDestination(this.getAdress(location))}
+        onPress={() => {
+              if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+                  const elapsedTime = (globalThis as any).taskTimer.stop();
+             analytics().logEvent('Task_3_finished', {
+            elapsed_time: elapsedTime/1000,
+        user_id: (globalThis as any).userId,                });
+              console.log(`Custom Event Logged: Task 3 Finished`);}
+
+            setInputDestination(this.getAdress(location))} }
+
+
         disabled={statusText === "Ended"} // Disable if class has ended
         style={({ pressed }) => [
           UpcomingClassItemStyle.container,

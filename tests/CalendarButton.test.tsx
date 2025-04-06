@@ -10,10 +10,13 @@ jest.mock('@react-navigation/native', () => ({
 }));
 
 jest.mock('@react-navigation/stack', () => ({}));
-
+jest.mock('@react-native-firebase/analytics', () => () => ({
+  logEvent: jest.fn(),
+}));
 jest.mock('../src/components/HandleGoogle', () => ({
   signIn: jest.fn(),
 }));
+
 
 jest.mock('../src/components/googleCalendarFetching', () => ({
   fetchUserCalendars: jest.fn(),

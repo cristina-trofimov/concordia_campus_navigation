@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { PoiFormStyles } from "../styles/Point-of-interest_Form-STYLES.tsx";
+import analytics from '@react-native-firebase/analytics';
 
 
 type PointOfInterestSelectorProps = {
@@ -60,10 +61,39 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
 
   const handlePOIChange = (itemValue: string) => {
     const newPOI = itemValue === "none" ? null : itemValue;
+    if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+        if(newPOI === "Food and Drinks"){
+       analytics().logEvent('good_POI', {
+       POI: newPOI,
+       user_id: (globalThis as any).userId,
+       });
+       console.log(`Custom Event Logged: good POI chosen: ${newPOI} was pressed`);
+    }else{
+        analytics().logEvent('wrong_POI', {
+        POI: newPOI,
+        user_id: (globalThis as any).userId,
+        });
+        console.log(`Custom Event Logged: bad POI chosen: ${newPOI} was pressed`);
+        }}
+
     setSelectedPOI(newPOI);
   };
 
   const handleRadiusChange = (value: number) => {
+      if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+              if(value === 150){
+             analytics().logEvent('good_radius', {
+             POI: value,
+             user_id: (globalThis as any).userId,
+             });
+             console.log(`Custom Event Logged: good radius chosen: ${value} meters was pressed`);
+          }else{
+              analytics().logEvent('wrong_radius', {
+              POI: value,
+              user_id: (globalThis as any).userId,
+              });
+              console.log(`Custom Event Logged: bad radius chosen: ${value} meters was pressed`);
+              }}
     setSelectedRadius(value);
   };
 
