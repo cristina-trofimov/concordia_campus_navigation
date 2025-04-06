@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
 import Mapbox from '@rnmapbox/maps';
 import { useIndoor } from "../data/IndoorContext";
 import { useCoords } from "../data/CoordsContext";
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature';
-import { FeatureCollection, LineString, Position } from 'geojson';
+import {LineString, Position } from 'geojson';
 import { EntryPointType, GraphNode, Graph } from '../interfaces/IndoorGraph';
 
 // A* pathfinding algorithm
