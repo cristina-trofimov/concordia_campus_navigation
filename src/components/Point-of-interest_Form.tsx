@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { PoiFormStyles } from "../styles/Point-of-interest_Form-STYLES.tsx";
 import analytics from '@react-native-firebase/analytics';
-import { Ionicons } from "@expo/vector-icons";
 import Modal from 'react-native-modal';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
@@ -112,7 +111,7 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
       <View style={{ flex: 1, alignItems: 'flex-end' }}>
 
 
-        <TouchableOpacity style={PoiFormStyles.button} onPress={() => { setIsVisible(!isVisible); }} >
+        <TouchableOpacity testID="poi-toggle-button" style={PoiFormStyles.button} onPress={() => { setIsVisible(!isVisible); }} >
           <FontAwesome6 name="map-location-dot" size={24} color="white" />
         </TouchableOpacity>
 
