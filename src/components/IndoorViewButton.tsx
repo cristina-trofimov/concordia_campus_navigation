@@ -14,9 +14,7 @@ function IndoorViewButton({ inFloorView, buildingId, onClose }: { inFloorView: b
     const backgroundColorInsideBuilding = buildingFloorAssociations.length > 0  ? "white" : "#ddd";
     const opacityInsideBuilding = buildingFloorAssociations.length > 0  ? 1 : 0.5;
 
-    // Handler function that only executes if buildingFloorAssociations exists
     const handlePress = () => {
-        console.log("buildingFloorAssociations length:", buildingFloorAssociations.length);
         if (buildingFloorAssociations) {
             setInFloorView(!inFloorView);
             setCurrentFloorAssociations(buildingFloorAssociations);

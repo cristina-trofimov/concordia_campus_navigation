@@ -19,17 +19,6 @@ export const FloorSelectorStyle = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#cccccc',
-        ...Platform.select({
-            ios: {
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-            },
-            android: {
-                elevation: 5,
-            },
-        }),
     },
     selectedFloorText: {
         fontSize: 16,
@@ -68,16 +57,5 @@ export const FloorSelectorStyle = StyleSheet.create({
         marginRight: 10,
         borderWidth: 1,
         borderColor: '#e0e0e0',
-        ...Platform.select({
-            ios: {
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
-            },
-            android: {
-                elevation: 5,
-            },
-        }),
     },
 })
