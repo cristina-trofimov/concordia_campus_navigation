@@ -50,7 +50,6 @@ describe('ShuttleBusTransit Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    console.log = jest.fn();
 
     // Create a default mock date - Wednesday, April 2, 2025, 8:00 AM
     mockDate = new Date(2025, 3, 2, 8, 0);
@@ -158,14 +157,6 @@ describe('ShuttleBusTransit Component', () => {
     // Create a new mock date at 11 PM and update the implementation
     mockDate = new Date(2025, 3, 2, 23, 0);
 
-    // Force getNextShuttleDepartures to return an empty array
-    // by mocking console.log to check what's happening
-    jest.spyOn(console, 'log').mockImplementation((message) => {
-      if (message === 'No more shuttles available today') {
-        return true;
-      }
-    });
-
     const { getByText } = render(
       <ShuttleBusTransit
         startLocation={SGW_COORDS}
@@ -209,9 +200,6 @@ describe('ShuttleBusTransit Component', () => {
 
     // Since the component should render null on weekends, we expect toJSON to be null
     expect(toJSON()).not.toBeNull();
-
-    // Verify the weekend log was called
-    expect(console.log).toHaveBeenCalledWith('No shuttle service available on weekends');
   });
 
   test('adjusts departure time when cannot make it to shuttle in time', () => {

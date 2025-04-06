@@ -110,7 +110,6 @@ const getNextShuttleDepartures = (
     scheduleKey = "friday";
   } else {
     // Weekend (Saturday or Sunday)
-    console.log("No shuttle service available on weekends");
     return [];
   }
 
@@ -123,7 +122,6 @@ const getNextShuttleDepartures = (
   const todaySchedule = shuttleSchedule.schedule[scheduleKey][directionKey];
 
   if (!todaySchedule) {
-    console.log(`No schedule found for ${directionKey} on ${scheduleKey}`);
     return [];
   }
 
@@ -144,7 +142,6 @@ const getNextShuttleDepartures = (
     .slice(0, limit);
 
   if (nextDepartures.length === 0) {
-    console.log("No more shuttles available today");
     return [];
   }
 
@@ -208,8 +205,6 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
     setStartCampus(start);
     setEndCampus(end);
 
-    console.log(`Origin campus: ${start}, Destination campus: ${end}`);
-
     // Check if shuttle is available
     const shuttleAvailable =
       start !== "UNKNOWN" && end !== "UNKNOWN" && start !== end;
@@ -218,17 +213,12 @@ const ShuttleBusTransit: React.FC<ShuttleBusTransitProps> = ({
 
     // Get next departures if shuttle is available
     if (shuttleAvailable) {
-      console.log("Shuttle bus is available between these campuses!");
       const departures = getNextShuttleDepartures(start, end, 2); // Get 3 departures
       if (departures.length > 0) {
         setNextDepartures(departures);
-        console.log(`Next departures:`, departures);
       } else {
         setNextDepartures([]);
-        console.log("No more departures today");
       }
-    } else {
-      console.log("Shuttle bus is not available for this route");
     }
   }, [startLocation, endLocation]);
 

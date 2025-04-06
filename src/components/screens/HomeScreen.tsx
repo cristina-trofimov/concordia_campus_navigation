@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Animated, Dimensions, ScrollView, Text, View } from "react-native";
+import { Animated, Dimensions, ScrollView, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
 import { IndoorsProvider } from "../../data/IndoorContext";
@@ -24,6 +24,7 @@ export function HomeScreen() {
   const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
   const [radius, setRadius] = useState<number | null>(null);
   const { classEvents } = useClassEvents();
+  const hasClassEvents = classEvents.length > 0;
 
   return (
     <CoordsProvider>
@@ -49,13 +50,14 @@ export function HomeScreen() {
                 setInputOrigin={setInputOrigin}
               />
               {inputDestination === "" ? (
+                // if (classEvents.length > 0) {
+                  
+                // }
                 classEvents.length > 0 ? (
-                  classEvents.map((event, index) => (
+                  classEvents?.map((event, index) => (
                     <UpcomingClassItem calendarEvent={event} key={index} setInputDestination={setInputDestination} />
                   ))
-                ) : (
-                  null
-                )
+                ) : ( null )
               ) : null}
               <RoomSearchBars />
               <PointOfInterestSelector

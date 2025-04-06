@@ -3,33 +3,26 @@ import { TouchableOpacity, Modal, View, Animated, Dimensions, GestureResponderEv
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LeftDrawerStyle } from "../styles/LeftDrawerStyle";
-import firebase from '../src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 
 
 const { width } = Dimensions.get("window");
 // timer for usabilty test
 let startTime = 0;
-let timerInterval: any = null;
 (globalThis as any).taskTimer = {
   start: () => {
-    if (startTime === 0) {  // Only start a new timer if no timer is running
-      startTime = Date.now(); // Record the start time
-      console.log("Timer started");
+    if (startTime === 0) {
+      startTime = Date.now();
     } else {
-      console.log("Timer already running, resetting.");
       startTime = Date.now(); // Reset the timer
     }
   },
   stop: () => {
     if (startTime !== 0) {
       const elapsedTime = Date.now() - startTime;
-      console.log(`Timer stopped. Time elapsed: ${(elapsedTime / 1000).toFixed(2)} seconds`);
-      // Reset the timer after stopping
       startTime = 0;
-      return elapsedTime; // Return the time taken
+      return elapsedTime;
     }
-    console.log("No Timer running currently");
     return 0;
   },
   getElapsedTime: () => {
@@ -62,8 +55,6 @@ const LeftDrawer = () => {
       message: 'Started a task',
       user_id: (globalThis as any).userId,
     });
-
-    console.log("Start Task pressed");
   };
 
   const handleCancelTask = () => {
@@ -75,8 +66,6 @@ const LeftDrawer = () => {
       message: 'Cancelled a task',
       user_id: (globalThis as any).userId,
     });}
-
-    console.log("Cancel Task pressed");
   };
 
   useEffect(() => {

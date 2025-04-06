@@ -1,6 +1,6 @@
 import React from 'react'
 import { useIndoor } from '../data/IndoorContext';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { IndoorViewButtonStyle } from '../styles/IndoorViewButtonStyle';
 import { changeCurrentFloorAssociations } from './IndoorMap';

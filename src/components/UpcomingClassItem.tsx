@@ -1,13 +1,8 @@
-import {
-  Text,
-  View,
-} from "react-native";
+import { Text, View, Pressable, } from "react-native";
 import React, { Component } from "react";
 import { Image } from "@rneui/base";
 import { CalendarEvent } from "../interfaces/CalendraEvent";
 import { UpcomingClassItemStyle } from "../styles/UpcomingClassItemStyle";
-import { Pressable } from "react-native";
-import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 
 interface UpcomingClassItemProps {
@@ -23,7 +18,7 @@ export default class UpcomingClassItem extends Component<
   UpcomingClassItemProps,
   ClassItemState
 > {
-  private courseIcon = require("../resources/images/book-icon.png");
+  private readonly courseIcon = require("../resources/images/book-icon.png");
   private intervalID: NodeJS.Timeout | null = null;
 
   constructor(props: UpcomingClassItemProps) {
@@ -54,19 +49,19 @@ export default class UpcomingClassItem extends Component<
     }
   }
 
-  private convertToMinutes = (time: String): number => {
+  private readonly convertToMinutes = (time: string): number => {
     const [hours, minutes] = time.split(":").map(Number);
     return hours * 60 + minutes;
   };
 
-  private getCurrentTimeInMinutes = (): number => {
+  private readonly getCurrentTimeInMinutes = (): number => {
     const now = new Date();
     const nowHours = now.getHours();
     const nowMinutes = now.getMinutes();
     return nowHours * 60 + nowMinutes;
   };
 
-  private isClassInProgress = (
+  private readonly isClassInProgress = (
     startDateTime: string,
     endDateTime: string,
     startTimeFormatted: string,
@@ -100,12 +95,12 @@ export default class UpcomingClassItem extends Component<
     return `${hours}:${minutes}`;
   }
 
-  private getBuildingName = (location: string): string => {
+  private readonly getBuildingName = (location: string): string => {
     const locationParts = location.split(",");
     return locationParts[0].trim(); // Return the first part of the location string
   };
 
-  private getAdress = (location: string): string => {
+  private readonly getAdress = (location: string): string => {
     const locationParts = location.split(",");
     return locationParts[1].trim(); // Return the second part of the location string
   }
@@ -125,11 +120,12 @@ export default class UpcomingClassItem extends Component<
       <Pressable
         onPress={() => {
               if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
-                  const elapsedTime = (globalThis as any).taskTimer.stop();
-             analytics().logEvent('Task_3_finished', {
-            elapsed_time: elapsedTime/1000,
-        user_id: (globalThis as any).userId,                });
-              console.log(`Custom Event Logged: Task 3 Finished`);}
+                const elapsedTime = (globalThis as any).taskTimer.stop();
+                analytics().logEvent('Task_3_finished', {
+                  elapsed_time: elapsedTime/1000,
+                  user_id: (globalThis as any).userId,
+                });
+              }
 
             setInputDestination(this.getAdress(location))} }
 
