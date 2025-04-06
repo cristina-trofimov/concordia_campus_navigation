@@ -1,21 +1,33 @@
 appId: com.cristina.trofimov143.frontend
 ---
 - launchApp
+
 - waitForAnimationToEnd:
-    timeout: 500
-- swipe:
-    start: 50%, 50% # From (90% of width, 50% of height)
-    end: 50%, 90% # To (10% of width, 50% of height)
-- tapOn:
-    point: 8%, 6%
-- waitForAnimationToEnd:
-    timeout: 500
-- tapOn:
-    point: 50%, 80%
+    timeout: 1100
 - tapOn:
     point: 93%, 6%
+- tapOn:
+    point: 93%, 7%
+- tapOn:
+    point: 93%, 12%
+- tapOn:
+    point: 93%, 11%
+- tapOn:
+    point: 93%, 10%
+
+- waitForAnimationToEnd:
+    timeout: 900
+- tapOn: "naolal30@gmail.com"
+- tapOn: "Map"
 - waitForAnimationToEnd:
     timeout: 500
+- tapOn: "SOEN 345"
 - swipe:
-    start: 80%, 50% # From (90% of width, 50% of height)
-    end: 40%, 50% # To (10% of width, 50% of height)
+    start: 50%, 50%
+    end: 50%, 90%
+- swipe:
+    start: 50%, 50%
+    end: 50%, 90%
+- swipe:
+    start: 50%, 50%
+    end: 10%, 50%

@@ -221,7 +221,7 @@ function SearchBars(
         setOriginRoom(null);
         setDestinationRoom(null);
         setInputDestination("");
-        setInputOrigin("");
+        setInputOrigin(myLocationString);
         setOrigin(myLocationString);
     }, [setRouteData]);
 

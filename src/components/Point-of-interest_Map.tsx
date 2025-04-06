@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import { PointAnnotation } from '@rnmapbox/maps';
-import { Text } from "@rneui/themed";
-import * as Location from "expo-location";
-import { Coords } from "../interfaces/Map.ts";
 import analytics from '@react-native-firebase/analytics';
 import { TokenManager } from "../data/TokenManager.ts";
 
-import axios from 'axios';
+
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const MAPBOX_ACCESS_TOKEN = TokenManager.getMapboxToken();

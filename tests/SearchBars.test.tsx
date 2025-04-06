@@ -219,7 +219,7 @@ describe('SearchBars Component', () => {
     expect(mockSetOriginRoom).toHaveBeenCalledWith(null);
     expect(mockSetDestinationRoom).toHaveBeenCalledWith(null);
     expect(mockSetInputDestination).toHaveBeenCalledWith("");
-    expect(mockSetInputOrigin).toHaveBeenCalledWith("");
+    expect(mockSetInputOrigin).toHaveBeenCalledWith("Current Location");
   });
 
   it('handles error in getDirections', async () => {
