@@ -83,6 +83,7 @@ export default function MapComponent({
       const { latitude, longitude } = myLocationCoords;
       const locationString = `${latitude},${longitude}`;
       setmyLocationString(locationString);
+      console.log("Location string set:", locationString);
     }
   }, [myLocationCoords, setmyLocationString]);
 
