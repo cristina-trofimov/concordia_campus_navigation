@@ -54,16 +54,10 @@ export const SearchBarsStyle = StyleSheet.create({
     timeText: {
         fontSize: 12,
     },
-    timeAndButtonsContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingHorizontal: 30,
-        paddingVertical: 20,
-    },
     timeContainer: {
         alignItems: "center",
-        marginRight: 10,
+        paddingHorizontal: 30,
+        paddingVertical: 20,
     },
     timeValue: {
         fontSize: 18,

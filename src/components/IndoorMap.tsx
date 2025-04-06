@@ -17,6 +17,7 @@ import { ve1Features } from '../data/indoor/VE/VE1.ts';
 import { ve2Features } from '../data/indoor/VE/VE2.ts';
 import { vl1Features } from '../data/indoor/VL/VL1.ts';
 import { vl2Features } from '../data/indoor/VL/VL2.ts';
+import { NavigationOverlay } from './IndoorNavigation.tsx';
 
 export const featureMap: { [key: string]: any } = {
     h1Features,
@@ -73,6 +74,13 @@ export const useIndoorFeatures = () => {
     return { selectIndoorFeatures };
 };
 
+export const changeCurrentFloorAssociations = (id: string) => {
+    const associations = buildingFloorAssociations.filter(
+        (association) => association.buildingID === id
+    );
+    return associations;
+}
+
 export const HighlightIndoorMap = () => {
     const { highlightedBuilding, isInsideBuilding, destinationCoords, myLocationCoords } = useCoords();
     const { setBuildingHasFloors, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations, setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures, originRoom, destinationRoom, currentFloor } = useIndoor();
@@ -93,12 +101,9 @@ export const HighlightIndoorMap = () => {
         setFloorList([]);
         if (highlightedBuilding) {
             const buildingId = highlightedBuilding.properties.id;
-            const associations = buildingFloorAssociations.filter(
-                (association) => association.buildingID === buildingId
-            );
-            setCurrentFloorAssociations(associations);
+            setCurrentFloorAssociations(changeCurrentFloorAssociations(buildingId));
         }
-    }, [highlightedBuilding]);
+    }, [highlightedBuilding, destinationCoords]);
 
     useEffect(() => {
         if (currentFloorAssociations.length > 0) {
@@ -154,7 +159,7 @@ export const HighlightIndoorMap = () => {
                                 10, 0,
                                 12, 0,
                                 15, 0,
-                                20, 20
+                                20, 15
                             ],
                             textColor: '#FFFFFF',
                             textAnchor: 'center',
@@ -163,6 +168,10 @@ export const HighlightIndoorMap = () => {
                         }}
                     />
                 </Mapbox.ShapeSource>
+            )}
+
+            {indoorFeatures.length > 0 && inFloorView && (
+                <NavigationOverlay />
             )}
 
             {/* Origin Room Pin */}

@@ -6,21 +6,20 @@ import getDirections from './Route';
 import { useCoords } from '../data/CoordsContext';
 import { useIndoor } from '../data/IndoorContext';
 import { Ionicons } from "@expo/vector-icons";
-import Entypo from "@expo/vector-icons/Entypo";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 import ShuttleBusTransit from './ShuttleBusTransit';
-import IndoorViewButton from './IndoorViewButton';
 
 
 function SearchBars({ inputDestination, setInputDestination }: { inputDestination: string, setInputDestination: (value: string) => void }) {
 
     const { setRouteData, myLocationString, setIsTransit, originCoords, setOriginCoords, destinationCoords, setDestinationCoords } = useCoords();
-    const { inFloorView, setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
+    const { setInFloorView, setOriginRoom, setDestinationRoom } = useIndoor();
 
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState(inputDestination);
+
     const [time, setTime] = useState('');
 
     const transportModes = [
@@ -234,7 +233,7 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
                                 key={mode}
                                 //style={SearchBarsStyle.transportButton}
                                 onPress={() => setSelectedMode(mode)}
-                                
+
                             >
                                 <View style={[
                                     SearchBarsStyle.transportButtonContent,
@@ -254,7 +253,6 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
                         ))}
                     </View>
 
-                   
                     {/* Only render ShuttleBusTransit component when transit mode is selected */}
                     {!!(selectedMode === "transit" && origin && destinationCoords) && (
                         <ShuttleBusTransit
@@ -354,25 +352,11 @@ function SearchBars({ inputDestination, setInputDestination }: { inputDestinatio
                         />
                     )}
 
-                    {/* Total Time, Start Button, and Floor/Outside View Button */}
-                    <View style={SearchBarsStyle.timeAndButtonsContainer}>
-                        <View style={SearchBarsStyle.timeContainer}>
-                            <Text style={SearchBarsStyle.timeValue}>
-                                {time}min
-                            </Text>
-
-                        </View>
-                        {/* Buttons Container */}
-                        <View style={SearchBarsStyle.buttonsContainer}>
-                            <TouchableOpacity style={[SearchBarsStyle.button, { backgroundColor: "#912338" }, { borderColor: "#912338" }]}  onPress={() => {logNavigationEvent()}}>
-                                <View style={SearchBarsStyle.buttonContent}>
-                                    <Entypo name="direction" size={20} color="white" />
-                                    <Text style={[SearchBarsStyle.buttonText, { color: "white" }]}>Start</Text>
-                                </View>
-                            </TouchableOpacity>
-
-                            <IndoorViewButton inFloorView={inFloorView} />
-                        </View>
+                    {/* Total Time */}
+                    <View style={SearchBarsStyle.timeContainer}>
+                        <Text style={SearchBarsStyle.timeValue}>
+                            {time}min
+                        </Text>
                     </View>
                 </>
             )}

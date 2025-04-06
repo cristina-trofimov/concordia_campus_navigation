@@ -1,22 +1,38 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import { FloorSelector } from '../src/components/FloorSelector';
-import { useIndoor } from '../src/data/IndoorContext';
-import { useIndoorFeatures } from '../src/components/IndoorMap';
 
-// Mock the hooks
-jest.mock('../src/data/IndoorContext', () => ({
+// Need to mock these first before importing
+jest.mock('../src/data/IndoorContext.tsx', () => ({
   useIndoor: jest.fn(),
 }));
 
-jest.mock('../src/components/IndoorMap', () => ({
+jest.mock('../src/components/IndoorMap.tsx', () => ({
   useIndoorFeatures: jest.fn(),
 }));
+
+jest.mock('../src/data/CoordsContext.tsx', () => ({
+  useCoords: jest.fn(),
+}));
+
+// Mock AntDesign with a proper mock that returns a valid React element
+jest.mock('@expo/vector-icons/AntDesign', () => {
+  const React = require('react');
+  return function MockAntDesign(props) {
+    return React.createElement('mockAntDesign', props);
+  };
+});
+
+// Import after mocking
+import { useIndoor } from '../src/data/IndoorContext.tsx';
+import { useIndoorFeatures } from '../src/components/IndoorMap.tsx';
+import { useCoords } from '../src/data/CoordsContext.tsx';
 
 describe('FloorSelector', () => {
   // Setup common mock values and functions
   const mockSetCurrentFloor = jest.fn();
   const mockSelectIndoorFeatures = jest.fn();
+  const mockSetInFloorView = jest.fn();
   
   beforeEach(() => {
     jest.clearAllMocks();
@@ -27,10 +43,15 @@ describe('FloorSelector', () => {
       setCurrentFloor: mockSetCurrentFloor,
       inFloorView: true,
       floorList: ['Floor 1', 'Floor 2', 'Floor 3'],
+      setInFloorView: mockSetInFloorView
     });
     
     (useIndoorFeatures as jest.Mock).mockReturnValue({
       selectIndoorFeatures: mockSelectIndoorFeatures,
+    });
+
+    (useCoords as jest.Mock).mockReturnValue({
+      destinationCoords: null,
     });
   });
 
@@ -49,6 +70,7 @@ describe('FloorSelector', () => {
       setCurrentFloor: mockSetCurrentFloor,
       inFloorView: false,
       floorList: ['Floor 1', 'Floor 2', 'Floor 3'],
+      setInFloorView: mockSetInFloorView
     });
     
     const { toJSON } = render(<FloorSelector />);
@@ -58,16 +80,12 @@ describe('FloorSelector', () => {
   });
 
   test('shows dropdown options when dropdown trigger is pressed', () => {
-    const { getByText, queryByText, getByTestId } = render(<FloorSelector />);
-    
-    // Add a testID to help identify the dropdown trigger in our component
-    // Note: You would need to add this testID to the actual component
-    // <TouchableOpacity testID="dropdown-trigger" ... >
+    const { getByText, queryByText } = render(<FloorSelector />);
     
     // Check dropdown is not visible initially
     expect(queryByText('Floor 2')).toBeNull();
     
-    // Click the dropdown trigger - using the arrow icon to avoid ambiguity
+    // Click the dropdown trigger
     fireEvent.press(getByText('▼'));
     
     // Check all floor options are displayed
@@ -76,7 +94,7 @@ describe('FloorSelector', () => {
   });
 
   test('selects a floor when option is pressed', () => {
-    const { getByText, queryByText } = render(<FloorSelector />);
+    const { getByText } = render(<FloorSelector />);
     
     // Open dropdown
     fireEvent.press(getByText('▼'));
@@ -111,12 +129,43 @@ describe('FloorSelector', () => {
     // Initially closed
     expect(queryByText('Floor 2')).toBeNull();
     
-    // First click - open (using arrow to avoid ambiguity)
+    // First click - open
     fireEvent.press(getByText('▼'));
     expect(queryByText('Floor 2')).toBeTruthy();
     
-    // Second click - close (using arrow to avoid ambiguity)
+    // Second click - close
     fireEvent.press(getByText('▼'));
     expect(queryByText('Floor 2')).toBeNull();
+  });
+
+  test('renders back button when destinationCoords is null', () => {
+    const { getByTestId } = render(<FloorSelector />);
+    
+    // Find the AntDesign component by its name prop which should be 'arrowleft'
+    const mockIcon = getByTestId('back-button');
+    expect(mockIcon).toBeTruthy();
+  });
+
+  test('back button not rendered when destinationCoords is present', () => {
+    (useCoords as jest.Mock).mockReturnValue({
+      destinationCoords: { latitude: 0, longitude: 0 },
+    });
+    
+    const { queryByTestId } = render(<FloorSelector />);
+    
+    // Back button should not be present
+    expect(queryByTestId('back-button')).toBeNull();
+  });
+
+  test('back button sets inFloorView to false when pressed', () => {
+    // Use getByTestId to find the back button wrapper
+    const { getByTestId } = render(<FloorSelector />);
+    
+    // Find the back button by testID and press it
+    const backButton = getByTestId('back-button-container');
+    fireEvent.press(backButton);
+    
+    // Check if setInFloorView was called with false
+    expect(mockSetInFloorView).toHaveBeenCalledWith(false);
   });
 });

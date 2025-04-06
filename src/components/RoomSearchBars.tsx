@@ -3,12 +3,15 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useCoords } from "../data/CoordsContext";
 import RoomSearchBar from "./RoomSearchBar";
 import { useIndoor } from "../data/IndoorContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const RoomSearchBars = () => {
   const { originCoords, destinationCoords, myLocationCoords } = useCoords();
   const { setIndoorTransport } = useIndoor();
   const [selectedTransport, setSelectedTransport] = useState<string>("");
+  const [roomSearched, setRoomSearched] = useState<boolean>(false);
+  const [originRoomSearched, setOriginRoomSearched] = useState<boolean>(false);
+  const [destinationRoomSearched, setDestinationRoomSearched] = useState<boolean>(false);
 
   const handleIconPress = (iconName: string) => {
     setIndoorTransport(iconName);  // Set the indoor transport type to the clicked icon name
@@ -18,6 +21,10 @@ export const RoomSearchBars = () => {
   const getIconColor = (iconName: string) => {
     return selectedTransport === iconName ? "#912338" : "black";  // Change the color when selected
   };
+
+  useEffect(() => {
+    setRoomSearched(originRoomSearched || destinationRoomSearched);
+  }, [originRoomSearched, destinationRoomSearched]);
 
   return (
     <>
@@ -33,17 +40,19 @@ export const RoomSearchBars = () => {
             location={originCoords ? originCoords : myLocationCoords}
             placeholder="origin room"
             searchType={"origin"}
+            setRoomSearched={setOriginRoomSearched}
           />
           <RoomSearchBar
             location={destinationCoords}
             placeholder="destination room"
             searchType={"destination"}
+            setRoomSearched={setDestinationRoomSearched}
           />
         </View>
       )}
 
       {/* Add the icons row */}
-      {destinationCoords && (
+      {destinationCoords && roomSearched && (
         <View style={{
           flexDirection: 'row',
           justifyContent: 'center',

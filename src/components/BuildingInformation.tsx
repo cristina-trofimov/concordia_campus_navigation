@@ -7,6 +7,8 @@ import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
 import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 import { useCoords } from '../data/CoordsContext';
+import IndoorViewButton from './IndoorViewButton';
+import { useIndoor } from '../data/IndoorContext';
 
 interface BuildingInformationProps {
     isVisible: boolean;
@@ -34,7 +36,9 @@ const stopTimerAndLogEvent = (title: string) => {
 const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation, setInputDestination }) => {
     const { title, description, buildingInfo, coordinates } = buildingLocation || {};
     const { photo, address, departments, services } = buildingInfo || {};
-    const {setDestinationCoords} = useCoords();
+    const { setDestinationCoords } = useCoords();
+    const { inFloorView } = useIndoor();
+    const buildingId = (title ?? "").split(" ")[0];
 
     return (
         <Modal isVisible={isVisible} onBackdropPress={onClose} onBackButtonPress={onClose}>
@@ -43,6 +47,13 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                     <View style={BuildingInfoStyle.card}>
                         <View style={BuildingInfoStyle.titleContainer}>
                             <Text style={BuildingInfoStyle.title}>{title}</Text>
+                        </View>
+                        <View style={BuildingInfoStyle.buttonsContainer}>
+                            <IndoorViewButton
+                                inFloorView={inFloorView}
+                                buildingId={buildingId}
+                                onClose={onClose}
+                            />
                             <TouchableOpacity
                                 style={BuildingInfoStyle.actionButton}
                                 onPress={() => {
