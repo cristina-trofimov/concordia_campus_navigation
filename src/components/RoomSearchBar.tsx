@@ -17,14 +17,18 @@ interface RoomSearchBarProps {
     placeholder?: string;
     searchType: 'origin' | 'destination';
     defaultValue?: string | null;
+    setRoomSearched: (value: boolean) => void;
     onClear?: () => void;
 }
+
 
 export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     location,
     placeholder,
     searchType,
+    setRoomSearched,
     defaultValue = null,
+
     onClear
 }) => {
     const [query, setQuery] = useState("");
@@ -98,6 +102,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
             setAllRooms([]);
             setQuery("");
             setDisplayedRoom("");
+            setRoomSearched(false);
         }
     }, [location]);
 
@@ -119,14 +124,15 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     const handleInputChange = (text: string) => {
         setQuery(text);
         setDisplayedRoom("");
+        setRoomSearched(false);
         filterSuggestions(text);
     };
 
     // Calculate center point of a room polygon
     const calculateRoomCenter = (room: RoomInfo): [number, number] | undefined => {
         const floorFeatures = featureMap[room.component];
-        const roomFeature = floorFeatures.find((feature: any) => 
-            feature.properties.ref === room.ref && 
+        const roomFeature = floorFeatures.find((feature: any) =>
+            feature.properties.ref === room.ref &&
             feature.properties.indoor === "room"
         );
 
@@ -150,6 +156,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     const handleSuggestionPress = (room: RoomInfo) => {
         const displayText = `${room.ref}`;
         setDisplayedRoom(displayText);
+        setRoomSearched(true);
         setQuery("");
         setSuggestions([]);
 
@@ -194,6 +201,7 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
     // Handle clearing the search
     const handleClear = () => {
         setDisplayedRoom("");
+        setRoomSearched(false);
         setQuery("");
         setSuggestions([]);
 

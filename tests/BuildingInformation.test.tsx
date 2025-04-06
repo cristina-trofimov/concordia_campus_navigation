@@ -1,7 +1,10 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react-native';
 import BuildingInformation from '../src/components/BuildingInformation';
-import { TouchableOpacity, Text } from 'react-native';
+
+// Mock all required dependencies
+// Mock Mapbox
+jest.mock('@rnmapbox/maps', () => ({}));
 
 // Mock the react-native-modal
 jest.mock('react-native-modal', () => {
@@ -22,24 +25,49 @@ jest.mock('react-native-modal', () => {
 // Mock the Icon component from react-native-elements
 jest.mock('react-native-elements', () => {
   const React = require('react');
-  const { Text } = require('react-native');
+  const { Text, TouchableOpacity } = require('react-native');
   return {
     Icon: ({ name, type, size, color, ...props }) => (
-      <Text testID={`icon-${name}-${type}`} {...props}>
-        {name}
-      </Text>
+      <TouchableOpacity testID={`icon-${name}-${type}`} {...props}>
+        <Text>{name}</Text>
+      </TouchableOpacity>
     )
   };
 });
 
-// Mock console.log
-console.log = jest.fn();
+// Mock the IndoorViewButton component
+jest.mock('../src/components/IndoorViewButton', () => {
+  const React = require('react');
+  const { TouchableOpacity, Text } = require('react-native');
+  return ({ buildingId, onClose }) => (
+    <TouchableOpacity testID={`indoor-view-button-${buildingId}`} onPress={onClose}>
+      <Text>Indoor View</Text>
+    </TouchableOpacity>
+  );
+});
+
+// Mock the CoordsContext
+jest.mock('../src/data/CoordsContext', () => ({
+  useCoords: () => ({
+    setDestinationCoords: jest.fn()
+  })
+}));
+
+// Mock the IndoorContext
+jest.mock('../src/data/IndoorContext', () => ({
+  useIndoor: () => ({
+    inFloorView: false,
+    setInFloorView: jest.fn()
+  })
+}));
 
 describe('BuildingInformation Component', () => {
   const mockOnClose = jest.fn();
+  const mockSetInputDestination = jest.fn();
   const mockBuildingLocation = {
     title: 'Test Building',
     description: 'This is a test description',
+    coordinates: [123.456, 78.910], // Add coordinates for full coverage
     buildingInfo: {
       photo: 'https://example.com/photo.jpg',
       address: '123 Test Street',
@@ -57,7 +85,8 @@ describe('BuildingInformation Component', () => {
       <BuildingInformation 
         isVisible={true} 
         onClose={mockOnClose} 
-        buildingLocation={mockBuildingLocation} 
+        buildingLocation={mockBuildingLocation}
+        setInputDestination={mockSetInputDestination}
       />
     );
 
@@ -82,6 +111,9 @@ describe('BuildingInformation Component', () => {
     expect(getByText('Services:')).toBeTruthy();
     expect(getByText('Service 1')).toBeTruthy();
     expect(getByText('Service 2')).toBeTruthy();
+    
+    // Check indoor view button is rendered
+    expect(getByTestId('indoor-view-button-Test')).toBeTruthy();
   });
 
   test('does not render when not visible', () => {
@@ -89,7 +121,8 @@ describe('BuildingInformation Component', () => {
       <BuildingInformation 
         isVisible={false} 
         onClose={mockOnClose} 
-        buildingLocation={mockBuildingLocation} 
+        buildingLocation={mockBuildingLocation}
+        setInputDestination={mockSetInputDestination}
       />
     );
     
@@ -102,7 +135,8 @@ describe('BuildingInformation Component', () => {
       <BuildingInformation 
         isVisible={true} 
         onClose={mockOnClose} 
-        buildingLocation={mockBuildingLocation} 
+        buildingLocation={mockBuildingLocation}
+        setInputDestination={mockSetInputDestination}
       />
     );
     
@@ -115,7 +149,8 @@ describe('BuildingInformation Component', () => {
       <BuildingInformation 
         isVisible={true} 
         onClose={mockOnClose} 
-        buildingLocation={mockBuildingLocation} 
+        buildingLocation={mockBuildingLocation}
+        setInputDestination={mockSetInputDestination}
       />
     );
     
@@ -123,9 +158,7 @@ describe('BuildingInformation Component', () => {
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
-  test('logs message when directions button is pressed', () => {
-    const mockSetInputDestination = jest.fn();
-    
+  test('handles directions button press correctly', () => {
     const { getByTestId } = render(
       <BuildingInformation 
         isVisible={true} 
@@ -135,10 +168,8 @@ describe('BuildingInformation Component', () => {
       />
     );
     
-    // Find the directions icon
+    // Find the directions icon and press it
     const directionsIcon = getByTestId('icon-directions-material');
-    
-    // Press the icon
     fireEvent.press(directionsIcon);
     
     // Check that setInputDestination was called with the correct address
@@ -146,8 +177,6 @@ describe('BuildingInformation Component', () => {
     
     // Check that onClose was called
     expect(mockOnClose).toHaveBeenCalled();
-    
-    // Remove the console.log check since it's not actually happening in the component
   });
 
   test('handles missing building location data gracefully', () => {
@@ -155,7 +184,8 @@ describe('BuildingInformation Component', () => {
       <BuildingInformation 
         isVisible={true} 
         onClose={mockOnClose} 
-        buildingLocation={null} 
+        buildingLocation={null}
+        setInputDestination={mockSetInputDestination}
       />
     );
     
@@ -168,6 +198,7 @@ describe('BuildingInformation Component', () => {
     const partialData = {
       title: 'Partial Building',
       description: 'Partial description',
+      coordinates: null, // Test with null coordinates
       buildingInfo: {
         address: '456 Partial Street',
         // No photo, departments or services
@@ -178,7 +209,8 @@ describe('BuildingInformation Component', () => {
       <BuildingInformation 
         isVisible={true} 
         onClose={mockOnClose} 
-        buildingLocation={partialData} 
+        buildingLocation={partialData}
+        setInputDestination={mockSetInputDestination}
       />
     );
     
@@ -190,5 +222,21 @@ describe('BuildingInformation Component', () => {
     // Should not display what we don't have
     expect(queryByText('Departments:')).toBeNull();
     expect(queryByText('Services:')).toBeNull();
+  });
+
+  test('handles indoor view button correctly', () => {
+    const { getByTestId } = render(
+      <BuildingInformation 
+        isVisible={true} 
+        onClose={mockOnClose} 
+        buildingLocation={mockBuildingLocation}
+        setInputDestination={mockSetInputDestination}
+      />
+    );
+    
+    const indoorButton = getByTestId('indoor-view-button-Test');
+    fireEvent.press(indoorButton);
+    
+    expect(mockOnClose).toHaveBeenCalled();
   });
 });

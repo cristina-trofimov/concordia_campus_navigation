@@ -20,7 +20,6 @@ const CalendarButton = () => {
         navigation.navigate("Calendar", { accessToken: token, calendars: calendarsData, open : true });
       }
     }
-    // navigation.navigate("Calendar", { accessToken: token });
 
   }
 

@@ -15,7 +15,8 @@ jest.mock('@rnmapbox/maps', () => {
     ShapeSource: ({ children }) => <div data-testid="mapbox-shape-source">{children}</div>,
     FillLayer: () => <div data-testid="mapbox-fill-layer" />,
     SymbolLayer: () => <div data-testid="mapbox-symbol-layer" />,
-    CircleLayer: () => <div data-testid="mapbox-circle-layer" />
+    CircleLayer: () => <div data-testid="mapbox-circle-layer" />,
+    LineLayer: () => <div data-testid="mapbox-line-layer" />
   };
 });
 
@@ -25,6 +26,11 @@ jest.mock('../src/data/CoordsContext', () => ({
 
 jest.mock('../src/data/IndoorContext', () => ({
   useIndoor: jest.fn()
+}));
+
+// Mock NavigationOverlay
+jest.mock('../src/components/IndoorNavigation', () => ({
+  NavigationOverlay: () => <div data-testid="navigation-overlay" />
 }));
 
 // Fix the import path for IndoorPointsOfInterest
@@ -65,12 +71,14 @@ describe('HighlightIndoorMap Component', () => {
     // Reset all mocks
     jest.clearAllMocks();
     
-    // Setup default mock values
+    // Setup default mock values with mandatory functions
     useCoords.mockReturnValue({
       highlightedBuilding: null,
       isInsideBuilding: false,
       destinationCoords: null,
-      myLocationCoords: null
+      myLocationCoords: null,
+      setOriginCoords: jest.fn(),
+      setDestinationCoords: jest.fn()
     });
     
     useIndoor.mockReturnValue({
@@ -85,7 +93,11 @@ describe('HighlightIndoorMap Component', () => {
       indoorFeatures: [],
       originRoom: null,
       destinationRoom: null,
-      currentFloor: null
+      currentFloor: null,
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      indoorTransport: "elevator",
+      setIndoorTransport: jest.fn()
     });
   });
 
@@ -109,7 +121,11 @@ describe('HighlightIndoorMap Component', () => {
       indoorFeatures: [{ type: 'Feature', properties: { ref: 'H1-101' } }],
       originRoom: null,
       destinationRoom: null,
-      currentFloor: null
+      currentFloor: null,
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      indoorTransport: "elevator",
+      setIndoorTransport: jest.fn()
     });
     
     render(<HighlightIndoorMap />);
@@ -137,7 +153,11 @@ describe('HighlightIndoorMap Component', () => {
       indoorFeatures: [],
       originRoom: { coordinates: [-73.577142, 45.495753], ref: 'H1-101', floor: '1' },
       destinationRoom: null,
-      currentFloor: '1st Floor'
+      currentFloor: '1st Floor',
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      indoorTransport: "elevator",
+      setIndoorTransport: jest.fn()
     });
     
     render(<HighlightIndoorMap />);
@@ -163,7 +183,11 @@ describe('HighlightIndoorMap Component', () => {
       indoorFeatures: [],
       originRoom: null,
       destinationRoom: { coordinates: [-73.577142, 45.495753], ref: 'H1-102', floor: '1' },
-      currentFloor: '1st Floor'
+      currentFloor: '1st Floor',
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      indoorTransport: "elevator",
+      setIndoorTransport: jest.fn()
     });
     
     render(<HighlightIndoorMap />);
@@ -188,7 +212,11 @@ describe('HighlightIndoorMap Component', () => {
       indoorFeatures: [],
       originRoom: { coordinates: [-73.577142, 45.495753], ref: 'H1-101', floor: '1' },
       destinationRoom: { coordinates: [-73.577142, 45.495753], ref: 'H2-201', floor: '2' },
-      currentFloor: '2nd Floor'
+      currentFloor: '2nd Floor',
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      indoorTransport: "elevator",
+      setIndoorTransport: jest.fn()
     });
     
     render(<HighlightIndoorMap />);
@@ -205,7 +233,9 @@ describe('HighlightIndoorMap Component', () => {
       highlightedBuilding: { properties: { id: 'hall' } },
       isInsideBuilding: false,
       destinationCoords: null,
-      myLocationCoords: null
+      myLocationCoords: null,
+      setOriginCoords: jest.fn(),
+      setDestinationCoords: jest.fn()
     });
     
     useIndoor.mockReturnValue({
@@ -220,7 +250,11 @@ describe('HighlightIndoorMap Component', () => {
       indoorFeatures: [],
       originRoom: null,
       destinationRoom: null,
-      currentFloor: null
+      currentFloor: null,
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      indoorTransport: "elevator",
+      setIndoorTransport: jest.fn()
     });
     
     render(<HighlightIndoorMap />);
@@ -240,7 +274,9 @@ describe('HighlightIndoorMap Component', () => {
       highlightedBuilding: null,
       isInsideBuilding: true,
       destinationCoords: [-73.577142, 45.495753],
-      myLocationCoords: [-73.577142, 45.495753]
+      myLocationCoords: [-73.577142, 45.495753],
+      setOriginCoords: jest.fn(),
+      setDestinationCoords: jest.fn()
     });
     
     useIndoor.mockReturnValue({
@@ -255,7 +291,11 @@ describe('HighlightIndoorMap Component', () => {
       indoorFeatures: [],
       originRoom: null,
       destinationRoom: null,
-      currentFloor: null
+      currentFloor: null,
+      setOriginRoom: jest.fn(),
+      setDestinationRoom: jest.fn(),
+      indoorTransport: "elevator",
+      setIndoorTransport: jest.fn()
     });
     
     render(<HighlightIndoorMap />);

@@ -1,19 +1,26 @@
 import React from 'react'
 import { useIndoor } from '../data/IndoorContext';
-import { useCoords } from '../data/CoordsContext';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
 import { IndoorViewButtonStyle } from '../styles/IndoorViewButtonStyle';
+import { changeCurrentFloorAssociations } from './IndoorMap';
 
-function IndoorViewButton({ inFloorView }: { inFloorView: boolean }) {
+function IndoorViewButton({ inFloorView, buildingId, onClose }: { inFloorView: boolean, buildingId: string, onClose: () => void; }) {
 
-    const { setInFloorView } = useIndoor();
-    const { isInsideBuilding } = useCoords();
-    const entypoBuildingColour = isInsideBuilding ? "#912338" : "grey"; 
-    const borderColourInsideBuilding = isInsideBuilding ? "#912338" : "grey";
-    const backgroundColorInsideBuilding = isInsideBuilding ? "white" : "#ddd";
-    const opacityInsideBuilding = isInsideBuilding ? 1 : 0.5;
+    const { setInFloorView, setCurrentFloorAssociations } = useIndoor();
+    const buildingFloorAssociations = changeCurrentFloorAssociations(buildingId);
+    const entypoBuildingColour = buildingFloorAssociations.length > 0 ? "#912338" : "grey"; 
+    const borderColourInsideBuilding = buildingFloorAssociations.length > 0  ? "#912338" : "grey";
+    const backgroundColorInsideBuilding = buildingFloorAssociations.length > 0  ? "white" : "#ddd";
+    const opacityInsideBuilding = buildingFloorAssociations.length > 0  ? 1 : 0.5;
 
+    const handlePress = () => {
+        if (buildingFloorAssociations) {
+            setInFloorView(!inFloorView);
+            setCurrentFloorAssociations(buildingFloorAssociations);
+            onClose();
+        }
+    };
 
     return (
         <View>
@@ -26,16 +33,15 @@ function IndoorViewButton({ inFloorView }: { inFloorView: boolean }) {
                         opacity: inFloorView ? 1 : opacityInsideBuilding
                     }
                 ]}
-                onPress={() => setInFloorView(!inFloorView)}
+                onPress={handlePress}
+                disabled={buildingFloorAssociations.length < 1 }
             >
                 <View style={IndoorViewButtonStyle.buttonContent}>
                     <Entypo name={inFloorView ? "tree" : "location"} size={20} color={inFloorView ? "#912338" : entypoBuildingColour} />
-                    <Text style={[IndoorViewButtonStyle.buttonText, { color: "#912338" }]}>{inFloorView ? "Outside View" : "Floor View"}</Text>
                 </View>
             </TouchableOpacity>
-
         </View>
     )
 }
 
-export default IndoorViewButton
+export default IndoorViewButton;
