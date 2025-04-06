@@ -29,7 +29,7 @@ const [sameBuilding, setSameBuilding] = useState(false);
     setFirstMessage(first);
     setSecondMessage(second);
     if (originRoom && destinationRoom && (originRoom?.building == destinationRoom?.building)) {
-      setSameBuilding(true);}
+      setSameBuilding(false);}
   }, [originRoom, destinationRoom, indoorTransport]);
 
 

@@ -7,7 +7,6 @@ import { useCoords } from '../data/CoordsContext';
 import { useIndoor } from '../data/IndoorContext';
 import { Ionicons } from "@expo/vector-icons";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
-import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 import ShuttleBusTransit from './ShuttleBusTransit';
 
