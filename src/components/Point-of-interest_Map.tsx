@@ -3,7 +3,6 @@ import { View, ActivityIndicator } from 'react-native';
 import { PointAnnotation } from '@rnmapbox/maps';
 import analytics from '@react-native-firebase/analytics';
 import { TokenManager } from "../data/TokenManager.ts";
-
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const MAPBOX_ACCESS_TOKEN = TokenManager.getMapboxToken();

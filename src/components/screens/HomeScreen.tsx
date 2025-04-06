@@ -31,7 +31,7 @@ export function HomeScreen() {
       <IndoorsProvider>
         <View style={HomeStyle.container}>
           <CalendarButton />
-           {(globalThis as any).isTesting && <LeftDrawer />}
+          {(globalThis as any).isTesting && <LeftDrawer />}
           <MapComponent
             drawerHeight={drawerHeight}
             setInputDestination={setInputDestination}

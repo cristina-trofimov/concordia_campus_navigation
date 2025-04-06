@@ -82,6 +82,7 @@ export default function MapComponent({
       const { latitude, longitude } = myLocationCoords;
       const locationString = `${latitude},${longitude}`;
       setmyLocationString(locationString);
+      
     }
   }, [myLocationCoords, setmyLocationString]);
 
@@ -194,6 +195,7 @@ export default function MapComponent({
       }
 
       let location = await Location.getCurrentPositionAsync({});
+      
       setMyLocationCoords(location.coords);
     } catch (err) {
       console.warn("Error getting location:", err);
