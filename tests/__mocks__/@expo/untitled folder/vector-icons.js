@@ -7,6 +7,7 @@ module.exports = {
   createIconSet,
   Ionicons: 'Ionicons',
   FontAwesome: 'FontAwesome',
+  Entypo
   // Add any other icon sets you might be using
 };
 
