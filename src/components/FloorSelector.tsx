@@ -39,8 +39,9 @@ export const FloorSelector = () => {
                             onPress={() => {
                                 setInFloorView(false);
                             }}
+                            testID="back-button-container"
                         >
-                            <AntDesign name="arrowleft" size={24} color="black" />
+                            <AntDesign name="arrowleft" size={24} color="black" testID="back-button" />
                         </TouchableOpacity>
                     )}
 
