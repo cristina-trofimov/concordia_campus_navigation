@@ -8,20 +8,32 @@ import { useIndoor } from '../src/data/IndoorContext';
 // Mock the external dependencies before importing the component
 jest.mock('@expo/vector-icons', () => ({
     Ionicons: 'MockedIonicons',
-  }));
-  
-  jest.mock('@expo/vector-icons/Entypo', () => 'MockedEntypo');
-  
-  // Other mocks
-  jest.mock('../src/components/Route', () => ({
+}));
+
+jest.mock('@expo/vector-icons/Entypo', () => 'MockedEntypo');
+
+// Other mocks
+jest.mock('../src/components/Route', () => ({
     __esModule: true,
     default: jest.fn()
-  }));
+}));
 
 jest.mock('@expo/vector-icons/Ionicons', () => 'MockedIonicons');
 jest.mock('@expo/vector-icons/Entypo', () => 'MockedEntypo');
 jest.mock('../src/components/ShuttleBusTransit', () => 'MockedShuttleBusTransit');
 jest.mock('../src/components/IndoorViewButton', () => 'MockedIndoorViewButton');
+jest.mock('../src/styles/SearchBarsStyle', () => ({
+  SearchBarsStyle: {
+    container: {},
+    selectedModeContainer: {},
+    selectedModeText: {},
+    transportButtonContainer: {},
+    transportButtonContent: {},
+    selectedTransportButton: {},
+    timeContainer: {},
+    timeValue: {}
+  }
+}));
 
 // Mock the SearchBar component
 jest.mock('../src/components/SearchBar', () => {
@@ -69,6 +81,7 @@ describe('SearchBars Component', () => {
   const mockSetOriginRoom = jest.fn();
   const mockSetDestinationRoom = jest.fn();
   const mockSetInputDestination = jest.fn();
+  const mockSetInputOrigin = jest.fn();
   
   const mockRouteData = [
     {
@@ -92,7 +105,7 @@ describe('SearchBars Component', () => {
       setIsTransit: mockSetIsTransit,
       originCoords: { latitude: 45.4941, longitude: -73.5774 },
       setOriginCoords: mockSetOriginCoords,
-      destinationCoords: null,
+      destinationCoords: { latitude: 45.4972, longitude: -73.5863 },
       setDestinationCoords: mockSetDestinationCoords
     });
     
@@ -109,23 +122,48 @@ describe('SearchBars Component', () => {
   });
 
   it('renders with destination prop', () => {
-    const { getByText } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
-    // Check if the component rendered with the destination
-    expect(getByText('Drive')).toBeDefined();
+    const { getByTestId } = render(
+      <SearchBars 
+        inputDestination="Hall Building" 
+        setInputDestination={mockSetInputDestination}
+        inputOrigin="Current Location"
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
+    // Check if the search bars are rendered
+    expect(getByTestId('search-bar-origin')).toBeDefined();
+    expect(getByTestId('search-bar-destination')).toBeDefined();
   });
 
   it('shows origin and destination search bars', () => {
-    const { getByText } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
-    // Check if component renders with expected content
-    expect(getByText('Drive')).toBeDefined();
+    const { getByTestId } = render(
+      <SearchBars 
+        inputDestination="Hall Building" 
+        setInputDestination={mockSetInputDestination}
+        inputOrigin="Current Location"
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
+    // Check if both search bars are rendered
+    expect(getByTestId('search-bar-origin')).toBeDefined();
+    expect(getByTestId('search-bar-destination')).toBeDefined();
   });
 
   it('clears destination and route data when clear button is pressed', async () => {
-    const { getByTestId } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
+    const { getByTestId } = render(
+      <SearchBars 
+        inputDestination="Hall Building" 
+        setInputDestination={mockSetInputDestination}
+        inputOrigin="Current Location"
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
     
     // Get the mocked clear button and trigger its onPress function
     const clearButton = getByTestId('clear-destination-button');
-    fireEvent.press(clearButton);
+    await act(async () => {
+      fireEvent.press(clearButton);
+    });
     
     // Verify expected functions were called
     expect(mockSetDestinationCoords).toHaveBeenCalledWith(null);
@@ -133,7 +171,8 @@ describe('SearchBars Component', () => {
     expect(mockSetInFloorView).toHaveBeenCalledWith(false);
     expect(mockSetOriginRoom).toHaveBeenCalledWith(null);
     expect(mockSetDestinationRoom).toHaveBeenCalledWith(null);
-    expect(mockSetInputDestination).toHaveBeenCalledWith(""); // Verify this mock is called
+    expect(mockSetInputDestination).toHaveBeenCalledWith("");
+    expect(mockSetInputOrigin).toHaveBeenCalledWith("");
   });
 
   it('handles error in getDirections', async () => {
@@ -141,7 +180,14 @@ describe('SearchBars Component', () => {
     
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
     
-    const { getByTestId } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
+    const { getByTestId } = render(
+      <SearchBars 
+        inputDestination="Hall Building" 
+        setInputDestination={mockSetInputDestination}
+        inputOrigin="Current Location"
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
     
     // Find and press the origin select button
     const originSelectButton = getByTestId('select-origin-button');
@@ -159,19 +205,39 @@ describe('SearchBars Component', () => {
   });
 
   it('updates destination when inputDestination prop changes', async () => {
-    const { rerender, getByText } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
+    const { rerender, getByTestId } = render(
+      <SearchBars 
+        inputDestination="Hall Building" 
+        setInputDestination={mockSetInputDestination}
+        inputOrigin="Current Location"
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
     
     // Update props to simulate changing destination
-    rerender(<SearchBars inputDestination="Library Building" setInputDestination={mockSetInputDestination} />);
+    rerender(
+      <SearchBars 
+        inputDestination="Library Building" 
+        setInputDestination={mockSetInputDestination}
+        inputOrigin="Current Location"
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
     
-    // We expect the useEffect to be called when inputDestination changes
-    // Since we can't easily test the internal state, we'll test if the component
-    // still renders with the key UI elements
-    expect(getByText('Drive')).toBeDefined();
+    // We expect the search bars to still be rendered
+    expect(getByTestId('search-bar-origin')).toBeDefined();
+    expect(getByTestId('search-bar-destination')).toBeDefined();
   });
 
   it('updates origin when myLocationString changes', async () => {
-    const { rerender, getByText } = render(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
+    const { rerender, getByTestId } = render(
+      <SearchBars 
+        inputDestination="Hall Building" 
+        setInputDestination={mockSetInputDestination}
+        inputOrigin="Current Location"
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
     
     // Update context to simulate changing myLocationString
     (useCoords as jest.Mock).mockReturnValue({
@@ -184,9 +250,17 @@ describe('SearchBars Component', () => {
       setDestinationCoords: mockSetDestinationCoords
     });
     
-    rerender(<SearchBars inputDestination="Hall Building" setInputDestination={mockSetInputDestination} />);
+    rerender(
+      <SearchBars 
+        inputDestination="Hall Building" 
+        setInputDestination={mockSetInputDestination}
+        inputOrigin="Updated Location"
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
     
-    // Check if the component still renders with key UI elements
-    expect(getByText('Drive')).toBeDefined();
+    // Check if the component still renders with search bars
+    expect(getByTestId('search-bar-origin')).toBeDefined();
+    expect(getByTestId('search-bar-destination')).toBeDefined();
   });
 });
