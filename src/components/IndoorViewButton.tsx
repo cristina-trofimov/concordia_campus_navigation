@@ -46,4 +46,4 @@ function IndoorViewButton({ inFloorView, buildingId, onClose }: { inFloorView: b
     )
 }
 
-export default IndoorViewButton
+export default IndoorViewButton;
