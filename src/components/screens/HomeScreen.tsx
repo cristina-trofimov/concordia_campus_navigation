@@ -24,7 +24,19 @@ export function HomeScreen() {
   const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
   const [radius, setRadius] = useState<number | null>(null);
   const { classEvents } = useClassEvents();
-  const hasClassEvents = classEvents.length > 0;
+
+  const renderUpcomingClasses = () => {
+    if (inputDestination === "" && classEvents.length > 0) {
+      return classEvents.map((event, index) => (
+        <UpcomingClassItem 
+          calendarEvent={event} 
+          key={index} 
+          setInputDestination={setInputDestination} 
+        />
+      ));
+    }
+    return null;
+  };
 
   return (
     <CoordsProvider>
@@ -49,16 +61,7 @@ export function HomeScreen() {
                 inputOrigin={inputOrigin}
                 setInputOrigin={setInputOrigin}
               />
-              {inputDestination === "" ? (
-                // if (classEvents.length > 0) {
-                  
-                // }
-                classEvents.length > 0 ? (
-                  classEvents?.map((event, index) => (
-                    <UpcomingClassItem calendarEvent={event} key={index} setInputDestination={setInputDestination} />
-                  ))
-                ) : ( null )
-              ) : null}
+              {renderUpcomingClasses()}
               <RoomSearchBars />
               <PointOfInterestSelector
                 pointsOfInterest={selectedPOI}

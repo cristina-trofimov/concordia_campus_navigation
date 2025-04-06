@@ -61,6 +61,7 @@ export const reverseGeocode = async (latitude, longitude) => {
       return null;
     }
   } catch (error) {
+    console.error("reverseGeocode: ", error);
     return null;
   }
 };

@@ -10,13 +10,7 @@ const { width } = Dimensions.get("window");
 // timer for usabilty test
 let startTime = 0;
 (globalThis as any).taskTimer = {
-  start: () => {
-    if (startTime === 0) {
-      startTime = Date.now();
-    } else {
-      startTime = Date.now(); // Reset the timer
-    }
-  },
+  start: () => { startTime = Date.now() },
   stop: () => {
     if (startTime !== 0) {
       const elapsedTime = Date.now() - startTime;
