@@ -48,41 +48,43 @@ const CalendarScreen = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(newDate.getDate() + days);
     setCurrentDate(newDate);
+    calendarRef.current?.goToDate({ date: newDate, animatedDate: true })
   };
 
   useEffect(() => {
     console.log("Updated current date:", currentDate);
   }, [currentDate]);
 
-
-
-
   useEffect(() => {
     const fetchEvents = async () => {
       if (chosenCalendar && accessToken) {
         const events = await fetchCalendarEventsByCalendarId(accessToken, chosenCalendar.id);
 
-        if (events.data?.events) {
-          for (const event of events.data.events) {
-            console.log("EVENT" + event.title + " " + event.location + " " + event.description + " " + event.startTime + " " + event.endTime);
-          }
-          setClassEvents(events.data?.events || []);
-        }
+        const today = new Date()
+        today.setHours(0, 0, 0, 0);
+        const max = new Date();
+        max.setDate(max.getDate() + 3);
+        max.setHours(23, 59, 59, 999);
 
-        const modifiedEvents = events.data?.events.map((event) => {
+        const recentEvents = events.data?.events?.filter(event => {
+          return new Date(event.startTime) >= today && new Date(event.endTime) <= max
+        }) ?? [];
+
+        setClassEvents(recentEvents);
+
+        const modifiedEvents = events.data?.events?.map((event) => {
           return {
             id: event.id,
             title: event.title,
             start: { dateTime: event.startTime },
             end: { dateTime: event.endTime },
-            color: '#4285F4',
+            color: '#FFF3B0',
           };
-        })
-        setEvents(modifiedEvents || []);
+        }) ?? [];
+        setEvents(modifiedEvents);
       }
     }
     fetchEvents();
-
   }, [chosenCalendar, accessToken]);
 
   useEffect(() => {
@@ -112,7 +114,13 @@ const CalendarScreen = () => {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={CalendarStyle.todayBTN} onPress={() => setCurrentDate(new Date())} >
+          <TouchableOpacity style={CalendarStyle.todayBTN}
+            onPress={() => {
+              const today = new Date();
+              calendarRef.current?.goToDate({ date: today, animatedDate: true });
+              setCurrentDate(today)
+            }}
+          >
             <MaterialIcons name="today" size={24} color="white" />
             <Text style={{ color: "white", fontWeight: "bold", margin: 2.5 }} >TODAY</Text>
           </TouchableOpacity>
@@ -134,10 +142,13 @@ const CalendarScreen = () => {
 
         {/* Renders the calendar view */}
         <CalendarContainer
-          key={currentDate.toISOString()}
+          theme={{ todayNumberContainer: {backgroundColor: '#E09F3E'}, nowIndicatorColor: '#E09F3E' }}
           ref={calendarRef}
           events={events}
           initialDate={currentDate.toISOString()}
+          onDateChanged={(date) => {
+            setCurrentDate(new Date(date));
+          }}
         >
           <CalendarHeader />
           <CalendarBody />

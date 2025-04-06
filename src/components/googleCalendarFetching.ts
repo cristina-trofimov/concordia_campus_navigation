@@ -135,7 +135,8 @@ export const fetchCalendarEventsByCalendarId = async (
 ): Promise<EventsApiResponse> => {
     try {
         // Format dates if provided, otherwise use defaults
-        const formattedTimeMin =  new Date().toISOString();
+        const formattedTimeMin = new Date();
+        formattedTimeMin.setMonth(formattedTimeMin.getMonth() - 1);
 
         const defaultTimeMax = new Date();
         defaultTimeMax.setMonth(defaultTimeMax.getMonth() + 1);
