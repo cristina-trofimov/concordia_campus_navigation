@@ -1,4 +1,4 @@
-import React, {  useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Animated, Dimensions, ScrollView, Text, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
@@ -20,6 +20,7 @@ const { height } = Dimensions.get("window");
 export function HomeScreen() {
   const drawerHeight = useRef(new Animated.Value(height * 0.5)).current;
   const [inputDestination, setInputDestination] = useState<string>("");
+  const [inputOrigin, setInputOrigin] = useState<string>("");
   const [selectedPOI, setSelectedPOI] = useState<string | null>(null);
   const [radius, setRadius] = useState<number | null>(null);
   const { classEvents } = useClassEvents();
@@ -33,6 +34,7 @@ export function HomeScreen() {
           <MapComponent
             drawerHeight={drawerHeight}
             setInputDestination={setInputDestination}
+            setInputOrigin={setInputOrigin}
             selectedPOI={selectedPOI}
             radius={radius}
           />
@@ -40,7 +42,12 @@ export function HomeScreen() {
 
           <BottomDrawer drawerHeight={drawerHeight}>
             <ScrollView>
-              <SearchBars inputDestination={inputDestination} setInputDestination={setInputDestination} />
+              <SearchBars
+                inputDestination={inputDestination}
+                setInputDestination={setInputDestination}
+                inputOrigin={inputOrigin}
+                setInputOrigin={setInputOrigin}
+              />
               {inputDestination === "" ? (
                 classEvents.length > 0 ? (
                   classEvents.map((event, index) => (

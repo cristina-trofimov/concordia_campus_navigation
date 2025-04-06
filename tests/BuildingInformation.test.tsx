@@ -21,9 +21,14 @@ jest.mock('react-native-modal', () => {
     );
   };
 });
-jest.mock('@react-native-firebase/analytics', () => () => ({
-  logEvent: jest.fn(),
-}));
+
+// Mock Firebase Analytics
+jest.mock('@react-native-firebase/analytics', () => {
+  const analyticsLogEvent = jest.fn();
+  return () => ({
+    logEvent: analyticsLogEvent,
+  });
+});
 
 // Mock the Icon component from react-native-elements
 jest.mock('react-native-elements', () => {
@@ -38,6 +43,19 @@ jest.mock('react-native-elements', () => {
   };
 });
 
+// Mock Expo vector icons
+jest.mock('@expo/vector-icons/Entypo', () => {
+  const React = require('react');
+  const { Text, TouchableOpacity } = require('react-native');
+  return function MockEntypo({ name, size, color, ...props }) {
+    return (
+      <TouchableOpacity testID={`entypo-icon-${name}`} {...props}>
+        <Text>{name}</Text>
+      </TouchableOpacity>
+    );
+  };
+}, { virtual: true });
+
 // Mock the IndoorViewButton component
 jest.mock('../src/components/IndoorViewButton', () => {
   const React = require('react');
@@ -49,10 +67,16 @@ jest.mock('../src/components/IndoorViewButton', () => {
   );
 });
 
-// Mock the CoordsContext
+// Mock useCoords with a custom module factory
+const mockSetDestinationCoords = jest.fn();
+const mockSetOriginCoords = jest.fn();
+let mockDestinationCoords = null;
+
 jest.mock('../src/data/CoordsContext', () => ({
   useCoords: () => ({
-    setDestinationCoords: jest.fn()
+    setDestinationCoords: mockSetDestinationCoords,
+    setOriginCoords: mockSetOriginCoords,
+    destinationCoords: mockDestinationCoords
   })
 }));
 
@@ -67,6 +91,7 @@ jest.mock('../src/data/IndoorContext', () => ({
 describe('BuildingInformation Component', () => {
   const mockOnClose = jest.fn();
   const mockSetInputDestination = jest.fn();
+  const mockSetInputOrigin = jest.fn();
   const mockBuildingLocation = {
     title: 'Test Building',
     description: 'This is a test description',
@@ -81,6 +106,7 @@ describe('BuildingInformation Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockDestinationCoords = null;
   });
 
   test('renders correctly when visible with full building information', () => {
@@ -90,6 +116,7 @@ describe('BuildingInformation Component', () => {
         onClose={mockOnClose} 
         buildingLocation={mockBuildingLocation}
         setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
       />
     );
 
@@ -126,6 +153,7 @@ describe('BuildingInformation Component', () => {
         onClose={mockOnClose} 
         buildingLocation={mockBuildingLocation}
         setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
       />
     );
     
@@ -140,6 +168,7 @@ describe('BuildingInformation Component', () => {
         onClose={mockOnClose} 
         buildingLocation={mockBuildingLocation}
         setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
       />
     );
     
@@ -154,6 +183,7 @@ describe('BuildingInformation Component', () => {
         onClose={mockOnClose} 
         buildingLocation={mockBuildingLocation}
         setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
       />
     );
     
@@ -168,6 +198,7 @@ describe('BuildingInformation Component', () => {
         onClose={mockOnClose} 
         buildingLocation={mockBuildingLocation}
         setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
       />
     );
     
@@ -182,6 +213,31 @@ describe('BuildingInformation Component', () => {
     expect(mockOnClose).toHaveBeenCalled();
   });
 
+  test('handles origin button press correctly when destination is set', () => {
+    // Set destinationCoords to a non-null value for this test
+    mockDestinationCoords = { latitude: 45.123, longitude: -73.456 };
+    
+    const { getByTestId } = render(
+      <BuildingInformation 
+        isVisible={true} 
+        onClose={mockOnClose} 
+        buildingLocation={mockBuildingLocation}
+        setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
+    
+    // Find the location icon and press it
+    const locationIcon = getByTestId('entypo-icon-location');
+    fireEvent.press(locationIcon);
+    
+    // Check that setInputOrigin was called with the correct address
+    expect(mockSetInputOrigin).toHaveBeenCalledWith(mockBuildingLocation.buildingInfo.address);
+    
+    // Check that onClose was called
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+
   test('handles missing building location data gracefully', () => {
     const { queryByText } = render(
       <BuildingInformation 
@@ -189,6 +245,7 @@ describe('BuildingInformation Component', () => {
         onClose={mockOnClose} 
         buildingLocation={null}
         setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
       />
     );
     
@@ -214,6 +271,7 @@ describe('BuildingInformation Component', () => {
         onClose={mockOnClose} 
         buildingLocation={partialData}
         setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
       />
     );
     
@@ -234,6 +292,7 @@ describe('BuildingInformation Component', () => {
         onClose={mockOnClose} 
         buildingLocation={mockBuildingLocation}
         setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
       />
     );
     
@@ -241,5 +300,50 @@ describe('BuildingInformation Component', () => {
     fireEvent.press(indoorButton);
     
     expect(mockOnClose).toHaveBeenCalled();
+  });
+  
+  test('logs event when setting H Henry F. Hall Building as destination', () => {
+    // Mock for stopTimerAndLogEvent
+    global.isTesting = true;
+    global.taskTimer = {
+      isStarted: jest.fn().mockReturnValue(true),
+      stop: jest.fn().mockReturnValue(30000) // Return 30 seconds
+    };
+    global.userId = 'test-user';
+    
+    const analyticsModule = require('@react-native-firebase/analytics');
+    const analyticsLogEvent = analyticsModule().logEvent;
+    
+    const hallBuilding = {
+      title: 'H Henry F. Hall Building',
+      description: 'Hall Building description',
+      coordinates: [123.456, 78.910],
+      buildingInfo: {
+        address: '1455 De Maisonneuve Blvd. W.',
+        departments: [],
+        services: []
+      }
+    };
+    
+    const { getByTestId } = render(
+      <BuildingInformation 
+        isVisible={true} 
+        onClose={mockOnClose} 
+        buildingLocation={hallBuilding}
+        setInputDestination={mockSetInputDestination}
+        setInputOrigin={mockSetInputOrigin}
+      />
+    );
+    
+    // Find the directions icon and press it
+    const directionsIcon = getByTestId('icon-directions-material');
+    fireEvent.press(directionsIcon);
+    
+    // Check that the analytics event was logged
+    expect(analyticsLogEvent).toHaveBeenCalledWith('Task_1_finished', {
+      building_name: 'H Henry F. Hall Building',
+      elapsed_time: 30,
+      user_id: 'test-user'
+    });
   });
 });
