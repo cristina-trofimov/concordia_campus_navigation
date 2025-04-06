@@ -2,6 +2,7 @@ import { render, fireEvent } from '@testing-library/react-native';
 import { RoomSearchBars } from '../src/components/RoomSearchBars';
 import { useCoords } from '../src/data/CoordsContext';
 import { useIndoor } from '../src/data/IndoorContext';
+import React from 'react';
 
 // Mock the context hooks
 jest.mock('../src/data/CoordsContext', () => ({
@@ -12,14 +13,27 @@ jest.mock('../src/data/IndoorContext', () => ({
   useIndoor: jest.fn()
 }));
 
+// Mock React useState hook
+const mockSetState = jest.fn();
+let originalUseState = React.useState;
+jest.spyOn(React, 'useState').mockImplementation((initialValue) => {
+  // Only override useState for selectedTransport and roomSearched
+  if (initialValue === "" || initialValue === false) {
+    return [true, mockSetState]; // Force roomSearched to be true in tests
+  }
+  // Use original implementation for other useState calls
+  return originalUseState(initialValue);
+});
+
 // Mock expo vector icons
 jest.mock('@expo/vector-icons', () => ({
-  MaterialIcons: ({ name, size, color }) => (
+  MaterialIcons: ({ name, size, color, onPress }) => (
     <mock-material-icon 
       testID={`material-icon-${name}`} 
       data-name={name} 
       data-size={size} 
-      data-color={color} 
+      data-color={color}
+      onPress={onPress}
     />
   )
 }));
@@ -33,6 +47,7 @@ jest.mock('../src/components/RoomSearchBar', () => jest.fn(
         data-location={JSON.stringify(props.location)}
         data-placeholder={props.placeholder}
         data-searchtype={props.searchType}
+        onPress={() => props.setRoomSearched && props.setRoomSearched(true)}
       />
     );
   }
@@ -154,32 +169,26 @@ describe('RoomSearchBars', () => {
     
     // Check that setIndoorTransport was called with 'elevator'
     expect(mockSetIndoorTransport).toHaveBeenCalledWith('elevator');
-    
-    // We can't directly test state changes, but we can test that the function was called
-    // with the correct argument, which indicates the state would be updated
+    expect(mockSetState).toHaveBeenCalledWith('elevator');
   });
   
   test('changes icon color when transport type is selected', () => {
-    const { getByTestId, rerender } = render(<RoomSearchBars />);
+    // Mock useState for selectedTransport specifically for this test
+    const mockUseState = jest.fn().mockReturnValue(['stairs', mockSetState]);
+    const originalUseState = React.useState;
+    React.useState = mockUseState;
     
-    // Initially all icons should have black color
-    const stairsIcon = getByTestId('material-icon-stairs');
-    expect(stairsIcon.props['data-color']).toBe('black');
-    
-    // Click on stairs icon to select it
-    fireEvent.press(stairsIcon);
-    
-    // Force re-render to reflect state changes
-    // We need to maintain the same mock return values
-    (useIndoor as jest.Mock).mockReturnValue({
-      setIndoorTransport: mockSetIndoorTransport
-    });
-    
-    rerender(<RoomSearchBars />);
+    const { getByTestId } = render(<RoomSearchBars />);
     
     // Now the stairs icon should have the selected color
-    // Note: This wouldn't actually work since we can't access the component's internal state
-    // in the test directly. In a real scenario, we would need to mock useState or use a 
-    // different approach to verify the color changes.
+    const stairsIcon = getByTestId('material-icon-stairs');
+    expect(stairsIcon.props['data-color']).toBe('#912338');
+    
+    // Other icons should remain black
+    const elevatorIcon = getByTestId('material-icon-elevator');
+    expect(elevatorIcon.props['data-color']).toBe('black');
+    
+    // Restore original useState
+    React.useState = originalUseState;
   });
 });

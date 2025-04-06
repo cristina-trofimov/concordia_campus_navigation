@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 export const FloorSelectorStyle = StyleSheet.create({
     container: {
@@ -6,6 +6,8 @@ export const FloorSelectorStyle = StyleSheet.create({
         top: '3%',
         zIndex: 1000,
         width: 150,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     dropdownTrigger: {
         flexDirection: 'row',
@@ -17,7 +19,6 @@ export const FloorSelectorStyle = StyleSheet.create({
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#cccccc',
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
     },
     selectedFloorText: {
         fontSize: 16,
@@ -28,12 +29,15 @@ export const FloorSelectorStyle = StyleSheet.create({
         color: '#000000',
     },
     dropdownOptions: {
-        marginTop: 5,
+        position: 'absolute',
+        top: 45,
+        left: 50,
         backgroundColor: '#ffffff',
         borderRadius: 5,
         borderWidth: 1,
         borderColor: '#cccccc',
-        width: '100%', 
+        width: '100%',
+        zIndex: 1001,
     },
     option: {
         padding: 10,
@@ -42,5 +46,16 @@ export const FloorSelectorStyle = StyleSheet.create({
     },
     optionText: {
         fontSize: 16,
+    },
+    backButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+        borderWidth: 1,
+        borderColor: '#e0e0e0',
     },
 })

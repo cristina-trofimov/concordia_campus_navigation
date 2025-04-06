@@ -74,6 +74,13 @@ export const useIndoorFeatures = () => {
     return { selectIndoorFeatures };
 };
 
+export const changeCurrentFloorAssociations = (id: string) => {
+    const associations = buildingFloorAssociations.filter(
+        (association) => association.buildingID === id
+    );
+    return associations;
+}
+
 export const HighlightIndoorMap = () => {
     const { highlightedBuilding, isInsideBuilding, destinationCoords, myLocationCoords } = useCoords();
     const { setBuildingHasFloors, setInFloorView, inFloorView, setCurrentFloor, setFloorList, currentFloorAssociations, setCurrentFloorAssociations, setIndoorFeatures, indoorFeatures, originRoom, destinationRoom, currentFloor } = useIndoor();
@@ -94,12 +101,9 @@ export const HighlightIndoorMap = () => {
         setFloorList([]);
         if (highlightedBuilding) {
             const buildingId = highlightedBuilding.properties.id;
-            const associations = buildingFloorAssociations.filter(
-                (association) => association.buildingID === buildingId
-            );
-            setCurrentFloorAssociations(associations);
+            setCurrentFloorAssociations(changeCurrentFloorAssociations(buildingId));
         }
-    }, [highlightedBuilding]);
+    }, [highlightedBuilding, destinationCoords]);
 
     useEffect(() => {
         if (currentFloorAssociations.length > 0) {

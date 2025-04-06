@@ -1,12 +1,6 @@
 import { StyleSheet } from "react-native";
 
 export const BuildingInfoStyle = StyleSheet.create({
-    titleContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-    },
     actionButton: {
         backgroundColor: '#912338',
         paddingVertical: 6,
@@ -91,5 +85,17 @@ export const BuildingInfoStyle = StyleSheet.create({
     closeButtonText: {
         color: 'white',
         fontSize: 16,
+    },
+    titleContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    buttonsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        gap: 10, 
     },
 });
