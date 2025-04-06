@@ -143,7 +143,6 @@ const CalendarScreen = () => {
 
         {/* Renders the calendar view */}
         <CalendarContainer
-          // theme={{ todayNumberContainer: {backgroundColor: '#335C67'}, nowIndicatorColor: '#335C67' }}
           theme={{ todayNumberContainer: {backgroundColor: '#E09F3E'}, nowIndicatorColor: '#E09F3E' }}
           ref={calendarRef}
           events={events}

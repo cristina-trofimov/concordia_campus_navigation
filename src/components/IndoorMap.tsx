@@ -154,7 +154,7 @@ export const HighlightIndoorMap = () => {
                                 10, 0,
                                 12, 0,
                                 15, 0,
-                                20, 20
+                                20, 15
                             ],
                             textColor: '#FFFFFF',
                             textAnchor: 'center',
