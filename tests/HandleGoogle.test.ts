@@ -51,7 +51,6 @@ import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-si
 (global as any).statusCodes = mockStatusCodes;
 
 // Spy on console methods
-const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
 const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
 describe('HandleGoogle', () => {
@@ -76,7 +75,6 @@ describe('HandleGoogle', () => {
       
       expect(AsyncStorage.getItem).toHaveBeenCalledWith('accessToken');
       expect(result).toBe('existing-token');
-      expect(consoleLogSpy).toHaveBeenCalledWith('User already signed in');
       expect(GoogleSignin.hasPlayServices).not.toHaveBeenCalled();
     });
 
@@ -110,7 +108,7 @@ describe('HandleGoogle', () => {
       const result = await signIn();
 
       expect(consoleErrorSpy).toHaveBeenCalled();
-      expect(consoleLogSpy).toHaveBeenCalledWith('Non-status code error:', mockError);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Non-status code error:', mockError);
       expect(result).toBeNull();
     });
   });
@@ -122,7 +120,6 @@ describe('HandleGoogle', () => {
       expect(GoogleSignin.signOut).toHaveBeenCalled();
       expect(AsyncStorage.removeItem).toHaveBeenCalledWith('accessToken');
       expect(AsyncStorage.removeItem).toHaveBeenCalledWith('chosenCalendar');
-      expect(consoleLogSpy).toHaveBeenCalledWith('User signed out successfully');
     });
 
     it('should handle sign out errors', async () => {

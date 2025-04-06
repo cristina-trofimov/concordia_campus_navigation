@@ -37,7 +37,7 @@ export const RoomSearchBars = () => {
           gap: 15,
         }}>
           <RoomSearchBar
-            location={originCoords ? originCoords : myLocationCoords}
+            location={originCoords ?? myLocationCoords}
             placeholder="origin room"
             searchType={"origin"}
             setRoomSearched={setOriginRoomSearched}

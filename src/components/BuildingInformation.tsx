@@ -28,9 +28,6 @@ const stopTimerAndLogEvent = (title: string) => {
         elapsed_time: elapsedTime/1000,  // Add the elapsed time
         user_id: (globalThis as any).userId,
       });
-
-      console.log(`Custom Event Logged: Task 1 Finished`);
-      console.log(`Elapsed Time: ${elapsedTime / 1000} seconds`);  // Log in seconds for readability
   }
 };
 
