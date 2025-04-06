@@ -118,7 +118,6 @@ export default class UpcomingClassItem extends Component<
     const buildingName = this.getBuildingName(location);
 
     const { statusColor, statusText } = this.isClassInProgress(startTime, endTime, startTimeFormatted, endTimeFormatted);
-    // const { statusColor, statusText } = this.isClassInProgress(startTime, endTime);
 
     return (
       <Pressable
