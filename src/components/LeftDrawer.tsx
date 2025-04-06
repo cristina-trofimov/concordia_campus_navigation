@@ -6,7 +6,6 @@ import { LeftDrawerStyle } from "../styles/LeftDrawerStyle";
 import firebase from '../src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 
-//THIS FILE NOT IN MAIN NO MO
 
 const { width } = Dimensions.get("window");
 // timer for usabilty test

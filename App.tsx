@@ -10,7 +10,7 @@ import analytics from '@react-native-firebase/analytics';
 import { Calendar } from "./src/interfaces/calendar";
 import { ClassEventsProvider } from "./src/data/ClassEventsContext";
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 (globalThis as any).isTesting = false; // when doing usability testing
 
 export type RootStackParamList = {
