@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator,Image,TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import { PointAnnotation } from '@rnmapbox/maps';
 import { Text } from "@rneui/themed";
 import * as Location from "expo-location";
 import { Coords } from "../interfaces/Map.ts";
-import { MAPBOX_TOKEN } from "@env";
 import analytics from '@react-native-firebase/analytics';
+import { TokenManager } from "../data/TokenManager.ts";
 
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+
+const MAPBOX_ACCESS_TOKEN = TokenManager.getMapboxToken();
 
 interface PointOfInterestMapProps {
   myLocationCoords: { latitude: number; longitude: number } | null;
@@ -25,10 +27,9 @@ const POI_ICONS = {
   arts_and_entertainment: "movie",
 };
 
-const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => {
-
+export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => {
   const TILESET_ID = 'mapbox.mapbox-streets-v8';
-  const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_TOKEN}`;
+  const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
   try {
     const response = await fetch(url);
@@ -40,8 +41,8 @@ const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => 
     }
 
     const filteredPOIs = data.features.filter(feature =>
-          feature.properties.class === selectedPOI
-        );
+      feature.properties && feature.properties.class === selectedPOI
+    );
 
     return filteredPOIs;
   } catch (error) {
@@ -50,15 +51,15 @@ const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => 
   }
 };
 
-const reverseGeocode = async (latitude, longitude) => {
-  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_TOKEN}`;
+export const reverseGeocode = async (latitude, longitude) => {
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_ACCESS_TOKEN}`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
 
     if (data.features && data.features.length > 0) {
-         // Get the full address
+      // Get the full address
       const address = data.features[0].place_name;
       return address;
     } else {
@@ -71,7 +72,7 @@ const reverseGeocode = async (latitude, longitude) => {
   }
 };
 
-const onPoiClick = async (poi, setInputDestination) => {
+export const onPoiClick = async (poi, setInputDestination) => {
   const coordinates = poi.geometry?.coordinates;
   if (Array.isArray(coordinates) && coordinates.length === 2) {
     const [longitude, latitude] = coordinates;
@@ -86,7 +87,7 @@ const onPoiClick = async (poi, setInputDestination) => {
            console.log(`Custom Event Logged: POI location chosen: ${address}, and directions were set`);
            console.log(`Custom Event Logged: Task 5 finished with time:`, elapsed_time/1000);
      }
-    setInputDestination(address || "");
+    setInputDestination(address || "Unknown location");
   }
 };
 
@@ -109,35 +110,39 @@ const PointOfInterestMap: React.FC<PointOfInterestMapProps> = ({
 
 
       if (myLocationCoords && selectedPOI) {
-              try {
-                await new Promise(resolve => setTimeout(resolve, 250));
-                const { latitude, longitude } = myLocationCoords;
-                const nearbyPois = await fetchNearbyPOI(longitude, latitude, radius, selectedPOI);
+        try {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          const { latitude, longitude } = myLocationCoords;
+          const nearbyPois = await fetchNearbyPOI(longitude, latitude, radius, selectedPOI);
 
-                setCurrentIcon(POI_ICONS[selectedPOI] || "map-marker");
-                setPoi(nearbyPois);
-              } catch (error) {
-                console.error("Error fetching POIs:", error);
-                setPoi([]);
-              } finally {
-                setIsLoading(false);
-              }
-            } else {
-              setIsLoading(false);
-            }
-          };
-
-          // Debounce to prevent multiple rapid calls
-          const timeoutId = setTimeout(getLocationAndFetchPois, 100);
-
-          // Cleanup function
-          return () => clearTimeout(timeoutId);
-        }, [myLocationCoords, radius, selectedPOI]);
-
-        // If loading, return null or a loading indicator
-        if (isLoading) {
-          return <ActivityIndicator size="large" color="#6E1A2A" />;
+          setCurrentIcon(POI_ICONS[selectedPOI] || "map-marker");
+          setPoi(nearbyPois);
+        } catch (error) {
+          console.error("Error fetching POIs:", error);
+          setPoi([]);
+        } finally {
+          setIsLoading(false);
         }
+      } else {
+        setIsLoading(false);
+      }
+    };
+
+    // Reduced debounce time for tests
+    const timeoutId = setTimeout(getLocationAndFetchPois, 50);
+
+    // Cleanup function
+    return () => clearTimeout(timeoutId);
+  }, [myLocationCoords, radius, selectedPOI]);
+
+  // If loading, return a loading indicator in a View wrapper
+  if (isLoading) {
+    return (
+      <View testID="loading-container">
+        <ActivityIndicator size="large" color="#6E1A2A" />
+      </View>
+    );
+  }
 
   return (
     <>

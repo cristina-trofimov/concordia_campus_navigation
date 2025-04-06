@@ -6,6 +6,7 @@ import BuildingLocation from '../interfaces/buildingLocation';
 import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
 import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
+import { useCoords } from '../data/CoordsContext';
 
 interface BuildingInformationProps {
     isVisible: boolean;
@@ -31,9 +32,9 @@ const stopTimerAndLogEvent = (title: string) => {
 };
 
 const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, onClose, buildingLocation, setInputDestination }) => {
-    const { title, description, buildingInfo } = buildingLocation || {};
+    const { title, description, buildingInfo, coordinates } = buildingLocation || {};
     const { photo, address, departments, services } = buildingInfo || {};
-
+    const {setDestinationCoords} = useCoords();
 
     return (
         <Modal isVisible={isVisible} onBackdropPress={onClose} onBackButtonPress={onClose}>
@@ -45,10 +46,14 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                             <TouchableOpacity
                                 style={BuildingInfoStyle.actionButton}
                                 onPress={() => {
-                                    setInputDestination(address || "");
+                                    setInputDestination(address ?? "");
                                     if(title=== "H Henry F. Hall Building"){
                                           stopTimerAndLogEvent(title);
                                         }
+                                    if (coordinates) {
+                                        const [longitude, latitude] = coordinates;
+                                        setDestinationCoords({ latitude, longitude });
+                                    }
                                     onClose();
                                 }}
                             >

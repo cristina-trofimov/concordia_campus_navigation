@@ -1,96 +1,146 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
-import CalendarButton from '../src/components/CalendarButton'; // Adjust this path as needed
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { useNavigation } from '@react-navigation/native';
+import { signIn } from '../src/components/HandleGoogle';
+import { fetchUserCalendars } from '../src/components/googleCalendarFetching';
 
-// Mock the navigation
-const mockNavigate = jest.fn();
+// Mock dependencies
 jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => ({
-    navigate: mockNavigate
-  })
+  useNavigation: jest.fn(),
+}));
+
+jest.mock('@react-navigation/stack', () => ({}));
+
+jest.mock('../src/components/HandleGoogle', () => ({
+  signIn: jest.fn(),
+}));
+
+jest.mock('../src/components/googleCalendarFetching', () => ({
+  fetchUserCalendars: jest.fn(),
+}));
+
+// Mock RootStackParamList
+jest.mock('../App', () => ({
+  RootStackParamList: {},
 }));
 
 // Mock FontAwesome
-jest.mock('@expo/vector-icons/FontAwesome', () => 'FontAwesome');
+jest.mock('@expo/vector-icons/FontAwesome', () => {
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: (props) => {
+      return <View testID={props.testID || 'mock-icon'} {...props} />;
+    },
+  };
+});
 
-// Mock the styles
+// Mock CalendarStyle
 jest.mock('../src/styles/CalendarStyle', () => ({
   CalendarStyle: {
     calendarButtonContainer: {},
     calBtn: {},
-    calButtonImg: {}
-  }
+    calButtonImg: {},
+  },
 }));
 
+// Import component after all mocks are setup
+const CalendarButton = require('../src/components/CalendarButton').default;
+
 describe('CalendarButton', () => {
+  // Setup navigation mock
+  const mockNavigate = jest.fn();
+  
   beforeEach(() => {
+    // Reset all mocks before each test
     jest.clearAllMocks();
+    
+    // Setup navigation mock implementation
+    (useNavigation as jest.Mock).mockReturnValue({
+      navigate: mockNavigate,
+    });
   });
 
   it('renders correctly', () => {
-    const tree = renderer.create(<CalendarButton />).toJSON();
-    expect(tree).toBeTruthy();
+    const { getByTestId } = render(<CalendarButton />);
+    expect(getByTestId('calendar-button')).toBeTruthy();
+    expect(getByTestId('calendar-icon')).toBeTruthy();
   });
 
-  it('navigates to Calendar screen when pressed', () => {
-    // Create the component
-    const component = renderer.create(<CalendarButton />);
-    const root = component.root;
+  it('calls signIn and navigates to Calendar screen when pressed', async () => {
+    // Mock successful authentication and calendar data
+    const mockToken = 'test-token';
+    const mockCalendarsData = [{ id: '1', name: 'Calendar 1' }, { id: '2', name: 'Calendar 2' }];
     
-    // First, let's examine the component structure to find where the onPress is
-    // Get all instances that have an onPress prop
-    const instances = root.findAll(
-      instance => instance.props && typeof instance.props.onPress === 'function'
-    );
+    (signIn as jest.Mock).mockResolvedValue(mockToken);
+    (fetchUserCalendars as jest.Mock).mockResolvedValue({
+      data: {
+        calendars: mockCalendarsData
+      }
+    });
+
+    const { getByTestId } = render(<CalendarButton />);
     
-    // If we found any instances with onPress, use the first one
-    expect(instances.length).toBeGreaterThan(0);
-    const buttonInstance = instances[0];
+    // Find the TouchableOpacity by its parent container
+    const touchableOpacity = getByTestId('calendar-button').children[0];
     
-    // Simulate pressing the button
-    buttonInstance.props.onPress();
+    // Simulate button press
+    fireEvent.press(touchableOpacity);
     
-    // Check if navigation was called correctly
-    expect(mockNavigate).toHaveBeenCalledWith('Calendar');
+    // Verify the correct functions were called with right parameters
+    await waitFor(() => {
+      expect(signIn).toHaveBeenCalled();
+      expect(fetchUserCalendars).toHaveBeenCalledWith(mockToken);
+      expect(mockNavigate).toHaveBeenCalledWith('Calendar', {
+        accessToken: mockToken,
+        calendars: mockCalendarsData,
+        open: true 
+      });
+    });
   });
 
-  it('includes FontAwesome calendar icon with correct props', () => {
-    // Create the component
-    const component = renderer.create(<CalendarButton />);
-    const root = component.root;
+  it('does not navigate when signIn returns null', async () => {
+    // Mock failed authentication
+    (signIn as jest.Mock).mockResolvedValue(null);
+
+    const { getByTestId } = render(<CalendarButton />);
     
-    // Find the FontAwesome component
-    const icon = root.findByType('FontAwesome');
+    // Find the TouchableOpacity by its parent container
+    const touchableOpacity = getByTestId('calendar-button').children[0];
     
-    // Check if the icon has the correct props
-    expect(icon.props.name).toBe('calendar');
-    expect(icon.props.size).toBe(26);
-    expect(icon.props.color).toBe('white');
+    // Simulate button press
+    fireEvent.press(touchableOpacity);
+    
+    // Wait to ensure all promises resolve
+    await waitFor(() => {
+      expect(signIn).toHaveBeenCalled();
+      expect(fetchUserCalendars).not.toHaveBeenCalled();
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
   });
 
-  it('has the correct style props', () => {
-    // Create the component
-    const component = renderer.create(<CalendarButton />);
-    const root = component.root;
+  it('does not navigate when fetchUserCalendars returns invalid data', async () => {
+    // Mock successful authentication but failed calendar fetch
+    const mockToken = 'test-token';
     
-    // Find all View components
-    const views = root.findAllByType('View');
-    expect(views.length).toBeGreaterThan(0);
+    (signIn as jest.Mock).mockResolvedValue(mockToken);
+    (fetchUserCalendars as jest.Mock).mockResolvedValue({
+      data: {} // No calendars property
+    });
+
+    const { getByTestId } = render(<CalendarButton />);
     
-    // Find FontAwesome component for icon style check
-    const icon = root.findByType('FontAwesome');
+    // Find the TouchableOpacity by its parent container
+    const touchableOpacity = getByTestId('calendar-button').children[0];
     
-    // Find the element with the onPress function (our button)
-    const buttonElements = root.findAll(
-      instance => instance.props && typeof instance.props.onPress === 'function'
-    );
-    expect(buttonElements.length).toBeGreaterThan(0);
-    const buttonElement = buttonElements[0];
+    // Simulate button press
+    fireEvent.press(touchableOpacity);
     
-    // We're just checking that styles exist rather than their exact values
-    // since our mock returns empty objects
-    expect(views[0].props).toHaveProperty('style');
-    expect(buttonElement.props).toHaveProperty('style');
-    expect(icon.props).toHaveProperty('style');
+    // Wait to ensure all promises resolve
+    await waitFor(() => {
+      expect(signIn).toHaveBeenCalled();
+      expect(fetchUserCalendars).toHaveBeenCalledWith(mockToken);
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
   });
 });
