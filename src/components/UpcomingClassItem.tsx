@@ -7,6 +7,8 @@ import { Image } from "@rneui/base";
 import { CalendarEvent } from "../interfaces/CalendraEvent";
 import { UpcomingClassItemStyle } from "../styles/UpcomingClassItemStyle";
 import { Pressable } from "react-native";
+import firebase from './src/components/firebase';
+import analytics from '@react-native-firebase/analytics';
 
 interface UpcomingClassItemProps {
   calendarEvent: CalendarEvent;
@@ -65,19 +67,28 @@ export default class UpcomingClassItem extends Component<
   };
 
   private isClassInProgress = (
-    startTime: String,
-    endTime: String
+    startDateTime: string,
+    endDateTime: string,
+    startTimeFormatted: string,
+    endTimeFormatted: string,
   ): { statusColor: string; statusText: string } => {
-    const startTimeInMinutes = this.convertToMinutes(startTime);
-    const endTimeInMinutes = this.convertToMinutes(endTime);
+    const todayDate = new Date();
+
+    const startDate = new Date(startDateTime);
+    const endDate = new Date(endDateTime);
+
+    const startTimeInMinutes = this.convertToMinutes(startTimeFormatted);
+    const endTimeInMinutes = this.convertToMinutes(endTimeFormatted);
     const nowInMinutes = this.state.currentTime;
 
-    if (nowInMinutes >= startTimeInMinutes && nowInMinutes < endTimeInMinutes) {
+    if ((todayDate < startDate) || (todayDate == startDate && nowInMinutes < startTimeInMinutes)) {
+      return { statusColor: "#FFBD59", statusText: "Upcoming" };
+    } else if ((todayDate >= startDate) && (todayDate <= endDate) && (nowInMinutes >= startTimeInMinutes) && (nowInMinutes <= endTimeInMinutes)) {
       return { statusColor: "#00BF63", statusText: "In progress" };
-    } else if (nowInMinutes >= endTimeInMinutes) {
+    } else if ((startDate <= todayDate) && (todayDate > endDate || (todayDate == endDate && nowInMinutes > endTimeInMinutes))) {
       return { statusColor: "#c1121f", statusText: "Ended" };
     } else {
-      return { statusColor: "#FFBD59", statusText: "Upcoming" };
+      return { statusColor: "#ad33ff", statusText: "Invalid" }
     }
   };
 
@@ -108,11 +119,21 @@ export default class UpcomingClassItem extends Component<
     const endTimeFormatted = this.convertToHHMM(endTime);
     const buildingName = this.getBuildingName(location);
 
-    const { statusColor, statusText } = this.isClassInProgress(startTimeFormatted, endTimeFormatted);
+    const { statusColor, statusText } = this.isClassInProgress(startTime, endTime, startTimeFormatted, endTimeFormatted);
 
     return (
       <Pressable
-        onPress={() => setInputDestination(this.getAdress(location))}
+        onPress={() => {
+              if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+                  const elapsedTime = (globalThis as any).taskTimer.stop();
+             analytics().logEvent('Task_3_finished', {
+            elapsed_time: elapsedTime/1000,
+        user_id: (globalThis as any).userId,                });
+              console.log(`Custom Event Logged: Task 3 Finished`);}
+
+            setInputDestination(this.getAdress(location))} }
+
+
         disabled={statusText === "Ended"} // Disable if class has ended
         style={({ pressed }) => [
           UpcomingClassItemStyle.container,

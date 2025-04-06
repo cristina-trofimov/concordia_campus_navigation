@@ -1,7 +1,9 @@
 jest.mock('@env', () => ({
   MAPBOX_TOKEN: 'mock-mapbox-token',
 }), { virtual: true });
-
+jest.mock('@react-native-firebase/analytics', () => () => ({
+  logEvent: jest.fn(),
+}));
 jest.mock('@rnmapbox/maps', () => ({
 
   PointAnnotation: jest.fn().mockImplementation(({ children }) => children),

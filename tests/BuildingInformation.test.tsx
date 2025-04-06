@@ -21,6 +21,9 @@ jest.mock('react-native-modal', () => {
     );
   };
 });
+jest.mock('@react-native-firebase/analytics', () => () => ({
+  logEvent: jest.fn(),
+}));
 
 // Mock the Icon component from react-native-elements
 jest.mock('react-native-elements', () => {

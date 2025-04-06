@@ -51,7 +51,9 @@ jest.mock('../src/data/IndoorContext', () => ({
     inFloorView: false,
   }),
 }));
-
+jest.mock('@react-native-firebase/analytics', () => () => ({
+  logEvent: jest.fn(),
+}));
 jest.mock('../src/components/BuildingCoordinates', () => ({
   HighlightBuilding: jest.fn().mockImplementation(() => null),
 }));

@@ -8,6 +8,7 @@ export const CalendarStyle = StyleSheet.create({
       position: "relative",
     },
     headerContainer: {
+      display: "flex",
       flexDirection: 'row',
       justifyContent: 'space-around',
       padding: 10,
@@ -42,6 +43,7 @@ export const CalendarStyle = StyleSheet.create({
       justifyContent: "center",
     },
     todayBTN: {
+      left: 85,
       height: 36,
       width: 80,
       backgroundColor: "#912338",

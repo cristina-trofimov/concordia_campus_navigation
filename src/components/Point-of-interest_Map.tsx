@@ -4,15 +4,20 @@ import { PointAnnotation } from '@rnmapbox/maps';
 import { Text } from "@rneui/themed";
 import * as Location from "expo-location";
 import { Coords } from "../interfaces/Map.ts";
+import analytics from '@react-native-firebase/analytics';
 import { TokenManager } from "../data/TokenManager.ts";
 
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-// Create a token manager system that works with both real and test environments
 
-
-// Set up the token once at the beginning
 const MAPBOX_ACCESS_TOKEN = TokenManager.getMapboxToken();
+
+interface PointOfInterestMapProps {
+  myLocationCoords: { latitude: number; longitude: number } | null;
+  setInputDestination: (inputDestination: string) => void;
+  selectedPOI?: string;
+  radius?: number;
+}
 
 const POI_ICONS = {
   food_and_drink: "food",
@@ -35,7 +40,6 @@ export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedP
       return [];
     }
 
-    // Fix: Check if feature.properties exists before accessing class
     const filteredPOIs = data.features.filter(feature =>
       feature.properties && feature.properties.class === selectedPOI
     );
@@ -72,10 +76,17 @@ export const onPoiClick = async (poi, setInputDestination) => {
   const coordinates = poi.geometry?.coordinates;
   if (Array.isArray(coordinates) && coordinates.length === 2) {
     const [longitude, latitude] = coordinates;
-    // Note: In mapbox, coordinates are [longitude, latitude]
-    // But the reverseGeocode function expects (latitude, longitude)
     const address = await reverseGeocode(latitude, longitude);
-    // Fix: Make sure we don't set empty string if address is null
+     if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+         const elapsed_time = (globalThis as any).taskTimer.stop();
+           analytics().logEvent('Task_5_finished', {
+           POI_address: address,
+           elapsed_time: elapsed_time/1000,
+           user_id: (globalThis as any).userId,
+           });
+           console.log(`Custom Event Logged: POI location chosen: ${address}, and directions were set`);
+           console.log(`Custom Event Logged: Task 5 finished with time:`, elapsed_time/1000);
+     }
     setInputDestination(address || "Unknown location");
   }
 };
@@ -92,13 +103,14 @@ const PointOfInterestMap: React.FC<PointOfInterestMapProps> = ({
 
   useEffect(() => {
     const getLocationAndFetchPois = async () => {
+
       setPoi([]);
       setCurrentIcon(null);
       setIsLoading(true);
 
+
       if (myLocationCoords && selectedPOI) {
         try {
-          // Reduce timeout to prevent test timeouts
           await new Promise(resolve => setTimeout(resolve, 100));
           const { latitude, longitude } = myLocationCoords;
           const nearbyPois = await fetchNearbyPOI(longitude, latitude, radius, selectedPOI);
