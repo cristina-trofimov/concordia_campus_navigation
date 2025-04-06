@@ -9,6 +9,9 @@ import { useIndoor } from '../src/data/IndoorContext';
 jest.mock('@expo/vector-icons', () => ({
     Ionicons: 'MockedIonicons',
   }));
+  jest.mock('@react-native-firebase/analytics', () => () => ({
+    logEvent: jest.fn(),
+  }));
   
   jest.mock('@expo/vector-icons/Entypo', () => 'MockedEntypo');
   

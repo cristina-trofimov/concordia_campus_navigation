@@ -1,6 +1,5 @@
 import React, { useState, useEffect  } from "react";
 import { AppRegistry, AppState } from 'react-native';
-import React, { useEffect } from "react";
 import { createTheme } from "@rneui/themed";
 import HomeScreen from './src/components/screens/HomeScreen';
 import CalendarScreen from "./src/components/screens/CalendarScreen";
@@ -12,7 +11,7 @@ import { Calendar } from "./src/interfaces/calendar";
 import { ClassEventsProvider } from "./src/data/ClassEventsContext";
 
 const Stack = createNativeStackNavigator();
-(globalThis as any).isTesting = true; // when doing usability testing
+(globalThis as any).isTesting = false; // when doing usability testing
 
 export type RootStackParamList = {
   Home: undefined;

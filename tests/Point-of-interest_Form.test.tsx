@@ -9,7 +9,9 @@ jest.mock("../src/styles/Point-of-interest_Form-STYLES.tsx", () => ({
     picker: {},
   },
 }));
-
+jest.mock('@react-native-firebase/analytics', () => () => ({
+  logEvent: jest.fn(),
+}));
 // Create a global store to hold callbacks
 const mockCallbacks = {
   poiOnValueChange: null,

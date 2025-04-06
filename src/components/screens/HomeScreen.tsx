@@ -13,6 +13,7 @@ import PointOfInterestSelector from "../Point-of-interest_Form";
 import { RoomSearchBars } from "../RoomSearchBars";
 import { useClassEvents } from "../../data/ClassEventsContext";
 import UpcomingClassItem from "../UpcomingClassItem";
+import LeftDrawer from "../LeftDrawer";
 
 const { height } = Dimensions.get("window");
 
@@ -28,6 +29,7 @@ export function HomeScreen() {
       <IndoorsProvider>
         <View style={HomeStyle.container}>
           <CalendarButton />
+           {(globalThis as any).isTesting && <LeftDrawer />}
           <MapComponent
             drawerHeight={drawerHeight}
             setInputDestination={setInputDestination}

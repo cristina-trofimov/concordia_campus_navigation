@@ -242,7 +242,15 @@ export const RoomSearchBar: React.FC<RoomSearchBarProps> = ({
                                     <TouchableOpacity
                                         key={`${item.ref}-${index}`}
                                         style={SearchBarStyle.suggestionItem}
-                                        onPress={() => handleSuggestionPress(item)}
+                                        onPress={() => {
+                                         if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
+                                             if(item != "119" || item != "835"){
+                                                 analytics().logEvent('Task_4_wrong_class', {
+                                                                  user_id: (globalThis as any).userId,
+                                                                  });}
+                                                 }
+                                            handleSuggestionPress(item)}}
+
                                     >
                                         <Text>{`${item.ref}`}</Text>
                                     </TouchableOpacity>

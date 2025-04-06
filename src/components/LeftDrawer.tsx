@@ -3,7 +3,7 @@ import { TouchableOpacity, Modal, View, Animated, Dimensions, GestureResponderEv
 import Feather from '@expo/vector-icons/Feather';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { LeftDrawerStyle } from "../styles/LeftDrawerStyle";
-import firebase from './src/components/firebase';
+import firebase from '../src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 
 //THIS FILE NOT IN MAIN NO MO
@@ -100,7 +100,11 @@ const LeftDrawer = () => {
     <View style={LeftDrawerStyle.container} >
       <View style={{ flex: 1 }}>
       {/* Button */}
-      <TouchableOpacity style={LeftDrawerStyle.button} onPress={ () => { setIsDrawerVisible(!isDrawerVisible); } } >
+      <TouchableOpacity
+        testID="drawer-button"
+        style={LeftDrawerStyle.button}
+        onPress={ () => { setIsDrawerVisible(!isDrawerVisible); } }
+      >
         <Ionicons name="reorder-three-outline" size={40} color="black" />
       </TouchableOpacity>
 
@@ -113,6 +117,7 @@ const LeftDrawer = () => {
     >
       <View style={{ flex: 1 }}>
         <TouchableOpacity
+          testID="drawer-overlay"
           style={LeftDrawerStyle.overlay}
           onPress={handleOverlayPress}
           activeOpacity={1}
@@ -125,37 +130,11 @@ const LeftDrawer = () => {
               <View style={LeftDrawerStyle.contentContainer} >
                 {/* <HandleGoogle /> */}
 
-                <TouchableOpacity onPress={ () => { console.log("your favorites was presses") } } >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', }} >
-                    <Feather name="heart" size={20} color="black" style={LeftDrawerStyle.contentImage} />
-                    <Text style={{ fontWeight: "bold" }} >Your Favorites</Text>
-                  </View>
-                </TouchableOpacity>
 
-                <TouchableOpacity onPress={ () => { console.log("your timeline was presses") } } >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', }} >
-                    <Ionicons name="analytics-outline" size={20} color="black" style={LeftDrawerStyle.contentImage} />
-                    <Text style={{ fontWeight: "bold" }} >Your Timeline</Text>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={ () => { console.log("help & feedback was presses") } } >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', }} >
-                    <Feather name="help-circle" size={20} color="black" style={LeftDrawerStyle.contentImage} />
-                    <Text style={{ fontWeight: "bold" }} >Help & Feedback</Text>
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={ () => { console.log("settings was presses") } } >
-                  <View style={{ flexDirection: 'row', alignItems: 'center', }} >
-                    <Feather name="settings" size={20} color="black" style={LeftDrawerStyle.contentImage} />
-                    <Text style={{ fontWeight: "bold" }} >Settings</Text>
-                  </View>
-                </TouchableOpacity>
                 {(globalThis as any).isTesting && (
                     <>
                     {/* Start Task Button */}
-                        <TouchableOpacity onPress={handleStartTask}>
+                        <TouchableOpacity testID="start-task-button" onPress={handleStartTask}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 300 }}>
                                 <Feather name="play" size={20} color="black" style={LeftDrawerStyle.contentImage} />
                                 <Text style={{ fontWeight: "bold" }}>Start Task</Text>
@@ -163,7 +142,7 @@ const LeftDrawer = () => {
                         </TouchableOpacity>
 
                     {/* Cancel Task Button */}
-                        <TouchableOpacity onPress={handleCancelTask}>
+                        <TouchableOpacity testID="cancel-task-button" onPress={handleCancelTask}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5 }}>
                                 <Feather name="x" size={20} color="black" style={LeftDrawerStyle.contentImage} />
                                 <Text style={{ fontWeight: "bold" }}>Cancel Task</Text>
@@ -181,7 +160,5 @@ const LeftDrawer = () => {
     </View>
   );
 };
-
-
 
 export default LeftDrawer;

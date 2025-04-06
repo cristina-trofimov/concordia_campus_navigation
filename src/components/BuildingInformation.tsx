@@ -40,6 +40,7 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
     const { inFloorView } = useIndoor();
     const buildingId = (title ?? "").split(" ")[0];
 
+
     return (
         <Modal isVisible={isVisible} onBackdropPress={onClose} onBackButtonPress={onClose}>
             <View style={BuildingInfoStyle.modalContent}>
