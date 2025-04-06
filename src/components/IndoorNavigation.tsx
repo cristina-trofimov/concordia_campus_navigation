@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-
 import Mapbox from '@rnmapbox/maps';
 import { useIndoor } from "../data/IndoorContext";
 import { useCoords } from "../data/CoordsContext";
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature';
-import {LineString, Position } from 'geojson';
+import { LineString, Position } from 'geojson';
 import { EntryPointType, GraphNode, Graph } from '../interfaces/IndoorGraph';
 
 // A* pathfinding algorithm
@@ -152,8 +151,6 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
       });
     }
   });
-  
-  console.log(`Found ${corridorPolygons.length} corridor polygons`);
   
   // Create nodes along the corridor edges and within the corridor
   corridorPolygons.forEach((corridor, corridorIndex) => {
@@ -323,7 +320,7 @@ const connectRoomsToCorridors = (graph: Graph): void => {
   // Connect each room to the closest corridor nodes
   roomNodes.forEach(roomNode => {
     // For specific rooms of interest, find more corridor connections
-    const connectionsToFind = specificRooms.includes(roomNode.roomNumber || "") ? 4 : 2;
+    const connectionsToFind = specificRooms.includes(roomNode.roomNumber ?? "") ? 4 : 2;
     
     // Find the closest corridor nodes
     const closestNodes = corridorNodes
@@ -344,7 +341,7 @@ const connectRoomsToCorridors = (graph: Graph): void => {
     });
     
     // Ensure important rooms have connections
-    if (specificRooms.includes(roomNode.roomNumber || "") && roomNode.neighbors.length === 0) {
+    if (specificRooms.includes(roomNode.roomNumber ?? "") && roomNode.neighbors.length === 0) {
       // Force connection to the closest node
       if (closestNodes.length > 0) {
         roomNode.neighbors.push(closestNodes[0].node.id);
@@ -524,20 +521,12 @@ export const IndoorNavigation: React.FC = () => {
   
   useEffect(() => {
     if (indoorFeatures.length === 0 || !currentFloor) return;
-    if (!destinationRoom) return; // No destination selected
-    
-    console.log("Building navigation graph...");
-    console.log("Current building:", highlightedBuilding?.properties.id);
-    console.log("Current floor:", currentFloor);
-    console.log("Transport preference:", indoorTransport);
-    
+    if (!destinationRoom) return;
     // Store the floor this route is valid for
     setRouteFloor(currentFloor);
     
     // Build the navigation graph
     const graph = buildNavigationGraph(indoorFeatures);
-    
-    console.log(`Built graph with ${Object.keys(graph.nodes).length} nodes`);
     
     // Debug - collect corridor nodes for visualization
     const corridorNodes: Position[] = Object.values(graph.nodes)
@@ -547,8 +536,6 @@ export const IndoorNavigation: React.FC = () => {
     
     // Log all entry points found
     const entryPoints = Object.values(graph.nodes).filter(node => node.isEntryPoint);
-    console.log(`Found ${entryPoints.length} entry points:`, 
-      entryPoints.map(ep => `${ep.id} (${ep.entryPointType})`));
     
     // Get destination room first so we can find the closest entry point to it
     const targetRoom = destinationRoom?.ref || "";
@@ -562,9 +549,8 @@ export const IndoorNavigation: React.FC = () => {
     // Get starting point - use origin room if available, otherwise use entry point
     let startNodeId: string | null = null;
     
-    if (originRoom && originRoom.ref) {
+    if (originRoom?.ref) {
       startNodeId = findRoomNode(graph, originRoom.ref);
-      console.log(`Using origin room ${originRoom.ref} as starting point`);
     }
     
     // If origin room not found, use the preferred transport type as starting point
@@ -572,7 +558,6 @@ export const IndoorNavigation: React.FC = () => {
     if (!startNodeId) {
       const entryType = getEntryPointTypeFromTransport();
       startNodeId = findEntryPoint(graph, entryType, endNodeId);
-      console.log(`Using ${indoorTransport} closest to destination as starting point`);
     }
     
     if (!startNodeId) {
@@ -580,15 +565,10 @@ export const IndoorNavigation: React.FC = () => {
       return;
     }
     
-    console.log(`Finding path from ${startNodeId} to ${endNodeId}`);
-    
     // Find the path
     const path = findPath(graph, startNodeId, endNodeId);
     
     if (path) {
-      console.log(`Found path with ${path.length} nodes`);
-      console.log(`Path: ${path.join(' -> ')}`);
-      
       // Convert path to GeoJSON LineString
       const lineString = pathToLineString(path, graph);
       setRoutePath(lineString);

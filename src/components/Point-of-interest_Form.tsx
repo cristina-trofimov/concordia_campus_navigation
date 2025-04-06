@@ -67,33 +67,29 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
        POI: newPOI,
        user_id: (globalThis as any).userId,
        });
-       console.log(`Custom Event Logged: good POI chosen: ${newPOI} was pressed`);
     }else{
         analytics().logEvent('wrong_POI', {
         POI: newPOI,
         user_id: (globalThis as any).userId,
         });
-        console.log(`Custom Event Logged: bad POI chosen: ${newPOI} was pressed`);
-        }}
+      }}
 
     setSelectedPOI(newPOI);
   };
 
   const handleRadiusChange = (value: number) => {
       if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
-              if(value === 150){
-             analytics().logEvent('good_radius', {
-             POI: value,
-             user_id: (globalThis as any).userId,
-             });
-             console.log(`Custom Event Logged: good radius chosen: ${value} meters was pressed`);
-          }else{
-              analytics().logEvent('wrong_radius', {
-              POI: value,
-              user_id: (globalThis as any).userId,
-              });
-              console.log(`Custom Event Logged: bad radius chosen: ${value} meters was pressed`);
-              }}
+        if(value === 150){
+          analytics().logEvent('good_radius', {
+            POI: value,
+            user_id: (globalThis as any).userId,
+        });
+      } else{
+        analytics().logEvent('wrong_radius', {
+          POI: value,
+          user_id: (globalThis as any).userId,
+        });
+      }}
     setSelectedRadius(value);
   };
 
