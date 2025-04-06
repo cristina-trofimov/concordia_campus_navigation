@@ -75,12 +75,17 @@ const findPath = (
   return null;
 };
 
-// Heuristic function for A* (Euclidean distance)
 const heuristic = (a: GraphNode, b: GraphNode): number => {
-  return distance(a.position, b.position);
+  // Base distance
+  const baseDistance = distance(a.position, b.position);
+  
+  // Add penalty for edge nodes to discourage wall-hugging paths
+  const edgePenalty = a.isEdgeNode ? 0.00002 : 0;
+  
+  return baseDistance + edgePenalty;
 };
 
-// Distance calculation (Euclidean)
+// Modified distance calculation to add wall penalties
 const distance = (posA: Position, posB: Position): number => {
   const dx = posA[0] - posB[0];
   const dy = posA[1] - posB[1];
@@ -110,36 +115,88 @@ const calculatePolygonCentroid = (coordinates: Position[]): Position => {
 
 // Get a centerline through a polygon (simplified approach)
 const getCenterline = (coordinates: Position[]): Position[] => {
-  // For simplicity, create a line through several key points in the polygon
+  // Create a denser grid of points throughout the corridor
   const centerline: Position[] = [];
   
   // Calculate the centroid of the polygon
   const centroid = calculatePolygonCentroid(coordinates);
   
-  // Select several points along the polygon edges at regular intervals
-  const numPoints = Math.min(coordinates.length, 6); // Use up to 6 points
-  const step = Math.floor(coordinates.length / numPoints);
+  // Create a grid of points inside the polygon
+  // First, find the bounding box of the polygon
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  coordinates.forEach(coord => {
+    minX = Math.min(minX, coord[0]);
+    minY = Math.min(minY, coord[1]);
+    maxX = Math.max(maxX, coord[0]);
+    maxY = Math.max(maxY, coord[1]);
+  });
   
-  // Create points that go from edge points toward the centroid
-  for (let i = 0; i < coordinates.length; i += step) {
-    // Create a point that's 70% of the way from the edge to the centroid
-    const edgePoint = coordinates[i];
-    const midPoint: Position = [
-      edgePoint[0] * 0.3 + centroid[0] * 0.7,
-      edgePoint[1] * 0.3 + centroid[1] * 0.7
-    ];
-    centerline.push(midPoint);
+  // Create a grid within the bounding box
+  // Adjust these values to control grid density
+  const gridDensityX = 5; 
+  const gridDensityY = 5;
+  
+  const stepX = (maxX - minX) / gridDensityX;
+  const stepY = (maxY - minY) / gridDensityY;
+  
+  // Simple point-in-polygon check (ray casting algorithm)
+  const isPointInPolygon = (point: Position, polygon: Position[]): boolean => {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i][0], yi = polygon[i][1];
+      const xj = polygon[j][0], yj = polygon[j][1];
+      
+      const intersect = ((yi > point[1]) !== (yj > point[1])) &&
+        (point[0] < (xj - xi) * (point[1] - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  };
+  
+  // Generate the grid points
+  for (let i = 0; i <= gridDensityX; i++) {
+    for (let j = 0; j <= gridDensityY; j++) {
+      const x = minX + i * stepX;
+      const y = minY + j * stepY;
+      const point: Position = [x, y];
+      
+      // Only add points that are inside the polygon
+      if (isPointInPolygon(point, coordinates)) {
+        centerline.push(point);
+      }
+    }
   }
   
-  // Add the centroid itself
+  // Always include the centroid
   centerline.push(centroid);
+  
+  // If we somehow ended up with very few points, revert to the old method
+  if (centerline.length < 3) {
+    // Select several points along the polygon edges at regular intervals
+    const numPoints = Math.min(coordinates.length, 6); // Use up to 6 points
+    const step = Math.floor(coordinates.length / numPoints);
+    
+    // Create points that go from edge points toward the centroid
+    for (let i = 0; i < coordinates.length; i += step) {
+      // Create a point that's 70% of the way from the edge to the centroid
+      const edgePoint = coordinates[i];
+      const midPoint: Position = [
+        edgePoint[0] * 0.3 + centroid[0] * 0.7,
+        edgePoint[1] * 0.3 + centroid[1] * 0.7
+      ];
+      centerline.push(midPoint);
+    }
+  }
   
   return centerline;
 };
 
 // Build a navigation graph from indoor features
 const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
-  const graph: Graph = { nodes: {} };
+  const graph: Graph = {
+    nodes: {},
+    graph: undefined
+  };
   
   // Extract the corridor polygons
   const corridorPolygons: {coordinates: Position[][]; id: number}[] = [];
@@ -158,8 +215,9 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
   // Create nodes along the corridor edges and within the corridor
   corridorPolygons.forEach((corridor, corridorIndex) => {
     // For each corridor polygon, create nodes along the edges
+    // Use more edge points for better path finding
     corridor.coordinates[0].forEach((coordinate, pointIndex) => {
-      if (pointIndex % 3 === 0) { // Only use every 3rd point to reduce density
+      if (pointIndex % 2 === 0) { // Use every 2nd point instead of every 3rd
         const nodeId = `corridor_${corridorIndex}_edge_${pointIndex}`;
         graph.nodes[nodeId] = {
           id: nodeId,
@@ -171,6 +229,7 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
     });
     
     // Add nodes along a line through the center of the corridor
+    // Using improved centerline generation for more nodes
     const centerline = getCenterline(corridor.coordinates[0]);
     centerline.forEach((position, pointIndex) => {
       const nodeId = `corridor_${corridorIndex}_center_${pointIndex}`;
@@ -187,6 +246,19 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
         graph.nodes[nodeId].neighbors.push(prevNodeId);
         graph.nodes[prevNodeId].neighbors.push(nodeId);
       }
+      
+      // Also connect to edge nodes that are nearby to create paths that
+      // don't hug the walls as much
+      Object.entries(graph.nodes)
+        .filter(([id, node]) => 
+          id.startsWith(`corridor_${corridorIndex}_edge_`) && 
+          distance(node.position, position) < 0.00006 // Slightly larger radius
+        )
+        .forEach(([id, _]) => {
+          // Add bidirectional connections
+          graph.nodes[nodeId].neighbors.push(id);
+          graph.nodes[id].neighbors.push(nodeId);
+        });
     });
   });
   
@@ -285,7 +357,7 @@ const connectCorridorNodes = (graph: Graph): void => {
   const corridorNodes = Object.values(graph.nodes).filter(node => node.isCorridor);
   
   // Connect nearby corridor nodes to create a network
-  const connectionRadius = 0.00007; // Slightly larger radius to ensure connectivity
+  const connectionRadius = 0.00005;
   
   // Connect nodes that are close to each other
   for (let i = 0; i < corridorNodes.length; i++) {
@@ -301,16 +373,38 @@ const connectCorridorNodes = (graph: Graph): void => {
         // Check if they're from the same corridor section
         const corridorA = nodeA.id.split('_')[1];
         const corridorB = nodeB.id.split('_')[1];
+        const typeA = nodeA.id.split('_')[2]; // "edge" or "center"
+        const typeB = nodeB.id.split('_')[2]; // "edge" or "center"
         
-        // Only connect if distance is very small or they're from the same corridor
-        if (dist < 0.00003 || corridorA === corridorB) {
+        // Connect edge-to-center nodes more aggressively to create paths
+        // that don't hug walls
+        if ((typeA === "edge" && typeB === "center") || 
+            (typeA === "center" && typeB === "edge")) {
+          nodeA.neighbors.push(nodeB.id);
+          nodeB.neighbors.push(nodeA.id);
+        }
+        // For same corridor section, connect all nodes
+        else if (corridorA === corridorB) {
+          nodeA.neighbors.push(nodeB.id);
+          nodeB.neighbors.push(nodeA.id);
+        }
+        // For different corridor sections, be more selective
+        else if (dist < 0.00002) {
           nodeA.neighbors.push(nodeB.id);
           nodeB.neighbors.push(nodeA.id);
         }
       }
     }
   }
+  
+  // This makes the A* algorithm prefer center nodes
+  Object.values(graph.nodes).forEach(node => {
+    if (node.isCorridor && node.id.includes("_edge_")) {
+      node.isEdgeNode = true;
+    }
+  });
 };
+
 
 // Connect rooms to corridors
 const connectRoomsToCorridors = (graph: Graph): void => {
