@@ -4,7 +4,6 @@ import Modal from 'react-native-modal';
 import { Icon } from 'react-native-elements';
 import BuildingLocation from '../interfaces/buildingLocation';
 import { BuildingInfoStyle } from '../styles/BuildingInfoStyle';
-import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 import { useCoords } from '../data/CoordsContext';
 import IndoorViewButton from './IndoorViewButton';
