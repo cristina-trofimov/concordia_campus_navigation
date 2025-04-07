@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { PoiFormStyles } from "../styles/Point-of-interest_Form-STYLES.tsx";
 import analytics from '@react-native-firebase/analytics';
+import Modal from 'react-native-modal';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+
 
 
 type PointOfInterestSelectorProps = {
@@ -69,8 +72,8 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
        });
     }else{
         analytics().logEvent('wrong_POI', {
-        POI: newPOI,
-        user_id: (globalThis as any).userId,
+          POI: newPOI,
+          user_id: (globalThis as any).userId,
         });
       }}
 
@@ -93,38 +96,57 @@ const PointOfInterestSelector: React.FC<PointOfInterestSelectorProps> = ({
     setSelectedRadius(value);
   };
 
+
+  const [isVisible, setIsVisible] = useState(false);
+
   return (
-    <View style={PoiFormStyles.container}>
-      <Text style={PoiFormStyles.title}>Points of Interest</Text>
 
-      {/* POI Picker */}
-      <Picker
-        testID="poi-picker"
-        selectedValue={selectedPOI ?? "none"}
-        onValueChange={(itemValue) => handlePOIChange(itemValue)}
-        style={PoiFormStyles.picker}
-        mode="dropdown"
-      >
-        <Picker.Item label="None" value="none" />
-        {Object.keys(POI_MAPPING).map((poi) => (
-          <Picker.Item key={poi} label={poi} value={poi} />
-        ))}
-      </Picker>
+    <View style={PoiFormStyles.containerAnother} >
+      <View style={{ flex: 1, alignItems: 'flex-end' }}>
 
-      {/* Radius Picker */}
-      <Text style={PoiFormStyles.title}>Search Radius</Text>
-      <Picker
-        testID="radius-picker"
-        selectedValue={selectedRadius ?? 50}
-        onValueChange={(value) => handleRadiusChange(value)}
-        style={PoiFormStyles.picker}
-        mode="dropdown"
-      >
-        {[25, 50, 75, 100, 150].map((r) => (
-          <Picker.Item key={r} label={`${r} meters`} value={r} />
-        ))}
-      </Picker>
+
+        <TouchableOpacity testID="poi-toggle-button" style={PoiFormStyles.button} onPress={() => { setIsVisible(!isVisible); }} >
+          <FontAwesome6 name="map-location-dot" size={24} color="white" />
+        </TouchableOpacity>
+
+        <Modal isVisible={isVisible} onBackdropPress={() => setIsVisible(!isVisible)} onBackButtonPress={() => setIsVisible(!isVisible)}>
+          <View style={PoiFormStyles.modalContent}>
+            <View style={PoiFormStyles.container}>
+              <Text style={PoiFormStyles.title}>Points of Interest</Text>
+
+              {/* POI Picker */}
+              <Picker
+                testID="poi-picker"
+                selectedValue={selectedPOI ?? "none"}
+                onValueChange={(itemValue) => handlePOIChange(itemValue)}
+                style={PoiFormStyles.picker}
+                mode="dropdown"
+              >
+                <Picker.Item label="None" value="none" />
+                {Object.keys(POI_MAPPING).map((poi) => (
+                  <Picker.Item key={poi} label={poi} value={poi} />
+                ))}
+              </Picker>
+
+              {/* Radius Picker */}
+              <Text style={PoiFormStyles.title}>Search Radius</Text>
+              <Picker
+                testID="radius-picker"
+                selectedValue={selectedRadius ?? 50}
+                onValueChange={(value) => handleRadiusChange(value)}
+                style={PoiFormStyles.picker}
+                mode="dropdown"
+              >
+                {[25, 50, 75, 100, 150].map((r) => (
+                  <Picker.Item key={r} label={`${r} meters`} value={r} />
+                ))}
+              </Picker>
+            </View>
+          </View>
+        </Modal>
+      </View>
     </View>
+
   );
 };
 

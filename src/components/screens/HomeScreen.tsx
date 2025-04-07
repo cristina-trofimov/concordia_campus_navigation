@@ -43,6 +43,12 @@ export function HomeScreen() {
       <IndoorsProvider>
         <View style={HomeStyle.container}>
           <CalendarButton />
+          <PointOfInterestSelector
+            pointsOfInterest={selectedPOI}
+            radius={radius}
+            onPOIChange={setSelectedPOI}
+            onRadiusChange={setRadius}
+          />
           {(globalThis as any).isTesting && <LeftDrawer />}
           <MapComponent
             drawerHeight={drawerHeight}
@@ -63,12 +69,6 @@ export function HomeScreen() {
               />
               {renderUpcomingClasses()}
               <RoomSearchBars />
-              <PointOfInterestSelector
-                pointsOfInterest={selectedPOI}
-                radius={radius}
-                onPOIChange={setSelectedPOI}
-                onRadiusChange={setRadius}
-              />
               <DirectionsSteps />
             </ScrollView>
           </BottomDrawer>
