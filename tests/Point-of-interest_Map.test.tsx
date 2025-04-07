@@ -202,7 +202,6 @@ describe('PointOfInterestMap Component', () => {
     expect(global.fetch).toHaveBeenCalledWith(
       expect.stringMatching(/https:\/\/api\.mapbox\.com\/geocoding\/v5\/mapbox\.places\/-122\.4194,37\.7749\.json\?access_token=.*/),
     );
-
     expect(mockSetInputDestination).toHaveBeenCalledWith(mockAddress);
   });
 

@@ -7,13 +7,12 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { CalendarStyle } from "../styles/CalendarStyle";
 import { signIn } from "./HandleGoogle";
 import { fetchUserCalendars } from "./googleCalendarFetching.ts";
-import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 const CalendarButton = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const goToCalendar = async () => {
-      logNavigationEvent(); //for firebase
+    logNavigationEvent(); //for firebase
     const token = await signIn();
     if (token) {
       const calendars = await fetchUserCalendars(token);
@@ -22,18 +21,15 @@ const CalendarButton = () => {
         navigation.navigate("Calendar", { accessToken: token, calendars: calendarsData, open : true });
       }
     }
-    // navigation.navigate("Calendar", { accessToken: token });
-
   }
 const logNavigationEvent = async () => {
 
        try {
            if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
-                              await analytics().logEvent('Calendar_Button', {
-                                  user_id: (globalThis as any).userId,
-                              });
-                          console.log(`Custom Event Logged: calendar button clicked`);
-           }
+            await analytics().logEvent('Calendar_Button', {
+              user_id: (globalThis as any).userId,
+            });
+          }
 
        } catch (error) {
            console.error("Error logging Firebase event:", error);

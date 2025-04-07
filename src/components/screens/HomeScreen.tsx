@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Animated, Dimensions, ScrollView, Text, View } from "react-native";
+import { Animated, Dimensions, ScrollView, View } from "react-native";
 import BottomDrawer from "../BottomDrawer";
 import { CoordsProvider } from "../../data/CoordsContext";
 import { IndoorsProvider } from "../../data/IndoorContext";
@@ -25,12 +25,31 @@ export function HomeScreen() {
   const [radius, setRadius] = useState<number | null>(null);
   const { classEvents } = useClassEvents();
 
+  const renderUpcomingClasses = () => {
+    if (inputDestination === "" && classEvents.length > 0) {
+      return classEvents.map((event, index) => (
+        <UpcomingClassItem 
+          calendarEvent={event} 
+          key={index} 
+          setInputDestination={setInputDestination} 
+        />
+      ));
+    }
+    return null;
+  };
+
   return (
     <CoordsProvider>
       <IndoorsProvider>
         <View style={HomeStyle.container}>
           <CalendarButton />
-           {(globalThis as any).isTesting && <LeftDrawer />}
+          <PointOfInterestSelector
+            pointsOfInterest={selectedPOI}
+            radius={radius}
+            onPOIChange={setSelectedPOI}
+            onRadiusChange={setRadius}
+          />
+          {(globalThis as any).isTesting && <LeftDrawer />}
           <MapComponent
             drawerHeight={drawerHeight}
             setInputDestination={setInputDestination}
@@ -48,22 +67,8 @@ export function HomeScreen() {
                 inputOrigin={inputOrigin}
                 setInputOrigin={setInputOrigin}
               />
-              {inputDestination === "" ? (
-                classEvents.length > 0 ? (
-                  classEvents.map((event, index) => (
-                    <UpcomingClassItem calendarEvent={event} key={index} setInputDestination={setInputDestination} />
-                  ))
-                ) : (
-                  null
-                )
-              ) : null}
+              {renderUpcomingClasses()}
               <RoomSearchBars />
-              <PointOfInterestSelector
-                pointsOfInterest={selectedPOI}
-                radius={radius}
-                onPOIChange={setSelectedPOI}
-                onRadiusChange={setRadius}
-              />
               <DirectionsSteps />
             </ScrollView>
           </BottomDrawer>

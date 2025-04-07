@@ -1,15 +1,14 @@
 // SearchBars.tsx
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import SearchBar from './SearchBar';
 import getDirections from './Route';
 import { useCoords } from '../data/CoordsContext';
 import { useIndoor } from '../data/IndoorContext';
-import { Ionicons } from "@expo/vector-icons";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
-import firebase from './src/components/firebase';
 import analytics from '@react-native-firebase/analytics';
 import ShuttleBusTransit from './ShuttleBusTransit';
+import TransportModeSelector from './TransportationModeSelector';
 
 
 function SearchBars(
@@ -105,10 +104,8 @@ function SearchBars(
 
         try {
             if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
-                console.log(destination);
                 if (destination === "Uncle Tetsu, Rue Pierce, Montréal, QC, Canada") {
                     if (origin === myLocationString) {
-                        console.log(origin);
                         if (selectedMode === "walking") {
                             const elapsedTime = (globalThis as any).taskTimer.stop();
                             await analytics().logEvent('Task_2_finished', {
@@ -118,8 +115,6 @@ function SearchBars(
                                 elapsed_time: elapsedTime / 1000,  // Add the elapsed time
                                 user_id: (globalThis as any).userId,
                             });
-                            console.log(`Custom Event Logged: Task 2 Finished`);
-                            console.log(`Elapsed Time: ${elapsedTime / 1000} seconds`);  // Log in seconds for readability
                         } else {
                             await analytics().logEvent('Task_2_wrong_transportMode', {
                                 origin: origin,
@@ -127,7 +122,6 @@ function SearchBars(
                                 mode_of_transport: selectedMode,
                                 user_id: (globalThis as any).userId,
                             });
-                            console.log(`Custom Event Logged: Task 2 error - wrong transport mode`);
 
                         }
                     } else {
@@ -137,7 +131,6 @@ function SearchBars(
                             mode_of_transport: selectedMode,
                             user_id: (globalThis as any).userId,
                         });
-                        console.log(`Custom Event Logged: Task 2 error - wrong origin`);
                     }
                 } else {
                     await analytics().logEvent('Task_2_wrong_destination', {
@@ -146,7 +139,6 @@ function SearchBars(
                         mode_of_transport: selectedMode,
                         user_id: (globalThis as any).userId,
                     });
-                    console.log(`Custom Event Logged: Task 2 error - wrong destination`);
                 }
             }
 
@@ -168,7 +160,6 @@ function SearchBars(
                 if (fetchedCoords && fetchedCoords.length > 0) {
                     setRouteData(fetchedCoords);
                     setTime(fetchedCoords[0].legs[0].duration.text);
-                    console.log("Origin", time);
                     //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
                 } else {
                     console.warn("No coordinates received or empty result from getDirections");
@@ -196,7 +187,6 @@ function SearchBars(
                     let durationText = fetchedCoords[0].legs[0].duration.text;
                     durationText = durationText.replace(/hours?/g, 'h').replace(/mins?/g, '');
                     setTime(durationText)
-                    console.log("Destination", time);
                     //set isTransit to true
                     if (selectedMode == "transit") { setIsTransit(true); } else { setIsTransit(false); };
                     //WHEN SETROUTEDATA() RUNS YOU SHOULD DO THE UI CHANGE!
@@ -222,7 +212,7 @@ function SearchBars(
         setOriginRoom(null);
         setDestinationRoom(null);
         setInputDestination("");
-        setInputOrigin("");
+        setInputOrigin(myLocationString);
         setOrigin(myLocationString);
     }, [setRouteData]);
 
@@ -254,36 +244,12 @@ function SearchBars(
 
             {origin.length > 0 && destination.length > 0 && (
                 <>
-                    {/* Selected Transport Mode Title */}
-                    <View style={SearchBarsStyle.selectedModeContainer}>
-                        <Text style={SearchBarsStyle.selectedModeText}>
-                            {transportModes.find((t) => t.mode === selectedMode)?.label}
-                        </Text>
-                    </View>
-                    {/* Transport Buttons with Time Estimates */}
-                    <View style={SearchBarsStyle.transportButtonContainer}>
-                        {transportModes.map(({ mode, icon, color }) => (
-                            <TouchableOpacity
-                                key={mode}
-                                testID={`transport-mode-${mode}`}
-                                onPress={() => setSelectedMode(mode)}
-                            >
-                                <View style={[
-                                    SearchBarsStyle.transportButtonContent,
-                                    selectedMode === mode && SearchBarsStyle.selectedTransportButton
-                                ]}>
-                                    <View style={SearchBarsStyle.transportButtonContent}>
-                                        <Ionicons
-                                            name={icon as keyof typeof Ionicons.glyphMap}
-                                            size={24}
-                                            color='black'
-                                        />
-                                        {selectedMode === mode}
-                                    </View>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
+
+                    <TransportModeSelector
+                        transportModes={transportModes}
+                        selectedMode={selectedMode}
+                        setSelectedMode={setSelectedMode}
+                    />
 
                     {/* Only render ShuttleBusTransit component when transit mode is selected */}
                     {!!(selectedMode === "transit" && origin && destinationCoords) && (

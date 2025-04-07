@@ -11,9 +11,6 @@ jest.mock('@rneui/base', () => ({
 jest.mock('@react-native-firebase/analytics', () => () => ({
   logEvent: jest.fn(),
 }));
-// Mock console.log
-const mockConsoleLog = jest.fn();
-console.log = mockConsoleLog;
 
 // Mock the current time for testing
 jest.useFakeTimers();
@@ -65,7 +62,6 @@ describe('UpcomingClassItem Component', () => {
   };
 
   beforeEach(() => {
-    mockConsoleLog.mockClear();
     mockSetInputDestination.mockClear();
   });
 
