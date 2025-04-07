@@ -116,6 +116,8 @@ describe("PointOfInterestSelector", () => {
     expect(mockOnPOIChange).toHaveBeenCalledWith("food_and_drink");
   });
 
+
+
   it("calls onRadiusChange when a new radius is selected", async () => {
     const mockOnRadiusChange = jest.fn();
 
