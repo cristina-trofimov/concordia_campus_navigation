@@ -139,19 +139,16 @@ jest.mock('../src/data/buildingLocation.ts', () => ({
   ],
 }));
 
-// Suppress console.log during tests
-const originalConsoleLog = console.log;
+// Suppress console during tests
 const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
 
 beforeAll(() => {
-  console.log = jest.fn();
   console.error = jest.fn();
   console.warn = jest.fn();
 });
 
 afterAll(() => {
-  console.log = originalConsoleLog;
   console.error = originalConsoleError;
   console.warn = originalConsoleWarn;
 });

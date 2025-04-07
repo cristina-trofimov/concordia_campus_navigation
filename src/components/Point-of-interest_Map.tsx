@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { PointAnnotation } from '@rnmapbox/maps';
 import analytics from '@react-native-firebase/analytics';
 import { TokenManager } from "../data/TokenManager.ts";
-
-
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const MAPBOX_ACCESS_TOKEN = TokenManager.getMapboxToken();
@@ -24,7 +22,7 @@ const POI_ICONS = {
   arts_and_entertainment: "movie",
 };
 
-export const fetchNearbyPOI = async (longitude, latitude, radius = 25, selectedPOI) => {
+export const fetchNearbyPOI = async (longitude, latitude, selectedPOI, radius = 25) => {
   const TILESET_ID = 'mapbox.mapbox-streets-v8';
   const url = `https://api.mapbox.com/v4/${TILESET_ID}/tilequery/${longitude},${latitude}.json?radius=${radius}&layers=poi_label&limit=50&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
@@ -60,11 +58,10 @@ export const reverseGeocode = async (latitude, longitude) => {
       const address = data.features[0].place_name;
       return address;
     } else {
-      console.log("No address found for these coordinates");
       return null;
     }
   } catch (error) {
-    console.error("Error fetching address:", error);
+    console.error("reverseGeocode: ", error);
     return null;
   }
 };
@@ -75,16 +72,14 @@ export const onPoiClick = async (poi, setInputDestination) => {
     const [longitude, latitude] = coordinates;
     const address = await reverseGeocode(latitude, longitude);
      if ((globalThis as any).isTesting && (globalThis as any).taskTimer.isStarted()) {
-         const elapsed_time = (globalThis as any).taskTimer.stop();
-           analytics().logEvent('Task_5_finished', {
-           POI_address: address,
-           elapsed_time: elapsed_time/1000,
-           user_id: (globalThis as any).userId,
-           });
-           console.log(`Custom Event Logged: POI location chosen: ${address}, and directions were set`);
-           console.log(`Custom Event Logged: Task 5 finished with time:`, elapsed_time/1000);
-     }
-    setInputDestination(address || "Unknown location");
+        const elapsed_time = (globalThis as any).taskTimer.stop();
+        analytics().logEvent('Task_5_finished', {
+          POI_address: address,
+          elapsed_time: elapsed_time/1000,
+          user_id: (globalThis as any).userId,
+        });
+      }
+    setInputDestination(address ?? "Unknown location");
   }
 };
 
@@ -110,9 +105,9 @@ const PointOfInterestMap: React.FC<PointOfInterestMapProps> = ({
         try {
           await new Promise(resolve => setTimeout(resolve, 100));
           const { latitude, longitude } = myLocationCoords;
-          const nearbyPois = await fetchNearbyPOI(longitude, latitude, radius, selectedPOI);
+          const nearbyPois = await fetchNearbyPOI(longitude, latitude, selectedPOI, radius);
 
-          setCurrentIcon(POI_ICONS[selectedPOI] || "map-marker");
+          setCurrentIcon(POI_ICONS[selectedPOI] ?? "map-marker");
           setPoi(nearbyPois);
         } catch (error) {
           console.error("Error fetching POIs:", error);

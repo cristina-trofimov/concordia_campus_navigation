@@ -88,7 +88,7 @@ export const HighlightIndoorMap = () => {
 
     // Check if we should show the room pin
     const shouldShowRoomPin = (room: RoomInfo | null) => {
-        if (!room || !room.coordinates || !currentFloor) {
+        if (!room?.coordinates || !currentFloor) {
             return false;
         }
 

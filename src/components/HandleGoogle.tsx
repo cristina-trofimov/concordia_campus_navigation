@@ -28,18 +28,14 @@ export const signIn = async () => {
 
         const token = await AsyncStorage.getItem("accessToken");
         if (token) {
-            console.log("User already signed in");
             return token;
         }
 
 
         await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-        const userInfo = await GoogleSignin.signIn();
-
-        console.log("Sign-in successful. User Info:", JSON.stringify(userInfo, null, 2));
+        await GoogleSignin.signIn();
 
         const tokens = await GoogleSignin.getTokens();
-        console.log("Sign-in successful. Access token obtained." + JSON.stringify(tokens.accessToken, null, 2));
 
         await AsyncStorage.setItem( 'accessToken', tokens.accessToken, );
 
@@ -52,19 +48,19 @@ export const signIn = async () => {
         if (isErrorWithCode(error)) {
             switch (error.code) {
                 case statusCodes.SIGN_IN_CANCELLED:
-                    console.log('User cancelled the sign-in flow');
+                    console.error('User cancelled the sign-in flow');
                     break;
                 case statusCodes.IN_PROGRESS:
-                    console.log('Sign-in operation is in progress already');
+                    console.error('Sign-in operation is in progress already');
                     break;
                 case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-                    console.log('Play services not available or outdated');
+                    console.error('Play services not available or outdated');
                     break;
                 default:
-                    console.log(`Other error. Code: ${error.code}, Message: ${error.message}`);
+                    console.error(`Other error. Code: ${error.code}, Message: ${error.message}`);
             }
         } else {
-            console.log('Non-status code error:', error);
+            console.error('Non-status code error:', error);
         }
         return null;
     }
@@ -74,8 +70,7 @@ export const signOut = async () => {
     try {
         await GoogleSignin.signOut();
         await AsyncStorage.removeItem("accessToken")
-        await AsyncStorage.removeItem("chosenCalendar")
-        console.log('User signed out successfully');        
+        await AsyncStorage.removeItem("chosenCalendar")   
     } catch (error) {
         console.error('Error signing out:', error);
     }
