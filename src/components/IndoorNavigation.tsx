@@ -211,8 +211,6 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
     }
   });
   
-  console.log(`Found ${corridorPolygons.length} corridor polygons`);
-  
   // Create nodes along the corridor edges and within the corridor
   corridorPolygons.forEach((corridor, corridorIndex) => {
     // For each corridor polygon, create nodes along the edges
@@ -567,9 +565,6 @@ const pathToLineString = (path: string[], graph: Graph): LineString => {
   };
 };
 
-// Main navigation component
-// Main navigation component
-// Main navigation component
 export const IndoorNavigation: React.FC = () => {
   const { 
     indoorFeatures, 
@@ -615,8 +610,6 @@ export const IndoorNavigation: React.FC = () => {
     if (indoorFeatures.length === 0 || !currentFloor) return;
     if (!destinationRoom) return;
 
-    console.log("Building navigation graph for floor:", currentFloor);
-    
     // Build the navigation graph for the current floor
     const graph = buildNavigationGraph(indoorFeatures);
     
@@ -636,7 +629,6 @@ export const IndoorNavigation: React.FC = () => {
       if (entryNodeId) {
         const destPath = findPath(graph, entryNodeId, endNodeId);
         if (destPath) {
-          console.log("Setting destination floor route for floor:", currentFloor);
           setDestinationRoute({
             path: pathToLineString(destPath, graph),
             floor: currentFloor
@@ -655,7 +647,6 @@ export const IndoorNavigation: React.FC = () => {
       if (entryNodeId) {
         const originPath = findPath(graph, startNodeId, entryNodeId);
         if (originPath) {
-          console.log("Setting origin floor route for floor:", currentFloor);
           setOriginRoute({
             path: pathToLineString(originPath, graph),
             floor: currentFloor
