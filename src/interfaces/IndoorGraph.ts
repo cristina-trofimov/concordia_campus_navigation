@@ -11,15 +11,17 @@ export enum EntryPointType {
 // Define types for our graph
 export interface GraphNode {
   id: string;
-  position: Position; // [longitude, latitude]
+  position: Position;
   neighbors: string[];
-  isEntryPoint?: boolean;
-  entryPointType?: EntryPointType;
-  isRoom?: boolean;
-  roomNumber?: string;
   isCorridor?: boolean;
+  isRoom?: boolean;
+  isEntryPoint?: boolean;
+  isEdgeNode?: boolean; 
+  roomNumber?: string;
+  entryPointType?: EntryPointType;
 }
 
 export interface Graph {
+  [x: string]: any;
   nodes: { [id: string]: GraphNode };
 }

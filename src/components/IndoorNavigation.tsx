@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import { useIndoor } from "../data/IndoorContext";
 import { useCoords } from "../data/CoordsContext";
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature';
-import { LineString, Position } from 'geojson';
+import { FeatureCollection, LineString, Position } from 'geojson';
 import { EntryPointType, GraphNode, Graph } from '../interfaces/IndoorGraph';
+import { RoomInfo } from '../interfaces/RoomInfo';
 
 // A* pathfinding algorithm
 const findPath = (
@@ -74,12 +76,17 @@ const findPath = (
   return null;
 };
 
-// Heuristic function for A* (Euclidean distance)
 const heuristic = (a: GraphNode, b: GraphNode): number => {
-  return distance(a.position, b.position);
+  // Base distance
+  const baseDistance = distance(a.position, b.position);
+  
+  // Add penalty for edge nodes to discourage wall-hugging paths
+  const edgePenalty = a.isEdgeNode ? 0.00002 : 0;
+  
+  return baseDistance + edgePenalty;
 };
 
-// Distance calculation (Euclidean)
+// Modified distance calculation to add wall penalties
 const distance = (posA: Position, posB: Position): number => {
   const dx = posA[0] - posB[0];
   const dy = posA[1] - posB[1];
@@ -109,36 +116,88 @@ const calculatePolygonCentroid = (coordinates: Position[]): Position => {
 
 // Get a centerline through a polygon (simplified approach)
 const getCenterline = (coordinates: Position[]): Position[] => {
-  // For simplicity, create a line through several key points in the polygon
+  // Create a denser grid of points throughout the corridor
   const centerline: Position[] = [];
   
   // Calculate the centroid of the polygon
   const centroid = calculatePolygonCentroid(coordinates);
   
-  // Select several points along the polygon edges at regular intervals
-  const numPoints = Math.min(coordinates.length, 6); // Use up to 6 points
-  const step = Math.floor(coordinates.length / numPoints);
+  // Create a grid of points inside the polygon
+  // First, find the bounding box of the polygon
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  coordinates.forEach(coord => {
+    minX = Math.min(minX, coord[0]);
+    minY = Math.min(minY, coord[1]);
+    maxX = Math.max(maxX, coord[0]);
+    maxY = Math.max(maxY, coord[1]);
+  });
   
-  // Create points that go from edge points toward the centroid
-  for (let i = 0; i < coordinates.length; i += step) {
-    // Create a point that's 70% of the way from the edge to the centroid
-    const edgePoint = coordinates[i];
-    const midPoint: Position = [
-      edgePoint[0] * 0.3 + centroid[0] * 0.7,
-      edgePoint[1] * 0.3 + centroid[1] * 0.7
-    ];
-    centerline.push(midPoint);
+  // Create a grid within the bounding box
+  // Adjust these values to control grid density
+  const gridDensityX = 5; 
+  const gridDensityY = 5;
+  
+  const stepX = (maxX - minX) / gridDensityX;
+  const stepY = (maxY - minY) / gridDensityY;
+  
+  // Simple point-in-polygon check (ray casting algorithm)
+  const isPointInPolygon = (point: Position, polygon: Position[]): boolean => {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i][0], yi = polygon[i][1];
+      const xj = polygon[j][0], yj = polygon[j][1];
+      
+      const intersect = ((yi > point[1]) !== (yj > point[1])) &&
+        (point[0] < (xj - xi) * (point[1] - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
+  };
+  
+  // Generate the grid points
+  for (let i = 0; i <= gridDensityX; i++) {
+    for (let j = 0; j <= gridDensityY; j++) {
+      const x = minX + i * stepX;
+      const y = minY + j * stepY;
+      const point: Position = [x, y];
+      
+      // Only add points that are inside the polygon
+      if (isPointInPolygon(point, coordinates)) {
+        centerline.push(point);
+      }
+    }
   }
   
-  // Add the centroid itself
+  // Always include the centroid
   centerline.push(centroid);
+  
+  // If we somehow ended up with very few points, revert to the old method
+  if (centerline.length < 3) {
+    // Select several points along the polygon edges at regular intervals
+    const numPoints = Math.min(coordinates.length, 6); // Use up to 6 points
+    const step = Math.floor(coordinates.length / numPoints);
+    
+    // Create points that go from edge points toward the centroid
+    for (let i = 0; i < coordinates.length; i += step) {
+      // Create a point that's 70% of the way from the edge to the centroid
+      const edgePoint = coordinates[i];
+      const midPoint: Position = [
+        edgePoint[0] * 0.3 + centroid[0] * 0.7,
+        edgePoint[1] * 0.3 + centroid[1] * 0.7
+      ];
+      centerline.push(midPoint);
+    }
+  }
   
   return centerline;
 };
 
 // Build a navigation graph from indoor features
 const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
-  const graph: Graph = { nodes: {} };
+  const graph: Graph = {
+    nodes: {},
+    graph: undefined
+  };
   
   // Extract the corridor polygons
   const corridorPolygons: {coordinates: Position[][]; id: number}[] = [];
@@ -155,8 +214,9 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
   // Create nodes along the corridor edges and within the corridor
   corridorPolygons.forEach((corridor, corridorIndex) => {
     // For each corridor polygon, create nodes along the edges
+    // Use more edge points for better path finding
     corridor.coordinates[0].forEach((coordinate, pointIndex) => {
-      if (pointIndex % 3 === 0) { // Only use every 3rd point to reduce density
+      if (pointIndex % 2 === 0) { // Use every 2nd point instead of every 3rd
         const nodeId = `corridor_${corridorIndex}_edge_${pointIndex}`;
         graph.nodes[nodeId] = {
           id: nodeId,
@@ -168,6 +228,7 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
     });
     
     // Add nodes along a line through the center of the corridor
+    // Using improved centerline generation for more nodes
     const centerline = getCenterline(corridor.coordinates[0]);
     centerline.forEach((position, pointIndex) => {
       const nodeId = `corridor_${corridorIndex}_center_${pointIndex}`;
@@ -184,6 +245,19 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
         graph.nodes[nodeId].neighbors.push(prevNodeId);
         graph.nodes[prevNodeId].neighbors.push(nodeId);
       }
+      
+      // Also connect to edge nodes that are nearby to create paths that
+      // don't hug the walls as much
+      Object.entries(graph.nodes)
+        .filter(([id, node]) => 
+          id.startsWith(`corridor_${corridorIndex}_edge_`) && 
+          distance(node.position, position) < 0.00006 // Slightly larger radius
+        )
+        .forEach(([id, _]) => {
+          // Add bidirectional connections
+          graph.nodes[nodeId].neighbors.push(id);
+          graph.nodes[id].neighbors.push(nodeId);
+        });
     });
   });
   
@@ -282,7 +356,7 @@ const connectCorridorNodes = (graph: Graph): void => {
   const corridorNodes = Object.values(graph.nodes).filter(node => node.isCorridor);
   
   // Connect nearby corridor nodes to create a network
-  const connectionRadius = 0.00007; // Slightly larger radius to ensure connectivity
+  const connectionRadius = 0.00005;
   
   // Connect nodes that are close to each other
   for (let i = 0; i < corridorNodes.length; i++) {
@@ -298,16 +372,38 @@ const connectCorridorNodes = (graph: Graph): void => {
         // Check if they're from the same corridor section
         const corridorA = nodeA.id.split('_')[1];
         const corridorB = nodeB.id.split('_')[1];
+        const typeA = nodeA.id.split('_')[2]; // "edge" or "center"
+        const typeB = nodeB.id.split('_')[2]; // "edge" or "center"
         
-        // Only connect if distance is very small or they're from the same corridor
-        if (dist < 0.00003 || corridorA === corridorB) {
+        // Connect edge-to-center nodes more aggressively to create paths
+        // that don't hug walls
+        if ((typeA === "edge" && typeB === "center") || 
+            (typeA === "center" && typeB === "edge")) {
+          nodeA.neighbors.push(nodeB.id);
+          nodeB.neighbors.push(nodeA.id);
+        }
+        // For same corridor section, connect all nodes
+        else if (corridorA === corridorB) {
+          nodeA.neighbors.push(nodeB.id);
+          nodeB.neighbors.push(nodeA.id);
+        }
+        // For different corridor sections, be more selective
+        else if (dist < 0.00002) {
           nodeA.neighbors.push(nodeB.id);
           nodeB.neighbors.push(nodeA.id);
         }
       }
     }
   }
+  
+  // This makes the A* algorithm prefer center nodes
+  Object.values(graph.nodes).forEach(node => {
+    if (node.isCorridor && node.id.includes("_edge_")) {
+      node.isEdgeNode = true;
+    }
+  });
 };
+
 
 // Connect rooms to corridors
 const connectRoomsToCorridors = (graph: Graph): void => {
@@ -320,7 +416,7 @@ const connectRoomsToCorridors = (graph: Graph): void => {
   // Connect each room to the closest corridor nodes
   roomNodes.forEach(roomNode => {
     // For specific rooms of interest, find more corridor connections
-    const connectionsToFind = specificRooms.includes(roomNode.roomNumber ?? "") ? 4 : 2;
+    const connectionsToFind = specificRooms.includes(roomNode.roomNumber || "") ? 4 : 2;
     
     // Find the closest corridor nodes
     const closestNodes = corridorNodes
@@ -341,7 +437,7 @@ const connectRoomsToCorridors = (graph: Graph): void => {
     });
     
     // Ensure important rooms have connections
-    if (specificRooms.includes(roomNode.roomNumber ?? "") && roomNode.neighbors.length === 0) {
+    if (specificRooms.includes(roomNode.roomNumber || "") && roomNode.neighbors.length === 0) {
       // Force connection to the closest node
       if (closestNodes.length > 0) {
         roomNode.neighbors.push(closestNodes[0].node.id);
@@ -469,130 +565,115 @@ const pathToLineString = (path: string[], graph: Graph): LineString => {
   };
 };
 
-// Main navigation component
 export const IndoorNavigation: React.FC = () => {
   const { 
     indoorFeatures, 
     currentFloor, 
     destinationRoom, 
     originRoom,
-    indoorTransport // Use the transport preference from context
+    indoorTransport
   } = useIndoor();
   const { highlightedBuilding } = useCoords();
-  const [routePath, setRoutePath] = useState<LineString | null>(null);
-  const [debugNodes, setDebugNodes] = useState<Position[]>([]);
-  const [routeFloor, setRouteFloor] = useState<string | null>(null);
   
+  // Store both the path and the floor it belongs to
+  const [destinationRoute, setDestinationRoute] = useState<{
+    path: LineString | null;
+    floor: string | null;
+  }>({ path: null, floor: null });
+  
+  const [originRoute, setOriginRoute] = useState<{
+    path: LineString | null;
+    floor: string | null;
+  }>({ path: null, floor: null });
+
+  const [debugNodes, setDebugNodes] = useState<Position[]>([]);
+
   // Map indoorTransport string to EntryPointType enum
   const getEntryPointTypeFromTransport = (): EntryPointType => {
     switch(indoorTransport) {
-      case "stairs":
-        return EntryPointType.STAIRS;
-      case "escalator":
-        return EntryPointType.ESCALATOR;
-      case "elevator":
-        return EntryPointType.ELEVATOR;
-      default:
-        return EntryPointType.ELEVATOR; // Default to elevator if no preference
+      case "stairs": return EntryPointType.STAIRS;
+      case "escalator": return EntryPointType.ESCALATOR;
+      case "elevator": return EntryPointType.ELEVATOR;
+      default: return EntryPointType.ELEVATOR;
     }
   };
   
-  // Clear route when destination is cleared
+  // Clear routes when destination is cleared
   useEffect(() => {
     if (!destinationRoom) {
-      setRoutePath(null);
-      setRouteFloor(null);
+      setDestinationRoute({ path: null, floor: null });
+      setOriginRoute({ path: null, floor: null });
     }
   }, [destinationRoom]);
-  
-  // Check if we should display the route on the current floor
-  const shouldShowRoute = (): boolean => {
-    return routePath !== null && currentFloor === routeFloor;
-  };
-  
-  // Clear route when floor changes
-  useEffect(() => {
-    if (routeFloor && currentFloor !== routeFloor) {
-      // Don't clear the stored route, just don't display it
-      // We'll keep the calculated route in case user returns to the correct floor
-      console.log("Floor changed, hiding route");
-    }
-  }, [currentFloor]);
   
   useEffect(() => {
     if (indoorFeatures.length === 0 || !currentFloor) return;
     if (!destinationRoom) return;
-    // Store the floor this route is valid for
-    setRouteFloor(currentFloor);
-    
-    // Build the navigation graph
+
+    // Build the navigation graph for the current floor
     const graph = buildNavigationGraph(indoorFeatures);
     
-    // Debug - collect corridor nodes for visualization
-    const corridorNodes: Position[] = Object.values(graph.nodes)
-      .filter(node => node.isCorridor)
-      .map(node => node.position);
-    setDebugNodes(corridorNodes);
-    
-    // Log all entry points found
-    const entryPoints = Object.values(graph.nodes).filter(node => node.isEntryPoint);
-    
-    // Get destination room first so we can find the closest entry point to it
+    // Get destination room node
     const targetRoom = destinationRoom?.ref || "";
     const endNodeId = targetRoom ? findRoomNode(graph, targetRoom) : null;
     
-    if (!endNodeId) {
-      setRoutePath(null);
-      return;
-    }
-    
-    // Get starting point - use origin room if available, otherwise use entry point
-    let startNodeId: string | null = null;
-    
-    if (originRoom?.ref) {
-      startNodeId = findRoomNode(graph, originRoom.ref);
-    }
-    
-    // If origin room not found, use the preferred transport type as starting point
-    // Find the one closest to the destination room
-    if (!startNodeId) {
+    // Get origin room node
+    const originRoomRef = originRoom?.ref || "";
+    const startNodeId = originRoomRef ? findRoomNode(graph, originRoomRef) : null;
+
+    // Case 1: Calculate route from entry point to destination (for destination floor)
+    if (endNodeId) {
       const entryType = getEntryPointTypeFromTransport();
-      startNodeId = findEntryPoint(graph, entryType, endNodeId);
+      const entryNodeId = findEntryPoint(graph, entryType, endNodeId);
+      
+      if (entryNodeId) {
+        const destPath = findPath(graph, entryNodeId, endNodeId);
+        if (destPath) {
+          setDestinationRoute({
+            path: pathToLineString(destPath, graph),
+            floor: currentFloor
+          });
+        } else {
+          setDestinationRoute(prev => ({ ...prev, path: null }));
+        }
+      }
     }
-    
-    if (!startNodeId) {
-      setRoutePath(null);
-      return;
-    }
-    
-    // Find the path
-    const path = findPath(graph, startNodeId, endNodeId);
-    
-    if (path) {
-      // Convert path to GeoJSON LineString
-      const lineString = pathToLineString(path, graph);
-      setRoutePath(lineString);
-    } else {
-      setRoutePath(null);
+
+    // Case 2: Calculate route from origin to entry point (for origin floor)
+    if (startNodeId) {
+      const entryType = getEntryPointTypeFromTransport();
+      const entryNodeId = findEntryPoint(graph, entryType, endNodeId || undefined);
+      
+      if (entryNodeId) {
+        const originPath = findPath(graph, startNodeId, entryNodeId);
+        if (originPath) {
+          setOriginRoute({
+            path: pathToLineString(originPath, graph),
+            floor: currentFloor
+          });
+        } else {
+          setOriginRoute(prev => ({ ...prev, path: null }));
+        }
+      }
     }
   }, [indoorFeatures, currentFloor, originRoom, destinationRoom, indoorTransport]);
   
   return (
     <>
-      {/* Route path display - only show on the correct floor */}
-      {shouldShowRoute() && (
+      {/* Origin route (only show if we're on the origin floor) */}
+      {originRoute.path && originRoute.floor === currentFloor && (
         <Mapbox.ShapeSource
-          id="route-path"
+          id="origin-route-path"
           shape={{
             type: "Feature",
-            geometry: routePath as LineString,
+            geometry: originRoute.path,
             properties: {}
           }}
         >
           <Mapbox.LineLayer
-            id="route-line"
+            id="origin-route-line"
             style={{
-              lineColor: "#4285F4",
+              lineColor: "#4285F4", 
               lineWidth: 4,
               lineCap: "round",
               lineJoin: "round"
@@ -600,11 +681,31 @@ export const IndoorNavigation: React.FC = () => {
           />
         </Mapbox.ShapeSource>
       )}
-          
+      
+      {/* Destination route (only show if we're on the destination floor) */}
+      {destinationRoute.path && destinationRoute.floor === currentFloor && (
+        <Mapbox.ShapeSource
+          id="route-path"
+          shape={{
+            type: "Feature",
+            geometry: destinationRoute.path,
+            properties: {}
+          }}
+        >
+          <Mapbox.LineLayer
+            id="route-line"
+            style={{
+              lineColor: "#4285F4", 
+              lineWidth: 4,
+              lineCap: "round", 
+              lineJoin: "round"
+            }}
+          />
+        </Mapbox.ShapeSource>
+      )}
     </>
   );
 };
-
 // Helper component to integrate with your HighlightIndoorMap
 export const NavigationOverlay: React.FC = () => {
   const { inFloorView, indoorFeatures, setOriginRoom, setDestinationRoom } = useIndoor();
