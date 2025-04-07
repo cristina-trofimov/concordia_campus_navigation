@@ -378,12 +378,7 @@ const connectCorridorNodes = (graph: Graph): void => {
         // Connect edge-to-center nodes more aggressively to create paths
         // that don't hug walls
         if ((typeA === "edge" && typeB === "center") || 
-            (typeA === "center" && typeB === "edge")) {
-          nodeA.neighbors.push(nodeB.id);
-          nodeB.neighbors.push(nodeA.id);
-        }
-        // For same corridor section, connect all nodes
-        else if (corridorA === corridorB) {
+            (typeA === "center" && typeB === "edge") || corridorA === corridorB) {
           nodeA.neighbors.push(nodeB.id);
           nodeB.neighbors.push(nodeA.id);
         }
@@ -573,7 +568,6 @@ export const IndoorNavigation: React.FC = () => {
     originRoom,
     indoorTransport
   } = useIndoor();
-  const { highlightedBuilding } = useCoords();
   
   // Store both the path and the floor it belongs to
   const [destinationRoute, setDestinationRoute] = useState<{
@@ -585,8 +579,6 @@ export const IndoorNavigation: React.FC = () => {
     path: LineString | null;
     floor: string | null;
   }>({ path: null, floor: null });
-
-  const [debugNodes, setDebugNodes] = useState<Position[]>([]);
 
   // Map indoorTransport string to EntryPointType enum
   const getEntryPointTypeFromTransport = (): EntryPointType => {
