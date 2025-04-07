@@ -8,18 +8,18 @@ import { useIndoor } from "../data/IndoorContext";
 
 const DirectionsSteps = () => {
   const { routeData: routeCoordinates, isTransit } = useCoords();
-  const { originRoom, destinationRoom,indoorTransport } = useIndoor();
+  const { originRoom, destinationRoom, indoorTransport } = useIndoor();
   const [htmlInstructions, setHtmlInstructions] = useState<string[]>([]);
 
 
 
-const [firstMessage, setFirstMessage] = useState("");
-const [secondMessage, setSecondMessage] = useState("");
-const [sameBuilding, setSameBuilding] = useState(false);
+  const [firstMessage, setFirstMessage] = useState("");
+  const [secondMessage, setSecondMessage] = useState("");
+  const [sameBuilding, setSameBuilding] = useState(false);
 
   const formatSteps = (step: any): any => {
     if (!step?.html_instructions) {
-      return 'Continue'; 
+      return 'Continue';
     }
     return step.html_instructions
       .replace(/<[^<>]*>/g, "")
@@ -32,7 +32,10 @@ const [sameBuilding, setSameBuilding] = useState(false);
     setFirstMessage(first);
     setSecondMessage(second);
     if (originRoom && destinationRoom && (originRoom?.building == destinationRoom?.building)) {
-      setSameBuilding(false);}
+      setSameBuilding(true);
+    } else {
+      setSameBuilding(false);
+    }
   }, [originRoom, destinationRoom, indoorTransport]);
 
 
@@ -52,12 +55,12 @@ const [sameBuilding, setSameBuilding] = useState(false);
       const number = filteredSteps.length;
       const instructionsGeneral = filteredSteps.map(
         (step: any) => {
-          if (step.travel_mode === "TRANSIT" &&(step.transit_details.line?.vehicle?.name=='Bus')) {
+          if (step.travel_mode === "TRANSIT" && (step.transit_details.line?.vehicle?.name == 'Bus')) {
             const busNumber = step.transit_details.line?.short_name ?? step.transit_details.line?.name ?? "Bus number not found";
             const busStop = step.transit_details.arrival_stop?.name ?? "Bus stop found";
             return step.html_instructions.replace(/<[^<>]*>/g, "") + `. Take Bus ${busNumber}. Get off at stop ${busStop}.`;
           }
-          if (step.travel_mode === "TRANSIT" &&(step.transit_details.line?.vehicle?.name=='Subway')){
+          if (step.travel_mode === "TRANSIT" && (step.transit_details.line?.vehicle?.name == 'Subway')) {
             const metroStop = step.transit_details.arrival_stop?.name ?? "Metro stop not found";
             return step.html_instructions.replace(/<[^<>]*>/g, "") + `. Get off at stop ${metroStop}.`;
           }
@@ -110,7 +113,7 @@ const [sameBuilding, setSameBuilding] = useState(false);
           </View>
         </View>
       )}
-  
+
       {/* Instruction List */}
       {htmlInstructions.length > 0 && !sameBuilding &&
         htmlInstructions.map((instruction, index) => {
@@ -133,18 +136,18 @@ const [sameBuilding, setSameBuilding] = useState(false);
             exit: "arrow-outward",
             wait: "access-time",
           };
-  
+
           const lowerCaseInstruction = instruction.toLowerCase();
           const instructionsIconsDisplay = Object.keys(iconMappings).find((key) =>
             lowerCaseInstruction.includes(key)
           )
             ? iconMappings[
-                Object.keys(iconMappings).find((key) =>
-                  lowerCaseInstruction.includes(key)
-                )!
-              ]
+            Object.keys(iconMappings).find((key) =>
+              lowerCaseInstruction.includes(key)
+            )!
+            ]
             : null;
-  
+
           return (
             <View key={index} style={DirectionStepsStyle.instructionsList}>
               <View>
@@ -168,9 +171,9 @@ const [sameBuilding, setSameBuilding] = useState(false);
             </View>
           );
         })}
-  
+
       {/* Second message at the bottom */}
-      {(secondMessage !== "" && htmlInstructions.length > 0 ) && (
+      {(secondMessage !== "" && htmlInstructions.length > 0) && (
         <View style={DirectionStepsStyle.instructionsList}>
           <View>
             <View style={DirectionStepsStyle.iconsBox}>

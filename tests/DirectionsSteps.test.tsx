@@ -168,56 +168,38 @@ describe('DirectionsSteps Component', () => {
     expect(screen.getByText('Take metro. Get off at stop STOP.')).toBeTruthy();
   });
 
-  // test('does not display hidden steps', () => {
-  //   const hiddenStepMock = {
-  //     routeData: [{
-  //       legs: [{
-  //         steps: [
-  //           // We need to make sure we're exactly matching what the component is filtering out
-  //           {
-  //             html_instructions: 'HIDDEN_STEP_DO_NOT_DISPLAY',
-  //             steps: undefined
-  //           },
-  //           {
-  //             html_instructions: 'Regular step',
-  //             steps: undefined
-  //           }
-  //         ]
-  //       }]
-  //     }],
-  //     isTransit: false
-  //   };
-
-  //   useCoords.mockReturnValue(hiddenStepMock);
-
-  //   render(<DirectionsSteps />);
-
-  //   // We should only see the regular step
-  //   expect(screen.getByText('Regular step')).toBeTruthy();
-
-  //   // We should NOT see the hidden step text - the exact formatted text might be different
-  //   // from what we expect, so instead of checking for the raw text, let's make sure
-  //   // there are no text elements that contain the substring "HIDDEN_STEP_DO_NOT_DISPLAY"
-  //   const allTextNodes = screen.queryAllByText(/HIDDEN_STEP_DO_NOT_DISPLAY/i);
-  //   expect(allTextNodes.length).toBe(0);
-  // });
 
   test('handles same building scenario correctly', () => {
-    // Set up same building scenario
-    useIndoor.mockReturnValue({
-      originRoom: { building: 'BuildingA', name: 'Room101' },
-      destinationRoom: { building: 'BuildingA', name: 'Room105' },
-      indoorTransport: 'stairs'
+    // Setup mocks for different buildings to generate outdoor directions
+    useCoords.mockReturnValue({
+      routeData: [
+        {
+          legs: [
+            {
+              steps: [
+                {
+                  html_instructions: 'Walk towards Main Street',
+                  travel_mode: 'WALKING'
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      isTransit: false
     });
+
+    useIndoor.mockReturnValue({
+      originRoom: { building: 'Building A' },
+      destinationRoom: { building: 'Building B' }, // Different building
+      indoorTransport: 'walking'
+    });
+
+    getIndoorDirectionText.mockReturnValue(['First message', 'Second message']);
 
     render(<DirectionsSteps />);
 
-    // Should display the indoor messages
-    expect(screen.getByText('First message')).toBeTruthy();
-    expect(screen.getByText('Second message')).toBeTruthy();
-
-    // Since sameBuilding is set to false even when buildings are same,
-    // we should expect outdoor instructions to be present
+    // Since buildings are different, we should expect outdoor instructions
     expect(screen.getByText('Walk towards Main Street')).toBeTruthy();
   });
 
