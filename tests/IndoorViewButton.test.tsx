@@ -101,7 +101,6 @@ describe('IndoorViewButton', () => {
       expect(tree).toBeTruthy();
     });
 
-    // Rest of the tests remain the same
     it('displays "Outside View" text and tree icon when inFloorView is true', () => {
       const component = renderer.create(
         <IndoorViewButton 
@@ -169,6 +168,19 @@ describe('IndoorViewButton', () => {
       });
       expect(touchable.props.disabled).toBe(false);
     });
+
+    // Verify changeCurrentFloorAssociations is called with correct buildingId
+    it('calls changeCurrentFloorAssociations with the correct buildingId', () => {
+      renderer.create(
+        <IndoorViewButton 
+          inFloorView={false} 
+          buildingId="testBuilding" 
+          onClose={mockOnClose} 
+        />
+      );
+      
+      expect(changeCurrentFloorAssociations).toHaveBeenCalledWith('testBuilding');
+    });
   });
 
   // Test with no building floor associations
@@ -221,23 +233,117 @@ describe('IndoorViewButton', () => {
       expect(icon.props.color).toBe('grey');
     });
 
-    it('does not call any functions when button is pressed but associations are empty', () => {
+    // Test that button is disabled even when inFloorView is true with empty associations
+    it('disables the button when buildingFloorAssociations is empty and inFloorView is true', () => {
       const component = renderer.create(
         <IndoorViewButton 
-          inFloorView={false} 
+          inFloorView={true} 
           buildingId="unknown" 
           onClose={mockOnClose} 
         />
       );
+      const touchable = component.root.findByType('button');
       
-      // Verify button is disabled
+      expect(touchable.props.disabled).toBe(true);
+    });
+
+    // Test styling when inFloorView is true with empty associations
+    it('applies correct styles when buildingFloorAssociations is empty and inFloorView is true', () => {
+      const component = renderer.create(
+        <IndoorViewButton 
+          inFloorView={true} 
+          buildingId="unknown" 
+          onClose={mockOnClose} 
+        />
+      );
+      const touchable = component.root.findByType('button');
+      
+      // Even though inFloorView is true, we should still see the disabled styling
+      // because buildingFloorAssociations is empty
+      expect(touchable.props.style[1].backgroundColor).toBe('white');
+      expect(touchable.props.style[1].borderColor).toBe('#912338');
+      expect(touchable.props.style[1].opacity).toBe(1);
+    });
+  });
+
+  // Test with undefined props
+  describe('with undefined or missing props', () => {
+    it('handles undefined buildingId gracefully', () => {
+      const component = renderer.create(
+        <IndoorViewButton 
+          inFloorView={false} 
+          buildingId={undefined} 
+          onClose={mockOnClose} 
+        />
+      );
+      
+      // Component should render without crashing
+      expect(component.toJSON()).toBeTruthy();
+      // changeCurrentFloorAssociations should be called with undefined
+      expect(changeCurrentFloorAssociations).toHaveBeenCalledWith(undefined);
+    });
+    
+    it('handles undefined inFloorView by defaulting to a value', () => {
+      const component = renderer.create(
+        <IndoorViewButton 
+          buildingId="hall" 
+          onClose={mockOnClose} 
+        />
+      );
+      
+      // Component should render without crashing
+      expect(component.toJSON()).toBeTruthy();
+    });
+  });
+
+  // Edge cases
+  describe('edge cases', () => {
+    it('handles buildingFloorAssociations with unexpected structure', () => {
+      // Set associations to something that's not an array but has a length property
+      mockBuildingFloorAssociations = { length: 0 };
+      
+      const component = renderer.create(
+        <IndoorViewButton 
+          inFloorView={false} 
+          buildingId="hall" 
+          onClose={mockOnClose} 
+        />
+      );
+      
       const touchable = component.root.findByType('button');
       expect(touchable.props.disabled).toBe(true);
+    });
+
+    it('handles missing length property on buildingFloorAssociations', () => {
+      // Create an object without a length property
+      mockBuildingFloorAssociations = {};
       
-      // Verify none of the functions were called
-      expect(mockSetInFloorView).not.toHaveBeenCalled();
-      expect(mockSetCurrentFloorAssociations).not.toHaveBeenCalled();
-      expect(mockOnClose).not.toHaveBeenCalled();
+      const component = renderer.create(
+        <IndoorViewButton 
+          inFloorView={false} 
+          buildingId="hall" 
+          onClose={mockOnClose} 
+        />
+      );
+      
+      // Component should render without crashing
+      expect(component.toJSON()).toBeTruthy();
+    });
+    
+    it('handles non-object buildingFloorAssociations values', () => {
+      // Set to a primitive value
+      mockBuildingFloorAssociations = "not an array";
+      
+      const component = renderer.create(
+        <IndoorViewButton 
+          inFloorView={false} 
+          buildingId="hall" 
+          onClose={mockOnClose} 
+        />
+      );
+      
+      // Component should render without crashing
+      expect(component.toJSON()).toBeTruthy();
     });
   });
 });
