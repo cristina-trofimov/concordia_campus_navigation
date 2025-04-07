@@ -244,6 +244,7 @@ function SearchBars(
 
             {origin.length > 0 && destination.length > 0 && (
                 <>
+
                     {/* Selected Transport Mode Title */}
                     <View style={SearchBarsStyle.selectedModeContainer}>
                         <Text style={SearchBarsStyle.selectedModeText}>

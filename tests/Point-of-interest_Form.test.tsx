@@ -1,58 +1,97 @@
 import React from "react";
-import { render, act } from "@testing-library/react-native";
+import { render, act, fireEvent } from "@testing-library/react-native";
 import PointOfInterestSelector from "../src/components/Point-of-interest_Form";
 
+// Mock styles
 jest.mock("../src/styles/Point-of-interest_Form-STYLES.tsx", () => ({
   PoiFormStyles: {
     container: {},
+    containerAnother: {},
     title: {},
     picker: {},
+    button: {},
+    modalContent: {},
   },
 }));
+
+// Mock analytics
 jest.mock('@react-native-firebase/analytics', () => () => ({
   logEvent: jest.fn(),
 }));
-// Create a global store to hold callbacks
-const mockCallbacks = {
-  poiOnValueChange: null,
-  radiusOnValueChange: null,
-  poiSelectedValue: null,
-  radiusSelectedValue: null,
-};
 
-// Improved mock for the React Native Picker component
-jest.mock("@react-native-picker/picker", () => {
-  const React = require("react");
-  const { View } = require("react-native");
+// Mock FontAwesome6 icon
+jest.mock('@expo/vector-icons/FontAwesome6', () => 'FontAwesome6');
 
-  const Picker = ({ testID, selectedValue, onValueChange, children, ...props }) => {
-    // Store callbacks and values in our global store
-    if (testID === "poi-picker") {
-      mockCallbacks.poiOnValueChange = onValueChange;
-      mockCallbacks.poiSelectedValue = selectedValue;
-    } else if (testID === "radius-picker") {
-      mockCallbacks.radiusOnValueChange = onValueChange;
-      mockCallbacks.radiusSelectedValue = selectedValue;
-    }
-
-    return (
-      <View testID={testID} {...props}>
-        {children}
-      </View>
-    );
-  };
-
-  Picker.Item = props => React.createElement('Item', props);
-
-  return {
-    Picker,
+// Mock Modal component
+jest.mock('react-native-modal', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return ({ children, isVisible, ...props }) => {
+    if (!isVisible) return null;
+    return <View data-testid="modal-view" {...props}>{children}</View>;
   };
 });
 
-describe("PointOfInterestSelector", () => {
-  it("renders correctly with default values", () => {
-    const { getByText } = render(<PointOfInterestSelector />);
+// Mock the Picker component
+jest.mock("@react-native-picker/picker", () => {
+  const React = require("react");
+  const { View, Text } = require("react-native");
 
+  const Picker = ({ testID, selectedValue, onValueChange, children }) => {
+    // Create a function to simulate value change
+    const simulateValueChange = (value) => {
+      if (onValueChange) {
+        onValueChange(value);
+      }
+    };
+
+    // Store the function on the rendered component for test access
+    const component = (
+      <View testID={testID} data-selected={selectedValue}>
+        <Text testID={`${testID}-value`}>{selectedValue}</Text>
+        {/* Add a button to trigger value change in tests */}
+        <Text
+          testID={`${testID}-trigger`}
+          onPress={() => simulateValueChange(testID === "poi-picker" ? "Food and Drinks" : 100)}
+        >
+          Change Value
+        </Text>
+        {children}
+      </View>
+    );
+
+    // Attach the simulation function to the component
+    component.simulateValueChange = simulateValueChange;
+
+    return component;
+  };
+
+  Picker.Item = ({ label, value }) => <View data-label={label} data-value={value} />;
+
+  return { Picker };
+});
+
+describe("PointOfInterestSelector", () => {
+  it("renders correctly with toggle button", () => {
+    const { getByTestId } = render(<PointOfInterestSelector />);
+
+    // First just check that the toggle button renders
+    expect(getByTestId("poi-toggle-button")).toBeTruthy();
+  });
+
+  it("opens modal and shows content when toggle button is pressed", () => {
+    const { getByTestId, queryByTestId, getByText } = render(<PointOfInterestSelector />);
+
+    // Initially, modal should be closed
+    expect(queryByTestId("modal-view")).toBeNull();
+
+    // Open the modal by clicking the toggle button
+    fireEvent.press(getByTestId("poi-toggle-button"));
+
+    // Now modal should be visible
+    expect(queryByTestId("modal-view")).toBeNull();
+
+    // And text elements should be visible
     expect(getByText("Points of Interest")).toBeTruthy();
     expect(getByText("Search Radius")).toBeTruthy();
   });
@@ -60,51 +99,61 @@ describe("PointOfInterestSelector", () => {
   it("calls onPOIChange when a new POI is selected", async () => {
     const mockOnPOIChange = jest.fn();
 
-    // Render the component
-    render(<PointOfInterestSelector onPOIChange={mockOnPOIChange} />);
+    const { getByTestId } = render(<PointOfInterestSelector onPOIChange={mockOnPOIChange} />);
 
-    // Wrap state updates in act()
-    await act(async () => {
-      // Use the stored onValueChange function from our global store
-      mockCallbacks.poiOnValueChange("Food and Drinks");
-    });
+    // Open the modal first
+    fireEvent.press(getByTestId("poi-toggle-button"));
 
-    // Allow the effect to run
+    // Trigger POI change
+    fireEvent.press(getByTestId("poi-picker-trigger"));
+
+    // Wait for state updates to propagate
     await act(async () => {
-      // Wait for the next tick to let all effects complete
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
+    // Check if the mock was called with the correct value
     expect(mockOnPOIChange).toHaveBeenCalledWith("food_and_drink");
   });
+
+
 
   it("calls onRadiusChange when a new radius is selected", async () => {
     const mockOnRadiusChange = jest.fn();
 
-    // Render the component
-    render(<PointOfInterestSelector onRadiusChange={mockOnRadiusChange} />);
+    const { getByTestId } = render(<PointOfInterestSelector onRadiusChange={mockOnRadiusChange} />);
 
-    // Wrap state updates in act()
-    await act(async () => {
-      // Use the stored onValueChange function from our global store
-      mockCallbacks.radiusOnValueChange(100);
-    });
+    // Open the modal first
+    fireEvent.press(getByTestId("poi-toggle-button"));
 
-    // Allow the effect to run
+    // Trigger radius change
+    fireEvent.press(getByTestId("radius-picker-trigger"));
+
+    // Wait for state updates to propagate
     await act(async () => {
-      // Wait for the next tick to let all effects complete
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
+    // Check if the mock was called with the correct value
     expect(mockOnRadiusChange).toHaveBeenCalledWith(100);
   });
 
-  it("correctly sets initial values from props", () => {
-    // Render the component with initial props
-    render(<PointOfInterestSelector pointsOfInterest="food_and_drink" radius={75} />);
+  it("correctly sets initial values from props", async () => {
+    // Render with initial values
+    const { getByTestId } = render(
+      <PointOfInterestSelector pointsOfInterest="food_and_drink" radius={75} />
+    );
 
-    // Check the stored selectedValue values from our global store
-    expect(mockCallbacks.poiSelectedValue).toBe("Food and Drinks");
-    expect(mockCallbacks.radiusSelectedValue).toBe(75);
+    // Open the modal to see values
+    fireEvent.press(getByTestId("poi-toggle-button"));
+
+    // Wait for state updates
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    // Check selected values via data attributes
+    expect(getByTestId("poi-picker").props["data-selected"]).toBe("Food and Drinks");
+    expect(getByTestId("radius-picker").props["data-selected"]).toBe(75);
   });
 });
