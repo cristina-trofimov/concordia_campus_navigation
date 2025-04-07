@@ -289,10 +289,10 @@ export default function MapComponent({
           </PointAnnotation>
         )}
 
-        {routeSegments?.map((segment, index) => (
+        {routeSegments?.map((segment) => (
           <Mapbox.ShapeSource
-            key={`segment-${index}`}
-            id={`routeSource-${index}`}
+            key={`segment-${segment.mode}`}
+            id={`routeSource-${segment.mode}`}
             shape={{
               type: "FeatureCollection",
               features: [
@@ -311,7 +311,7 @@ export default function MapComponent({
             }}
           >
             <Mapbox.LineLayer
-              id={`routeLine-${index}`}
+              id={`routeLine-${segment.mode}`}
               style={{
                 lineColor: getLineColor(segment.mode),
                 lineWidth: 3,

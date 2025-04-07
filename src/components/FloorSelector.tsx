@@ -61,7 +61,7 @@ export const FloorSelector = () => {
                         <View style={FloorSelectorStyle.dropdownOptions}>
                             {floorList.map((floor, index) => (
                                 <TouchableOpacity
-                                    key={index}
+                                    key={floor}
                                     style={[
                                         FloorSelectorStyle.option,
                                         index === floorList.length - 1 && { borderBottomWidth: 0 }

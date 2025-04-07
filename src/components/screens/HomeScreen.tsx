@@ -27,11 +27,11 @@ export function HomeScreen() {
 
   const renderUpcomingClasses = () => {
     if (inputDestination === "" && classEvents.length > 0) {
-      return classEvents.map((event, index) => (
-        <UpcomingClassItem 
-          calendarEvent={event} 
-          key={index} 
-          setInputDestination={setInputDestination} 
+      return classEvents.map((event) => (
+        <UpcomingClassItem
+          calendarEvent={event}
+          key={event.id}
+          setInputDestination={setInputDestination}
         />
       ));
     }

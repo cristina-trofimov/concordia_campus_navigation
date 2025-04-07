@@ -116,7 +116,7 @@ const DirectionsSteps = () => {
 
       {/* Instruction List */}
       {htmlInstructions.length > 0 && !sameBuilding &&
-        htmlInstructions.map((instruction, index) => {
+        htmlInstructions.map((instruction) => {
           const iconMappings: { [key: string]: string } = {
             destination: "location-on",
             left: "turn-left",
@@ -149,7 +149,7 @@ const DirectionsSteps = () => {
             : null;
 
           return (
-            <View key={index} style={DirectionStepsStyle.instructionsList}>
+            <View key={instruction} style={DirectionStepsStyle.instructionsList}>
               <View>
                 <View style={DirectionStepsStyle.iconsBox}>
                   {instructionsIconsDisplay && (

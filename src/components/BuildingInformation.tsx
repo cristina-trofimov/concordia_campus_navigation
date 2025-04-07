@@ -117,8 +117,8 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                         {departments && departments.length > 0 && (
                             <View style={BuildingInfoStyle.infoSection}>
                                 <Text style={BuildingInfoStyle.sectionTitle}>Departments:</Text>
-                                {departments.map((dept, index) => (
-                                    <Text key={index} style={BuildingInfoStyle.listItem}>
+                                {departments.map((dept) => (
+                                    <Text key={dept} style={BuildingInfoStyle.listItem}>
                                         {dept}
                                     </Text>
                                 ))}
@@ -127,8 +127,8 @@ const BuildingInformation: React.FC<BuildingInformationProps> = ({ isVisible, on
                         {services && services.length > 0 && (
                             <View style={BuildingInfoStyle.infoSection}>
                                 <Text style={BuildingInfoStyle.sectionTitle}>Services:</Text>
-                                {services.map((service, index) => (
-                                    <Text key={index} style={BuildingInfoStyle.listItem}>
+                                {services.map((service) => (
+                                    <Text key={service} style={BuildingInfoStyle.listItem}>
                                         {service}
                                     </Text>
                                 ))}

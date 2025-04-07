@@ -31,7 +31,6 @@ let startTime = 0;
 };
 
 const LeftDrawer = () => {
-  const [isTesting, setIsTesting] = useState((globalThis as any).isTesting);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(-width)).current;
 
