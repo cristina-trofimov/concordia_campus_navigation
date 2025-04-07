@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Mapbox from '@rnmapbox/maps';
 import { useIndoor } from "../data/IndoorContext";
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature';
-import { FeatureCollection, LineString, Position } from 'geojson';
+import { LineString, Position } from 'geojson';
 import { EntryPointType, GraphNode, Graph } from '../interfaces/IndoorGraph';
-import { RoomInfo } from '../interfaces/RoomInfo';
 
 // A* pathfinding algorithm
 const findPath = (
@@ -264,7 +262,7 @@ const buildNavigationGraph = (features: IndoorFeatureCollection): Graph => {
   features.forEach((feature, featureIndex) => {
     if (feature.geometry.type === "Polygon" && feature.properties.indoor === "room") {
       // Create a node for each room (using centroid of polygon)
-      const roomRef = feature.properties.ref || `room_${featureIndex}`;
+      const roomRef = feature.properties.ref ?? `room_${featureIndex}`;
       const nodeId = `room_${roomRef}`;
       const centroid = calculatePolygonCentroid(feature.geometry.coordinates[0]);
       
@@ -410,7 +408,7 @@ const connectRoomsToCorridors = (graph: Graph): void => {
   // Connect each room to the closest corridor nodes
   roomNodes.forEach(roomNode => {
     // For specific rooms of interest, find more corridor connections
-    const connectionsToFind = specificRooms.includes(roomNode.roomNumber || "") ? 4 : 2;
+    const connectionsToFind = specificRooms.includes(roomNode.roomNumber ?? "") ? 4 : 2;
     
     // Find the closest corridor nodes
     const closestNodes = corridorNodes
@@ -431,7 +429,7 @@ const connectRoomsToCorridors = (graph: Graph): void => {
     });
     
     // Ensure important rooms have connections
-    if (specificRooms.includes(roomNode.roomNumber || "") && roomNode.neighbors.length === 0) {
+    if (specificRooms.includes(roomNode.roomNumber ?? "") && roomNode.neighbors.length === 0) {
       // Force connection to the closest node
       if (closestNodes.length > 0) {
         roomNode.neighbors.push(closestNodes[0].node.id);
@@ -605,11 +603,11 @@ export const IndoorNavigation: React.FC = () => {
     const graph = buildNavigationGraph(indoorFeatures);
     
     // Get destination room node
-    const targetRoom = destinationRoom?.ref || "";
+    const targetRoom = destinationRoom?.ref ?? "";
     const endNodeId = targetRoom ? findRoomNode(graph, targetRoom) : null;
     
     // Get origin room node
-    const originRoomRef = originRoom?.ref || "";
+    const originRoomRef = originRoom?.ref ?? "";
     const startNodeId = originRoomRef ? findRoomNode(graph, originRoomRef) : null;
 
     // Case 1: Calculate route from entry point to destination (for destination floor)
@@ -633,7 +631,7 @@ export const IndoorNavigation: React.FC = () => {
     // Case 2: Calculate route from origin to entry point (for origin floor)
     if (startNodeId) {
       const entryType = getEntryPointTypeFromTransport();
-      const entryNodeId = findEntryPoint(graph, entryType, endNodeId || undefined);
+      const entryNodeId = findEntryPoint(graph, entryType, endNodeId ?? undefined);
       
       if (entryNodeId) {
         const originPath = findPath(graph, startNodeId, entryNodeId);
