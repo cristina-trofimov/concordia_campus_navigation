@@ -6,6 +6,7 @@ import { useCoords } from "../data/CoordsContext";
 import { IndoorFeatureCollection } from '../interfaces/IndoorFeature';
 import { FeatureCollection, LineString, Position } from 'geojson';
 import { EntryPointType, GraphNode, Graph } from '../interfaces/IndoorGraph';
+import { RoomInfo } from '../interfaces/RoomInfo';
 
 // A* pathfinding algorithm
 const findPath = (
@@ -567,146 +568,121 @@ const pathToLineString = (path: string[], graph: Graph): LineString => {
 };
 
 // Main navigation component
+// Main navigation component
+// Main navigation component
 export const IndoorNavigation: React.FC = () => {
   const { 
     indoorFeatures, 
     currentFloor, 
     destinationRoom, 
     originRoom,
-    indoorTransport // Use the transport preference from context
+    indoorTransport
   } = useIndoor();
   const { highlightedBuilding } = useCoords();
-  const [routePath, setRoutePath] = useState<LineString | null>(null);
-  const [debugNodes, setDebugNodes] = useState<Position[]>([]);
-  const [routeFloor, setRouteFloor] = useState<string | null>(null);
   
+  // Store both the path and the floor it belongs to
+  const [destinationRoute, setDestinationRoute] = useState<{
+    path: LineString | null;
+    floor: string | null;
+  }>({ path: null, floor: null });
+  
+  const [originRoute, setOriginRoute] = useState<{
+    path: LineString | null;
+    floor: string | null;
+  }>({ path: null, floor: null });
+
+  const [debugNodes, setDebugNodes] = useState<Position[]>([]);
+
   // Map indoorTransport string to EntryPointType enum
   const getEntryPointTypeFromTransport = (): EntryPointType => {
     switch(indoorTransport) {
-      case "stairs":
-        return EntryPointType.STAIRS;
-      case "escalator":
-        return EntryPointType.ESCALATOR;
-      case "elevator":
-        return EntryPointType.ELEVATOR;
-      default:
-        return EntryPointType.ELEVATOR; // Default to elevator if no preference
+      case "stairs": return EntryPointType.STAIRS;
+      case "escalator": return EntryPointType.ESCALATOR;
+      case "elevator": return EntryPointType.ELEVATOR;
+      default: return EntryPointType.ELEVATOR;
     }
   };
   
-  // Clear route when destination is cleared
+  // Clear routes when destination is cleared
   useEffect(() => {
     if (!destinationRoom) {
-      setRoutePath(null);
-      setRouteFloor(null);
+      setDestinationRoute({ path: null, floor: null });
+      setOriginRoute({ path: null, floor: null });
     }
   }, [destinationRoom]);
   
-  // Check if we should display the route on the current floor
-  const shouldShowRoute = (): boolean => {
-    return routePath !== null && currentFloor === routeFloor;
-  };
-  
-  // Clear route when floor changes
-  useEffect(() => {
-    if (routeFloor && currentFloor !== routeFloor) {
-      // Don't clear the stored route, just don't display it
-      // We'll keep the calculated route in case user returns to the correct floor
-      console.log("Floor changed, hiding route");
-    }
-  }, [currentFloor]);
-  
   useEffect(() => {
     if (indoorFeatures.length === 0 || !currentFloor) return;
-    if (!destinationRoom) return; // No destination selected
+    if (!destinationRoom) return;
+
+    console.log("Building navigation graph for floor:", currentFloor);
     
-    console.log("Building navigation graph...");
-    console.log("Current building:", highlightedBuilding?.properties.id);
-    console.log("Current floor:", currentFloor);
-    console.log("Transport preference:", indoorTransport);
-    
-    // Store the floor this route is valid for
-    setRouteFloor(currentFloor);
-    
-    // Build the navigation graph
+    // Build the navigation graph for the current floor
     const graph = buildNavigationGraph(indoorFeatures);
     
-    console.log(`Built graph with ${Object.keys(graph.nodes).length} nodes`);
-    
-    // Debug - collect corridor nodes for visualization
-    const corridorNodes: Position[] = Object.values(graph.nodes)
-      .filter(node => node.isCorridor)
-      .map(node => node.position);
-    setDebugNodes(corridorNodes);
-    
-    // Log all entry points found
-    const entryPoints = Object.values(graph.nodes).filter(node => node.isEntryPoint);
-    console.log(`Found ${entryPoints.length} entry points:`, 
-      entryPoints.map(ep => `${ep.id} (${ep.entryPointType})`));
-    
-    // Get destination room first so we can find the closest entry point to it
+    // Get destination room node
     const targetRoom = destinationRoom?.ref || "";
     const endNodeId = targetRoom ? findRoomNode(graph, targetRoom) : null;
     
-    if (!endNodeId) {
-      setRoutePath(null);
-      return;
-    }
-    
-    // Get starting point - use origin room if available, otherwise use entry point
-    let startNodeId: string | null = null;
-    
-    if (originRoom && originRoom.ref) {
-      startNodeId = findRoomNode(graph, originRoom.ref);
-      console.log(`Using origin room ${originRoom.ref} as starting point`);
-    }
-    
-    // If origin room not found, use the preferred transport type as starting point
-    // Find the one closest to the destination room
-    if (!startNodeId) {
+    // Get origin room node
+    const originRoomRef = originRoom?.ref || "";
+    const startNodeId = originRoomRef ? findRoomNode(graph, originRoomRef) : null;
+
+    // Case 1: Calculate route from entry point to destination (for destination floor)
+    if (endNodeId) {
       const entryType = getEntryPointTypeFromTransport();
-      startNodeId = findEntryPoint(graph, entryType, endNodeId);
-      console.log(`Using ${indoorTransport} closest to destination as starting point`);
-    }
-    
-    if (!startNodeId) {
-      setRoutePath(null);
-      return;
-    }
-    
-    console.log(`Finding path from ${startNodeId} to ${endNodeId}`);
-    
-    // Find the path
-    const path = findPath(graph, startNodeId, endNodeId);
-    
-    if (path) {
-      console.log(`Found path with ${path.length} nodes`);
-      console.log(`Path: ${path.join(' -> ')}`);
+      const entryNodeId = findEntryPoint(graph, entryType, endNodeId);
       
-      // Convert path to GeoJSON LineString
-      const lineString = pathToLineString(path, graph);
-      setRoutePath(lineString);
-    } else {
-      setRoutePath(null);
+      if (entryNodeId) {
+        const destPath = findPath(graph, entryNodeId, endNodeId);
+        if (destPath) {
+          console.log("Setting destination floor route for floor:", currentFloor);
+          setDestinationRoute({
+            path: pathToLineString(destPath, graph),
+            floor: currentFloor
+          });
+        } else {
+          setDestinationRoute(prev => ({ ...prev, path: null }));
+        }
+      }
+    }
+
+    // Case 2: Calculate route from origin to entry point (for origin floor)
+    if (startNodeId) {
+      const entryType = getEntryPointTypeFromTransport();
+      const entryNodeId = findEntryPoint(graph, entryType, endNodeId || undefined);
+      
+      if (entryNodeId) {
+        const originPath = findPath(graph, startNodeId, entryNodeId);
+        if (originPath) {
+          console.log("Setting origin floor route for floor:", currentFloor);
+          setOriginRoute({
+            path: pathToLineString(originPath, graph),
+            floor: currentFloor
+          });
+        } else {
+          setOriginRoute(prev => ({ ...prev, path: null }));
+        }
+      }
     }
   }, [indoorFeatures, currentFloor, originRoom, destinationRoom, indoorTransport]);
   
   return (
     <>
-      {/* Route path display - only show on the correct floor */}
-      {shouldShowRoute() && (
+      {/* Origin route (only show if we're on the origin floor) */}
+      {originRoute.path && originRoute.floor === currentFloor && (
         <Mapbox.ShapeSource
-          id="route-path"
+          id="origin-route-path"
           shape={{
             type: "Feature",
-            geometry: routePath as LineString,
+            geometry: originRoute.path,
             properties: {}
           }}
         >
           <Mapbox.LineLayer
-            id="route-line"
+            id="origin-route-line"
             style={{
-              lineColor: "#4285F4",
+              lineColor: "#4285F4", 
               lineWidth: 4,
               lineCap: "round",
               lineJoin: "round"
@@ -714,11 +690,31 @@ export const IndoorNavigation: React.FC = () => {
           />
         </Mapbox.ShapeSource>
       )}
-          
+      
+      {/* Destination route (only show if we're on the destination floor) */}
+      {destinationRoute.path && destinationRoute.floor === currentFloor && (
+        <Mapbox.ShapeSource
+          id="route-path"
+          shape={{
+            type: "Feature",
+            geometry: destinationRoute.path,
+            properties: {}
+          }}
+        >
+          <Mapbox.LineLayer
+            id="route-line"
+            style={{
+              lineColor: "#4285F4", 
+              lineWidth: 4,
+              lineCap: "round", 
+              lineJoin: "round"
+            }}
+          />
+        </Mapbox.ShapeSource>
+      )}
     </>
   );
 };
-
 // Helper component to integrate with your HighlightIndoorMap
 export const NavigationOverlay: React.FC = () => {
   const { inFloorView, indoorFeatures, setOriginRoom, setDestinationRoom } = useIndoor();
