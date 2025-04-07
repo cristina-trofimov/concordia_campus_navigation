@@ -1,11 +1,10 @@
 // SearchBars.tsx
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import SearchBar from './SearchBar';
 import getDirections from './Route';
 import { useCoords } from '../data/CoordsContext';
 import { useIndoor } from '../data/IndoorContext';
-import { Ionicons } from "@expo/vector-icons";
 import { SearchBarsStyle } from '../styles/SearchBarsStyle';
 import analytics from '@react-native-firebase/analytics';
 import ShuttleBusTransit from './ShuttleBusTransit';
@@ -245,7 +244,7 @@ function SearchBars(
 
             {origin.length > 0 && destination.length > 0 && (
                 <>
-                    
+
                     <TransportModeSelector
                         transportModes={transportModes}
                         selectedMode={selectedMode}
